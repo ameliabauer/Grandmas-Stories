@@ -22,7 +22,7 @@ p{font-size:18px;line-height:1.6;color:#526669;max-width:590px;margin:0 0 22px}
 .home-mode header{position:absolute;top:0;left:0;right:0;padding:24px clamp(18px,5vw,68px);pointer-events:none}
 .home-mode .brand{display:none}
 .home-mode .add-top{pointer-events:auto;width:48px;height:48px;border:1px solid #f0e2ce;background:#f5efe5ed;color:#29474b;font-size:31px;box-shadow:0 4px 16px #0d1e1d50}
-.home-mode .home-panel{width:100%;max-width:none;min-height:100svh;height:100svh;margin:0;padding:clamp(36px,8vw,100px);align-items:flex-start;justify-content:center;text-align:left;border:0;box-shadow:none;isolation:isolate;background-color:#193c3e;background-image:linear-gradient(90deg,rgba(12,31,32,.78) 0%,rgba(16,39,39,.58) 38%,rgba(18,35,34,.14) 100%),linear-gradient(0deg,rgba(14,22,20,.38),transparent 42%),url("https://resize.imagekit.co/AloU769G4ZtXoGSV-mEDp_vpcn2vUn7KtGaVK2d25bM/w%3A1024/plain/https%3A//replicate.delivery/xezq/kO0331WRwP71JZbJ5ce0fferWOfZLzmvnWBxgQnwSfazsrLYF/tmp70kvx7g5.jpg");background-size:cover;background-position:center 52%}
+.home-mode .home-panel{width:100%;max-width:none;min-height:100svh;height:100svh;margin:0;padding:clamp(36px,8vw,100px);align-items:flex-start;justify-content:center;text-align:left;border:0;box-shadow:none;isolation:isolate;background-color:#193c3e;background-image:linear-gradient(90deg,rgba(12,31,32,.78) 0%,rgba(16,39,39,.58) 38%,rgba(18,35,34,.14) 100%),linear-gradient(0deg,rgba(14,22,20,.38),transparent 42%),url("https://replicate.delivery/xezq/kO0331WRwP71JZbJ5ce0fferWOfZLzmvnWBxgQnwSfazsrLYF/tmp70kvx7g5.jpg");background-size:cover;background-position:center 52%}
 .home-mode .home-panel:after{display:none}
 .home-copy{position:relative;z-index:2;width:min(560px,48%);margin-left:7%;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:14px;min-height:100%;padding:0 0 3%}
 .home-panel .eyebrow{color:#edb28b;margin:0 0 3px}
@@ -88,7 +88,7 @@ button,.upload-box{touch-action:manipulation}
  header{min-height:48px}.brand{font-size:21px}.add-top{width:45px;height:45px}
  .panel{min-height:calc(100svh - 115px);margin:10px auto;padding:22px 16px}
  .home-mode header{padding:18px 18px}.home-mode .add-top{width:44px;height:44px}
- .home-mode .home-panel{min-height:100svh;height:100svh;padding:28px 24px;background-position:37% center;background-image:linear-gradient(90deg,rgba(10,29,30,.72),rgba(12,29,30,.28)),linear-gradient(0deg,rgba(12,20,18,.4),transparent 55%),url("https://resize.imagekit.co/AloU769G4ZtXoGSV-mEDp_vpcn2vUn7KtGaVK2d25bM/w%3A1024/plain/https%3A//replicate.delivery/xezq/kO0331WRwP71JZbJ5ce0fferWOfZLzmvnWBxgQnwSfazsrLYF/tmp70kvx7g5.jpg")}
+ .home-mode .home-panel{min-height:100svh;height:100svh;padding:28px 24px;background-position:37% center;background-image:linear-gradient(90deg,rgba(10,29,30,.72),rgba(12,29,30,.28)),linear-gradient(0deg,rgba(12,20,18,.4),transparent 55%),url("https://replicate.delivery/xezq/kO0331WRwP71JZbJ5ce0fferWOfZLzmvnWBxgQnwSfazsrLYF/tmp70kvx7g5.jpg")}
  .home-copy{width:min(90%,480px);margin:0;min-height:100%;padding:0 0 18%;gap:12px}
  .home-panel h1{font-size:clamp(54px,12vw,76px)}
  .home-panel p{font-size:17px}
