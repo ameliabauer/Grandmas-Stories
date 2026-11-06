@@ -2,21 +2,20 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f7f2ea"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/style.css?v=13"><title>Grandma’s Stories</title>
+<meta name="theme-color" content="#183b40"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/style.css?v=14"><title>Grandma’s Stories</title>
 </head>
-<body><main class="shell">
+<body class="home-mode"><main class="shell">
 <header><div class="brand"><span>♥</span> Grandma’s Stories</div><button class="add-top" id="addFromHome" aria-label="Add family photographs" title="Add family photographs">＋</button></header>
 <section id="welcome" class="panel home-panel">
   <div class="home-copy">
     <div class="eyebrow">A family album, shared</div>
-    <h1>Ready for a little story?</h1>
-    <p id="homeMessage">We’ll bring up a photograph and see what memories come to mind.</p>
+    <h1>Grandma’s<br>Stories</h1>
+    <p id="homeMessage">Real stories. Lasting memories.</p>
     <button class="primary start-home" id="startSession" disabled>Start <b>→</b></button>
     <small class="muted" id="photoCount">Your family album is waiting.</small>
-    <small class="home-hint">You can talk naturally. No buttons to hold.</small>
+    <small class="home-hint">A quiet moment, one photograph at a time.</small>
   </div>
-  <div class="home-materials" aria-hidden="true"><span class="material-walnut"></span><span class="material-corduroy"></span></div>
 </section>
 <section id="addPanel" class="panel hidden">
   <div class="eyebrow">Add to the family album</div><h1>Bring out the old photos.</h1>
@@ -37,11 +36,19 @@
   <button class="primary" id="accept" disabled>Let’s begin <b>→</b></button><button class="text" id="notnow">Not now</button>
 </section>
 <section id="live" class="panel live-panel hidden" data-audio-state="listening">
-  <div class="live-photo-wrap" id="livePhotoWrap"><img id="livePhoto" alt="A family photograph to look at together"></div>
+  <div class="live-photo-wrap photo-enter" id="livePhotoWrap">
+    <div class="album-paper">
+      <div class="album-kicker">A photograph from the family album</div>
+      <img id="livePhoto" alt="A family photograph to look at together">
+      <div class="album-caption"><span class="quote-mark">“</span><h2 id="liveQuestion">Tell me about this time…</h2></div>
+    </div>
+  </div>
   <div class="live-story-side">
-    <div class="eyebrow">A moment from the family album</div>
-    <h2 id="liveQuestion">I wonder what you remember about this one?</h2>
-    <div class="turntable" id="turntable" aria-label="Audio status: listening"><div class="record"><div class="record-grooves"></div><div class="record-label"><span>GRANDMA’S<br>STORIES</span></div></div><div class="tonearm"><span></span></div></div>
+    <div class="audio-brand">Grandma’s Stories</div>
+    <div class="turntable" id="turntable" aria-label="Audio status: listening">
+      <div class="record"><div class="record-grooves"></div><div class="record-label"><span>GRANDMA’S<br>STORIES</span></div></div>
+      <div class="tonearm"><span></span></div>
+    </div>
     <div class="voice-status" id="voiceStatus" aria-live="polite"><span class="voice-dot"></span><span>Whenever you’re ready, I’m listening.</span></div>
     <div id="timer">0:00</div><div id="transcript" aria-live="polite"></div>
     <div class="live-actions"><button class="next-photo" id="nextPhoto">Next Photo <b>→</b></button><button class="stop" id="stop">I’m done for today</button></div>
@@ -51,5 +58,5 @@
 <section id="saved" class="panel hidden"><div class="flower">✿</div><h1>Thank you. That was lovely.</h1><p>Your story has been saved with this photograph on this iPad.</p><div id="savedPhoto" class="saved-photo"></div><div class="notice">Stored on this iPad only. It is not yet backed up online.</div><button class="primary" id="anotherStory">Another story <b>→</b></button><button class="text" id="finish">That’s enough for today</button></section>
 <section id="error" class="panel hidden"><div class="flower">♡</div><h1>Let’s try again.</h1><p id="errorText">We couldn’t start the conversation right now.</p><button class="primary" id="retry">Try again <b>→</b></button><button class="text" id="errorBack">Back home</button></section>
 <audio id="remoteAudio" autoplay playsinline></audio>
-<footer>Made with love, for the stories that matter. <span>♥</span></footer>
-</main><script src="/app.js?v=13" defer></script></body></html>
+<footer>Made with love, for the stories that matter. <span>♥</span><small class="image-credit">Room image: <a href="https://roomai.com/ideas/orange-sofa-and-teal-cone-fireplace-lounge-1580" target="_blank" rel="noreferrer">Room AI</a> · Turntable: <a href="https://unsplash.com/photos/black-vinyl-record-player-on-brown-wooden-table-ytOQrHL0V4w" target="_blank" rel="noreferrer">Samuel Regan-Asante / Unsplash</a></small></footer>
+</main><script src="/app.js?v=14" defer></script></body></html>
