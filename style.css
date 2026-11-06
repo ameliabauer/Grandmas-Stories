@@ -167,3 +167,7 @@ button,.upload-box{touch-action:manipulation}
  .live-mode .live-panel{min-height:100svh;height:auto}
  .live-story-side{display:flex}
 }
+
+@media(max-width:760px){.live-story-side .turntable{width:82px;max-width:82px;background:none}}
+@media(max-width:420px){.live-story-side .turntable{width:76px;max-width:76px}}
+@media(max-height:620px) and (orientation:landscape){.live-story-side .turntable{width:min(100%,240px);max-width:240px;background-image:linear-gradient(135deg,rgba(22,17,13,.16),rgba(22,17,13,.35)),url("https://images.unsplash.com/photo-1613311106434-89edb8bb30c8?auto=format&fit=crop&fm=jpg&q=75&w=1400")}}
