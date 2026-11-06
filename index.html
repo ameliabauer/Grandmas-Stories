@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f2ea"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/style.css?v=8"><title>Grandma’s Stories</title>
+<link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/style.css?v=9"><title>Grandma’s Stories</title>
 </head>
 <body><main class="shell">
 <header><div class="brand"><span>♥</span> Grandma’s Stories</div><button class="add-top" id="addFromHome" aria-label="Add family photographs" title="Add family photographs">＋</button></header>
-<section id="welcome" class="panel home-panel">
+<section id="welcome" class="panel home-panel"><img class="scene-art room-art" src="/assets/room.svg" alt="" aria-hidden="true">
   <div class="flower">✿</div><h1>Ready for a little story?</h1>
   <p id="homeMessage">We’ll bring up a photograph and see what memories come to mind.</p>
   <button class="primary start-home" id="startSession" disabled>Start <b>→</b></button>
@@ -32,8 +32,8 @@
   <label class="check"><input type="checkbox" id="agree"><span>I understand, and I’d like to continue.</span></label>
   <button class="primary" id="accept" disabled>Let’s begin <b>→</b></button><button class="text" id="notnow">Not now</button>
 </section>
-<section id="live" class="panel live-panel hidden" data-audio-state="listening">
-  <div class="live-photo-wrap" id="livePhotoWrap"><img id="livePhoto" alt="A family photograph to look at together"></div>
+<section id="live" class="panel live-panel hidden" data-audio-state="listening"><img class="scene-art live-wood-art" src="/assets/vinyl.svg" alt="" aria-hidden="true">
+  <div class="live-photo-wrap" id="livePhotoWrap"><img class="album-art" src="/assets/album.svg" alt="" aria-hidden="true"><img id="livePhoto" alt="A family photograph to look at together"></div>
   <h2 id="liveQuestion">I wonder what you remember about this one?</h2>
   <div class="turntable" id="turntable" aria-label="Audio status: listening"><div class="record"><div class="record-grooves"></div><div class="record-label"><span>GRANDMA’S<br>STORIES</span></div></div><div class="tonearm"><span></span></div></div>
   <div class="voice-status" id="voiceStatus" aria-live="polite"><span class="voice-dot"></span><span>Whenever you’re ready, I’m listening.</span></div>
@@ -45,4 +45,4 @@
 <section id="error" class="panel hidden"><div class="flower">♡</div><h1>Let’s try again.</h1><p id="errorText">We couldn’t start the conversation right now.</p><button class="primary" id="retry">Try again <b>→</b></button><button class="text" id="errorBack">Back home</button></section>
 <audio id="remoteAudio" autoplay playsinline></audio>
 <footer>Made with love, for the stories that matter. <span>♥</span></footer>
-</main><script src="/app.js?v=8" defer></script></body></html>
+</main><script src="/app.js?v=9" defer></script></body></html>
