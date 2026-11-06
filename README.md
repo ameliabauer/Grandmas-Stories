@@ -29,3 +29,8 @@ npm install && npm run dev
 3. Add private cloud storage and story/photo APIs; synchronize sessions and family archive across devices.
 4. Add durable offline upload queue, duplicate protection, backups, export and deletion.
 5. Run accessibility, privacy, reliability and family acceptance tests.
+
+## Design image credits
+
+- Living-room photograph: Room AI, [Orange Sofa and Teal Cone Fireplace Lounge](https://roomai.com/ideas/orange-sofa-and-teal-cone-fireplace-lounge-1580).
+- Turntable photograph: Samuel Regan-Asante, [Unsplash](https://unsplash.com/photos/black-vinyl-record-player-on-brown-wooden-table-ytOQrHL0V4w).
