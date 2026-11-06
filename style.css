@@ -197,3 +197,64 @@ button{min-height:44px}
  footer{padding-top:4px}
 }
 @media(prefers-reduced-motion:reduce){.photo-enter img{animation:none}}
+
+/* Reference-aligned scene composition */
+:root{--midnight-teal:#1c4141;--walnut:#583820;--walnut-deep:#382316;--paper:#f1dfc1;--burnt-orange:#b95127;--corduroy:#c36532}
+body{background:#eee5d7;color:#38291e}
+.shell{max-width:1220px;padding:18px 26px}
+.panel{border:7px solid #69452c;border-radius:15px;box-shadow:0 5px 0 #382316,0 14px 30px #34201440,inset 0 0 0 2px #c29365}
+.home-panel{position:relative;isolation:isolate;min-height:min(850px,calc(100svh - 50px));padding:clamp(110px,17vh,160px) 8% 170px 28%;align-items:center;justify-content:flex-start;text-align:center;gap:10px;
+background:
+linear-gradient(90deg,transparent 0 25%,#1b3e3e 25% 100%),
+linear-gradient(180deg,#1b3e3e 0 57%,#70472c 57% 100%);
+}
+.home-panel:before{content:"";position:absolute;z-index:-1;inset:0;border:0;border-radius:0;background:
+radial-gradient(circle at 12% 12%,#d7a15d 0 2px,transparent 3px),
+linear-gradient(90deg,#4c2b18 0 24%,transparent 24%),
+linear-gradient(180deg,transparent 0 57%,#6e482c 57% 100%);
+box-shadow:inset 0 0 0 3px #b78455}
+.home-panel:after{content:"";position:absolute;z-index:-1;left:27%;right:-3%;bottom:0;height:42%;border-radius:70px 0 0 0;
+background:
+repeating-linear-gradient(90deg,#a94b21 0 3px,#c96b37 3px 7px,#a94b21 7px 10px,#d17c49 10px 13px),
+linear-gradient(180deg,#b85a2b,#8b401f);
+border-top:8px solid #714326;box-shadow:inset 0 12px 0 #d17a48,0 -4px 0 #e7d4b5}
+.home-panel>*{position:relative;z-index:1}
+.home-panel .flower{display:none}
+.home-panel h1{font-size:clamp(44px,6vw,76px);line-height:.92;color:#f7e8cf;text-shadow:0 2px 3px #16110d;max-width:540px;margin:0 auto}
+.home-panel p{font-size:clamp(16px,2vw,21px);color:#f6e8d2;max-width:440px;margin:0 auto 12px}
+.home-panel .muted,.home-panel .home-hint{color:#f2dfc4;text-shadow:0 1px 3px #21170f}
+.home-panel .start-home{width:min(100%,340px);min-height:74px;border:2px solid #e5a16b;border-radius:44px;background:repeating-linear-gradient(90deg,#ad4b24 0 4px,#ca6b39 4px 8px,#ad4b24 8px 12px);box-shadow:0 5px 0 #69381e,0 12px 24px #24170e66;font-size:clamp(24px,3vw,32px);margin:12px auto 4px}
+.live-panel{position:relative;isolation:isolate;background:
+repeating-linear-gradient(0deg,#68442b 0 2px,#805838 2px 5px,#68442b 5px 8px),
+linear-gradient(135deg,#68442b,#38271d);border-color:#6d472b}
+.live-panel:before{inset:5px;border:1px solid #bd9161}
+.live-photo-wrap{padding:16px;background:linear-gradient(135deg,#815b3d,#4b3020 42%,#a27a50);box-shadow:0 8px 22px #20150e88}
+.live-photo-wrap:before{inset:8px;border-color:#dfbd8e}
+.live-photo-wrap img{border:11px solid #f1dfc1;box-shadow:0 2px 10px #28190f}
+#liveQuestion{color:#f7e9d3;font-size:clamp(26px,3vw,40px)}
+.turntable{width:clamp(150px,21vw,250px);height:clamp(150px,21vw,250px)}
+.record{background:repeating-radial-gradient(circle at center,#090b0b 0 2px,#2b2c29 2.5px 3.4px,#101211 4px 5px);box-shadow:0 12px 22px #160f0c99,inset 0 0 0 2px #55534b}
+.record:before{inset:8%;border-color:#88847a66}
+.record-label{background:#b95127;border:3px solid #e3a16c;color:#fff0d8}
+.voice-status{color:#f7e8d1}
+.voice-dot{background:#df783c;box-shadow:0 0 0 7px #df783c30,0 0 18px #df783c99}
+.next-photo{background:repeating-linear-gradient(90deg,#ad4b24 0 4px,#ca6b39 4px 8px,#ad4b24 8px 12px);border:1px solid #e5a16b;color:#fff1dd;border-radius:32px}
+.stop{background:#ead9bd;color:#432d1e;border:1px solid #c29b70;border-radius:32px}
+.primary{background:repeating-linear-gradient(90deg,#ad4b24 0 4px,#ca6b39 4px 8px,#ad4b24 8px 12px);border:1px solid #e5a16b;border-radius:36px}
+@media(max-width:760px){
+.shell{padding:8px 10px}
+.panel,.home-panel{min-height:calc(100svh - 20px);margin:2px auto 10px}
+.home-panel{padding:clamp(110px,17vh,150px) 7% 150px;align-items:center;background:linear-gradient(90deg,#70472c 0 25%,#1b3e3e 25% 100%)}
+.home-panel:after{left:12%;height:36%}
+.home-panel h1{font-size:clamp(40px,10vw,62px)}
+.live-panel{gap:10px}
+.live-photo-wrap{height:clamp(220px,38svh,380px)}
+}
+@media(max-width:420px){
+.home-panel{padding-top:115px}
+.home-panel .start-home{min-height:64px}
+.live-panel{padding:14px 12px}
+.live-photo-wrap{height:clamp(180px,31svh,260px);padding:9px}
+.live-photo-wrap img{border-width:7px}
+.turntable{width:112px;height:112px}
+}
