@@ -1,26 +1,31 @@
 # Grandma's Stories
 
-A voice-first storytelling experience designed around dignity, consent, accessibility and family preservation.
+A photo-led family storytelling experience. The heart of the product is recreating the feeling of sitting together in a living room, opening an old box of photographs, and letting the pictures bring memories to the surface.
 
-## Current milestone
-- Grandma-first responsive web app / PWA shell
-- Plain-language AI and recording consent before microphone use
-- OpenAI Realtime WebRTC session proxy (API key remains server-side)
-- Local audio recording and IndexedDB save
-- Large touch controls, spoken conversation, transcript captions, explicit stop and eight-minute session cap
+## Current milestone: photo-led iPad prototype
+- Grandma-first responsive web app / PWA shell.
+- A family photo album with image upload, one-photo-at-a-time viewing, and optional family context.
+- The selected photograph is shown throughout the conversation and sent as visual context to the Realtime session.
+- Conversational guidance asks the AI to describe only what is visibly present, avoid guessing identities or facts, and let Grandma lead the memory.
+- Plain-language AI and recording consent before microphone use.
+- OpenAI Realtime WebRTC session proxy (API key remains server-side).
+- Local audio recording and transcript stored with the photograph reference in IndexedDB.
+- Large touch controls, explicit stop, and eight-minute session cap.
 
-## Important limitation
-This first iteration stores recordings and transcripts on the same iPad only. It does not yet provide secure cross-device family backup. Do not treat it as a preservation archive until private cloud storage, authentication, backups, and export/delete flows are complete and tested.
+## Important limitations
+This milestone stores photographs, recordings, and transcripts on the same iPad only. There is no secure family login, remote upload, cross-device sync, cloud archive, backup, or family sharing yet. Do not treat it as a permanent preservation archive until those features and recovery/export/delete flows are complete and tested.
+
+The photo album is intentionally local for this first photo-led interaction prototype. The next milestone is a secure family web portal so relatives can upload and curate photographs remotely, with those photographs delivered privately to Grandma's iPad.
 
 ## Environment
-Copy `.env.example` to `.env.local` and set `OPENAI_API_KEY`. Optional: `REALTIME_MODEL`, `REALTIME_VOICE`, and `GRANDMA_NAME`.
+Set OPENAI_API_KEY in the Vercel project. Optional: REALTIME_MODEL, REALTIME_VOICE.
 
 ## Run
-`npm install && npm run dev`
+npm install && npm run dev
 
-## Production roadmap
-1. Complete live voice and iPad testing.
-2. Provision private object storage and relational data; implement secure family authentication and story/photo endpoints.
-3. Add a private photo queue and non-leading image-context handling.
-4. Implement durable offline upload queue, duplicate protection, backups, export and deletion.
-5. Run accessibility, privacy, reliability and real-user acceptance tests.
+## Roadmap
+1. Complete live photo + voice session testing on a physical iPad, including confirmation that the Realtime model accepts image input.
+2. Build secure family authentication and remote photo upload/curation.
+3. Add private cloud storage and story/photo APIs; synchronize sessions and family archive across devices.
+4. Add durable offline upload queue, duplicate protection, backups, export and deletion.
+5. Run accessibility, privacy, reliability and family acceptance tests.
