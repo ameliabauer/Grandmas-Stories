@@ -2,8 +2,9 @@
 
 A photo-led family storytelling experience. The heart of the product is recreating the feeling of sitting together in a living room, opening an old box of photographs, and letting the pictures bring memories to the surface.
 
-## Current milestone: photo-led iPad prototype
-- Grandma-first responsive web app / PWA shell.
+## Current milestone: family-first iPad experience
+- Grandma-first responsive web app / PWA shell, retaining the approved mid-century living-room aesthetic.
+- Opens directly into the family album without email sign-in or account setup.
 - A family photo album with image upload, one-photo-at-a-time viewing, and optional family context.
 - The selected photograph is shown throughout the conversation and sent as visual context to the Realtime session.
 - Conversational guidance asks the AI to describe only what is visibly present, avoid guessing identities or facts, and let Grandma lead the memory.
@@ -36,12 +37,8 @@ npm install && npm run dev
 - Turntable photograph: Samuel Regan-Asante, [Unsplash](https://unsplash.com/photos/black-vinyl-record-player-on-brown-wooden-table-ytOQrHL0V4w).
 
 
-## New milestone: secure family access foundation
-- Email magic-link sign-in using Supabase Auth.
-- First-time users can create a private family space.
-- The creator becomes the family owner, and the first person profile (Betty by default) is created in the family archive.
-- Family membership and records are protected by PostgreSQL row-level security.
-- Supabase URL and publishable key are read from Vercel environment variables through a small public config endpoint; no database password or service-role key is exposed to the browser.
-
-### Current boundary
-This milestone connects sign-in, family membership and the first person profile to Supabase. Existing photographs, recordings and transcripts are still stored locally on the iPad. Private cloud photo/audio storage and cross-device synchronization are the next implementation milestone.
+## Family-first access decision
+- The current prototype is intended for one family and opens directly to the album.
+- Email magic-link sign-in and first-family setup have been removed from the app's entry path because they blocked access and created unnecessary friction.
+- Photos, recordings and transcripts continue to be stored in the existing local IndexedDB on this iPad. Existing local data is not cleared by this change.
+- Supabase remains the planned foundation for a later private cloud archive, family invitations, backup and cross-device access. Those features are not yet implemented and should not be described as available.
