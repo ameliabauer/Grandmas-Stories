@@ -11,6 +11,91 @@ function compressImage(file){return new Promise((resolve,reject)=>{const url=URL
 
 const SUPABASE_URL='https://zxsumrlxfuqnjjuaszbs.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_LtISsb2h1FDOayTDinoZ2g_PDmqfzbb';
+async function uploadPhotoToCloud(photo){
+  if(!cloudUser||!cloudFamilyId||photo.cloudAssetId)return photo;
+  const {data:asset,error:assetError}=await supabaseClient.from('media_assets').insert({family_id:cloudFamilyId,asset_type:'photo',title:photo.title||'Family photograph',created_by:cloudUser.id}).select('id').single();
+  if(assetError)throw assetError;
+  const objectKey=cloudFamilyId+'/'+asset.id+'/original.jpg';
+  const {error:uploadError}=await supabaseClient.storage.from('family-archive').upload(objectKey,photo.image,{contentType:'image/jpeg',upsert:false});
+  if(uploadError){await supabaseClient.from('media_assets').delete().eq('id',asset.id).eq('family_id',cloudFamilyId);throw uploadError;}
+  const {error:fileError}=await supabaseClient.from('media_files').insert({family_id:cloudFamilyId,media_asset_id:asset.id,variant:'original',storage_provider:'supabase',bucket_name:'family-archive',object_key:objectKey,mime_type:'image/jpeg',byte_size:photo.image.size,created_by:cloudUser.id});
+  if(fileError){await supabaseClient.storage.from('family-archive').remove([objectKey]);await supabaseClient.from('media_assets').delete().eq('id',asset.id).eq('family_id',cloudFamilyId);throw fileError;}
+  const updated={...photo,cloudAssetId:asset.id};
+  await store('photos','readwrite',st=>st.put(updated));
+  return updated;
+}
+async function syncCloudPhotos(){
+  if(!cloudUser||!cloudFamilyId)return;
+  let local=await allPhotos();
+  for(const photo of local){if(!photo.cloudAssetId)await uploadPhotoToCloud(photo);}
+  const {data:assets,error}=await supabaseClient.from('media_assets').select('id,title,created_at').eq('family_id',cloudFamilyId).eq('asset_type','photo').order('created_at',{ascending:true});
+  if(error)throw error;
+  if(!assets?.length)return;
+  const ids=assets.map(a=>a.id);
+  const {data:files,error:fileError}=await supabaseClient.from('media_files').select('media_asset_id,object_key,mime_type').eq('family_id',cloudFamilyId).eq('variant','original').in('media_asset_id',ids);
+  if(fileError)throw fileError;
+  const byAsset=new Map((files||[]).map(f=>[f.media_asset_id,f]));
+  local=await allPhotos();
+  const localCloudIds=new Set(local.map(p=>p.cloudAssetId).filter(Boolean));
+  for(const asset of assets){
+    if(localCloudIds.has(asset.id))continue;
+    const file=byAsset.get(asset.id);if(!file)continue;
+    const {data:signed,error:signedError}=await supabaseClient.storage.from('family-archive').createSignedUrl(file.object_key,3600);
+    if(signedError)throw signedError;
+    const response=await fetch(signed.signedUrl);if(!response.ok)throw Error('A family photograph could not be downloaded.');
+    const image=await response.blob();
+    await store('photos','readwrite',st=>st.put({id:'cloud-'+asset.id,cloudAssetId:asset.id,title:asset.title||'Family photograph',notes:'',image,createdAt:asset.created_at||new Date().toISOString()}));
+  }
+  await refreshPhotos();
+}
+function transcriptForCloud(lines){
+  return (lines||[]).filter(line=>line.text).map(line=>(line.who==='user'?'Betty':'A gentle thought')+': '+line.text).join('\\n');
+}
+async function syncStoryToCloud(story){
+  if(!cloudUser||!cloudFamilyId)return false;
+  const {data:row,error}=await supabaseClient.from('stories').insert({family_id:cloudFamilyId,title:(story.photoTitle||'A family story').slice(0,240),original_text:transcriptForCloud(story.lines),status:'draft',created_by:cloudUser.id,updated_by:cloudUser.id}).select('id').single();
+  if(error)throw error;
+  const links=[];
+  const photo=photos.find(p=>p.id===story.photoId);
+  if(photo?.cloudAssetId)links.push({family_id:cloudFamilyId,story_id:row.id,media_asset_id:photo.cloudAssetId,relationship:'cover'});
+  if(story.audio?.size){
+    const {data:asset,error:assetError}=await supabaseClient.from('media_assets').insert({family_id:cloudFamilyId,asset_type:'audio',title:(story.photoTitle||'Family story')+' — recording',created_by:cloudUser.id}).select('id').single();
+    if(assetError)throw assetError;
+    const ext=story.audio.type.includes('mp4')?'m4a':'webm';
+    const objectKey=cloudFamilyId+'/'+asset.id+'/original.'+ext;
+    const {error:uploadError}=await supabaseClient.storage.from('family-archive').upload(objectKey,story.audio,{contentType:story.audio.type||'audio/webm',upsert:false});
+    if(uploadError)throw uploadError;
+    const {error:fileError}=await supabaseClient.from('media_files').insert({family_id:cloudFamilyId,media_asset_id:asset.id,variant:'original',storage_provider:'supabase',bucket_name:'family-archive',object_key:objectKey,mime_type:story.audio.type||'audio/webm',byte_size:story.audio.size,created_by:cloudUser.id});
+    if(fileError)throw fileError;
+    links.push({family_id:cloudFamilyId,story_id:row.id,media_asset_id:asset.id,relationship:'audio_narration'});
+  }
+  if(links.length){const {error:linkError}=await supabaseClient.from('story_media').insert(links);if(linkError)throw linkError;}
+  await store('stories','readwrite',st=>st.put({...story,cloudStoryId:row.id}));
+  return true;
+}
+async function syncCloudStories(){
+  if(!cloudUser||!cloudFamilyId)return;
+  const {data:rows,error}=await supabaseClient.from('stories').select('id,title,original_text,created_at').eq('family_id',cloudFamilyId).order('created_at',{ascending:false});
+  if(error)throw error;if(!rows?.length)return;
+  const ids=rows.map(r=>r.id);
+  const {data:links,error:linkError}=await supabaseClient.from('story_media').select('story_id,media_asset_id,relationship').eq('family_id',cloudFamilyId).in('story_id',ids);
+  if(linkError)throw linkError;
+  const assetIds=[...new Set((links||[]).filter(l=>l.relationship==='audio_narration').map(l=>l.media_asset_id))];
+  const audioFiles=assetIds.length?await supabaseClient.from('media_files').select('media_asset_id,object_key,mime_type').eq('family_id',cloudFamilyId).eq('variant','original').in('media_asset_id',assetIds):{data:[],error:null};
+  if(audioFiles.error)throw audioFiles.error;
+  const byAsset=new Map((audioFiles.data||[]).map(f=>[f.media_asset_id,f]));
+  const existing=await allStories();const known=new Set(existing.map(story=>story.cloudStoryId).filter(Boolean));
+  const localPhotos=await allPhotos();
+  for(const row of rows){
+    if(known.has(row.id))continue;
+    let audio=null;const audioLink=(links||[]).find(l=>l.story_id===row.id&&l.relationship==='audio_narration');const audioFile=audioLink&&byAsset.get(audioLink.media_asset_id);
+    if(audioFile){const {data:signed,error:signedError}=await supabaseClient.storage.from('family-archive').createSignedUrl(audioFile.object_key,3600);if(signedError)throw signedError;const response=await fetch(signed.signedUrl);if(!response.ok)throw Error('A saved story recording could not be downloaded.');audio=await response.blob();}
+    const storyLines=(row.original_text||'').split('\\n').map(line=>{const m=line.match(/^(Betty|A gentle thought):\\s*(.*)$/);return m?{who:m[1]==='Betty'?'user':'ai',text:m[2]}:{who:'user',text:line};}).filter(l=>l.text);
+    const cover=(links||[]).find(l=>l.story_id===row.id&&l.relationship==='cover');
+    const localPhoto=localPhotos.find(p=>p.cloudAssetId===cover?.media_asset_id);
+    await store('stories','readwrite',st=>st.put({id:'cloud-story-'+row.id,cloudStoryId:row.id,photoId:localPhoto?.id||null,photoTitle:row.title,lines:storyLines,createdAt:row.created_at,audio}));
+  }
+}
 async function connectCloudSession(user){
   cloudUser=user;
   $('cloudAuthTitle').textContent='Your family archive is connected.';
@@ -22,12 +107,11 @@ async function connectCloudSession(user){
   const {data:membership,error:memberError}=await supabaseClient.from('family_members').select('family_id,role').eq('user_id',user.id).eq('status','active').limit(1).maybeSingle();
   if(memberError)throw memberError;
   if(membership){cloudFamilyId=membership.family_id;}
-  else{
-    const {data:familyId,error:createError}=await supabaseClient.rpc('create_family',{p_name:"Grandma’s Stories"});
-    if(createError)throw createError;
-    cloudFamilyId=familyId;
-  }
-  $('cloudAuthStatus').textContent='Your private family space is ready. Cloud photo and story syncing is the next step.';
+  else{const {data:familyId,error:createError}=await supabaseClient.rpc('create_family',{p_name:"Grandma’s Stories"});if(createError)throw createError;cloudFamilyId=familyId;}
+  $('cloudAuthStatus').textContent='Syncing your family album…';
+  await syncCloudPhotos();
+  await syncCloudStories();
+  $('cloudAuthStatus').textContent='Your private family archive is ready. Photos and stories are syncing securely.';
   $('cloudAuthDescription').textContent='Signed in as '+user.email+'.';
   $('connectArchive').textContent='Family archive connected';
 }
@@ -63,7 +147,7 @@ function chooseRandomPhoto(){if(!photos.length)return null;const available=new S
 function addLine(who,text){if(!text)return;lines.push({who,text,at:new Date().toISOString()});const p=document.createElement('p'),label=document.createElement('strong');label.textContent=who==='ai'?'A gentle thought':'Betty';p.append(label,document.createTextNode(text));$('transcript').append(p);$('transcript').scrollTop=$('transcript').scrollHeight;}
 function setVoiceStatus(text,state='listening'){$('voiceStatus').lastElementChild.textContent=text;$('live').dataset.audioState=state;const record=$('turntable').querySelector('.record-disc');if(record)record.classList.toggle('is-spinning',state==='listening');$('turntable').setAttribute('aria-label','Audio status: '+state);}
 function cleanup(){clearInterval(tick);tick=null;if(recorder&&recorder.state!=='inactive'){try{recorder.stop()}catch{}}if(stream)stream.getTracks().forEach(t=>t.stop());if(pc)pc.close();pc=null;dc=null;stream=null;sessionPhase='idle';}
-async function saveStory(blob){const story={id:crypto.randomUUID(),photoId:currentPhoto?.id||null,photoTitle:currentPhoto?.title||'Family photograph',lines,createdAt:new Date().toISOString(),audio:blob||null};await store('stories','readwrite',s=>s.put(story));}
+async function saveStory(blob){const story={id:crypto.randomUUID(),photoId:currentPhoto?.id||null,photoTitle:currentPhoto?.title||'Family photograph',lines:[...lines],createdAt:new Date().toISOString(),audio:blob||null};await store('stories','readwrite',st=>st.put(story));if(cloudUser){try{await syncStoryToCloud(story);$('savedCloudStatus').textContent='Also saved securely to your family archive.';$('savedCloudStatus').classList.remove('hidden');}catch(e){console.error('Cloud story sync failed',e);$('savedCloudStatus').textContent='Saved on this iPad, but cloud backup needs attention: '+(e.message||'Please try again.');$('savedCloudStatus').classList.remove('hidden');}}}
 async function end(advance=false){if(sessionPhase!=='live')return;sessionPhase='saving';if(!advance)show('saving');else setVoiceStatus('Saving this story…','thinking');let blob=null;try{if(recorder&&recorder.state!=='inactive')await new Promise(resolve=>{recorder.addEventListener('stop',resolve,{once:true});recorder.stop()});if(chunks.length)blob=new Blob(chunks,{type:recorder?.mimeType||'audio/webm'});cleanup();await saveStory(blob);if(advance){currentPhoto=chooseRandomPhoto();if(currentPhoto){$('timer').textContent='0:00';$('transcript').innerHTML='';start();return;}}const thumb=$('savedPhoto');thumb.innerHTML='';if(currentPhoto){const img=document.createElement('img');img.src=URL.createObjectURL(currentPhoto.image);img.alt='The photograph connected to this story';thumb.append(img)}show('saved')}catch(e){cleanup();$('errorText').textContent='We could not save this story on the iPad. Please keep this page open and ask a family member for help.';show('error')}}
 async function start(){if(!currentPhoto)return;
   // Go straight to the photograph. The connection happens in place; there is no
@@ -102,7 +186,7 @@ async function start(){if(!currentPhoto)return;
 $('addFromHome').onclick=async()=>{await refreshPhotos();$('emptyAlbumPrompt').classList.add('hidden');show('addPanel')};
 $('openStories').onclick=async()=>{await refreshPhotos();await renderStories();show('stories')};
 $('storiesHome').onclick=()=>show('welcome');
-$('photoFiles').onchange=async e=>{const files=[...e.target.files].filter(f=>f.type.startsWith('image/'));e.target.value='';if(!files.length)return;const label=$('uploadTitle'),hint=$('uploadHint');label.textContent='Adding photographs…';hint.classList.remove('hidden');hint.textContent='Placing your photographs in the album…';try{let added=0;for(const file of files){const image=await compressImage(file);await store('photos','readwrite',s=>s.put({id:crypto.randomUUID(),title:file.name.replace(/\.[^.]+$/,''),notes:'',image,createdAt:new Date().toISOString()}));added++;}photoQueue=[];await refreshPhotos();label.textContent='Add more photographs';hint.classList.remove('hidden');hint.textContent=added+' photograph'+(added===1?'':'s')+' added to our album.';}catch(e){await refreshPhotos();label.textContent='Add more photographs';hint.classList.remove('hidden');hint.textContent=e.message||'We could not add those photographs. Please try again.';}};
+$('photoFiles').onchange=async e=>{const files=[...e.target.files].filter(f=>f.type.startsWith('image/'));e.target.value='';if(!files.length)return;const label=$('uploadTitle'),hint=$('uploadHint');label.textContent='Adding photographs…';hint.classList.remove('hidden');hint.textContent='Placing your photographs in the album…';try{let added=0;for(const file of files){const image=await compressImage(file);let photo={id:crypto.randomUUID(),title:file.name.replace(/\.[^.]+$/,''),notes:'',image,createdAt:new Date().toISOString()};await store('photos','readwrite',st=>st.put(photo));if(cloudUser)photo=await uploadPhotoToCloud(photo);added++;}photoQueue=[];await refreshPhotos();label.textContent='Add more photographs';hint.classList.remove('hidden');hint.textContent=added+' photograph'+(added===1?'':'s')+' added to our album.';}catch(e){await refreshPhotos();label.textContent='Add more photographs';hint.classList.remove('hidden');hint.textContent=e.message||'We could not add those photographs. Please try again.';}};
 $('savePhotos').onclick=async()=>{await refreshPhotos();show('welcome')};
 $('startSession').onclick=async()=>{try{await refreshPhotos();if(!photos.length){$('emptyAlbumPrompt').classList.remove('hidden');show('addPanel');return;}$('emptyAlbumPrompt').classList.add('hidden');currentPhoto=chooseRandomPhoto();if(!currentPhoto)return;if(localStorage.getItem('grandmas-stories-consent-v1')==='yes'){start();}else{show('consent');}}catch(e){$('errorText').textContent='We could not open the family album on this iPad.';show('error');}};
 $('accept').onclick=()=>{localStorage.setItem('grandmas-stories-consent-v1','yes');start();};$('notnow').onclick=()=>show('welcome');
