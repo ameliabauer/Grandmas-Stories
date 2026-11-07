@@ -209,3 +209,13 @@ button,.upload-box{touch-action:manipulation}
 
 /* Quietly reassure the family without interrupting the album experience. */
 .local-home-note{color:#e3e5dc;font-size:11px;letter-spacing:.035em;text-shadow:0 2px 8px #10282770;margin-top:2px;}
+
+
+/* Stable vinyl rotation: animate the independent rotate property, never transform.
+   This keeps the record centred in place on iPad and desktop while it spins. */
+.record{animation:none!important;rotate:0deg;}
+.record.is-spinning{animation:record-spin 8s linear infinite!important;animation-play-state:running!important;}
+.record:not(.is-spinning){animation:none!important;rotate:0deg;}
+@keyframes record-spin{from{rotate:0deg}to{rotate:360deg}}
+.live-panel[data-audio-state="speaking"] .record{animation-play-state:paused!important;}
+.live-panel[data-audio-state="thinking"] .record{animation-play-state:paused!important;}
