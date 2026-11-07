@@ -3,38 +3,18 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#183b40"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/style.css?v=19"><title>Grandma’s Stories</title>
+<link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/style.css?v=20"><title>Grandma’s Stories</title>
 </head>
 <body class="home-mode"><main class="shell">
 <header><div class="brand"><span>♥</span> Grandma’s Stories</div><button class="add-top" id="addFromHome" aria-label="Add family photographs" title="Add family photographs">＋</button></header>
-<section id="accountPanel" class="panel hidden">
-  <div class="eyebrow">A private place for your family</div><h1>Come on in.</h1>
-  <p>Enter your email and we’ll send you a secure sign-in link. No password to remember.</p>
-  <label class="field-label" for="authEmail">Your email address</label>
-  <input id="authEmail" class="field" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required>
-  <button class="primary auth-submit" id="sendMagicLink">Email me a sign-in link <b>→</b></button>
-  <p id="authMessage" class="auth-message" aria-live="polite">Your family archive is private. Only invited family members will be able to see it.</p>
-</section>
-<section id="familySetup" class="panel hidden">
-  <div class="eyebrow">Your family’s private space</div><h1>Let’s begin with family.</h1>
-  <p>Create the family space where photographs, stories and shared memories will belong.</p>
-  <label class="field-label" for="familyName">What should we call your family album?</label>
-  <input id="familyName" class="field" type="text" maxlength="160" value="Our Family Album">
-  <label class="field-label" for="firstPersonName">Who are we beginning with?</label>
-  <input id="firstPersonName" class="field" type="text" maxlength="200" value="Betty">
-  <button class="primary auth-submit" id="createFamily">Create our family space <b>→</b></button>
-  <p id="familySetupMessage" class="auth-message" aria-live="polite">We’ll create the family space and add Betty’s first profile.</p>
-  <button class="text" id="setupSignOut">Use a different email</button>
-</section>
 <section id="welcome" class="panel home-panel">
-  <div class="family-session-bar hidden" id="familySessionBar"><span>Our family space · <strong id="familyGreeting"></strong></span><button id="signOut" type="button">Sign out</button></div>
   <div class="home-copy">
     <div class="eyebrow">A family album, shared</div>
     <h1>Grandma’s<br>Stories</h1>
     <p id="homeMessage">Real stories. Lasting memories.</p>
     <button class="primary start-home" id="startSession" disabled>Start <b>→</b></button>
     <small class="muted" id="photoCount">Your family album is waiting.</small>
-    <small id="homeHint" class="home-hint">A quiet moment, one photograph at a time.</small>
+    <small id="homeHint" class="home-hint">A quiet moment, one photograph at a time.</small><small class="local-home-note">Our family album · kept on this iPad for now</small>
   </div>
 </section>
 <section id="addPanel" class="panel hidden">
@@ -79,5 +59,4 @@
 <section id="error" class="panel hidden"><div class="flower">♡</div><h1>Let’s try again.</h1><p id="errorText">We couldn’t start the conversation right now.</p><button class="primary" id="retry">Try again <b>→</b></button><button class="text" id="errorBack">Back home</button></section>
 <audio id="remoteAudio" autoplay playsinline></audio>
 <footer>Made with love, for the stories that matter. <span>♥</span><small class="image-credit">Room image: <a href="https://roomai.com/ideas/orange-sofa-and-teal-cone-fireplace-lounge-1580" target="_blank" rel="noreferrer">Room AI</a> · Turntable: <a href="https://unsplash.com/photos/black-vinyl-record-player-on-brown-wooden-table-ytOQrHL0V4w" target="_blank" rel="noreferrer">Samuel Regan-Asante / Unsplash</a></small></footer>
-</main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.min.js"></script>
-<script src="/app.js?v=19" defer></script></body></html>
+</main><script src="/app.js?v=20" defer></script></body></html>
