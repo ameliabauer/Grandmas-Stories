@@ -1,5 +1,5 @@
 const $=id=>document.getElementById(id);
-const screens=['welcome','addPanel','consent','live','saving','saved','error'];
+const screens=['welcome','cloudAuth','addPanel','consent','live','saving','saved','error'];
 let db,photos=[],selectedFiles=[],currentPhoto=null,pc=null,dc=null,stream=null,recorder=null,chunks=[],lines=[],started=0,tick=null,sessionPhase='idle',photoQueue=[],lastPhotoId=null,supabaseClient=null,cloudUser=null,cloudFamilyId=null,authBusy=false;
 function show(id){screens.forEach(name=>$(name).classList.toggle('hidden',name!==id));document.body.classList.toggle('home-mode',id==='welcome');document.body.classList.toggle('live-mode',id==='live');window.scrollTo({top:0,behavior:'smooth'});}
 function show(id){screens.forEach(name=>$(name).classList.toggle('hidden',name!==id));document.body.classList.toggle('home-mode',id==='welcome');document.body.classList.toggle('live-mode',id==='live');window.scrollTo({top:0,behavior:'smooth'});}
