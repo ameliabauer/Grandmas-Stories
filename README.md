@@ -34,3 +34,14 @@ npm install && npm run dev
 
 - Living-room photograph: Room AI, [Orange Sofa and Teal Cone Fireplace Lounge](https://roomai.com/ideas/orange-sofa-and-teal-cone-fireplace-lounge-1580).
 - Turntable photograph: Samuel Regan-Asante, [Unsplash](https://unsplash.com/photos/black-vinyl-record-player-on-brown-wooden-table-ytOQrHL0V4w).
+
+
+## New milestone: secure family access foundation
+- Email magic-link sign-in using Supabase Auth.
+- First-time users can create a private family space.
+- The creator becomes the family owner, and the first person profile (Betty by default) is created in the family archive.
+- Family membership and records are protected by PostgreSQL row-level security.
+- Supabase URL and publishable key are read from Vercel environment variables through a small public config endpoint; no database password or service-role key is exposed to the browser.
+
+### Current boundary
+This milestone connects sign-in, family membership and the first person profile to Supabase. Existing photographs, recordings and transcripts are still stored locally on the iPad. Private cloud photo/audio storage and cross-device synchronization are the next implementation milestone.
