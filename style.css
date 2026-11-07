@@ -370,3 +370,8 @@ button,.upload-box{touch-action:manipulation}
  #addPanel .album-preview{padding:10px}
  #addPanel .upload-box{min-height:88px;margin-top:4px}
 }
+
+.archive-link{border:0;background:transparent;color:#f0d4bd;text-decoration:underline;text-underline-offset:4px;font:500 14px 'DM Sans',sans-serif;padding:10px 0;cursor:pointer}
+.auth-label{width:min(100%,430px);text-align:left;font-size:13px;font-weight:700;color:#53696a;margin:10px 0 6px}
+.auth-input{width:min(100%,430px);height:56px;border:1px solid #b8b6a9;border-radius:5px;background:#fffdf7;padding:0 16px;color:#29474b;font:16px 'DM Sans',sans-serif;margin-bottom:18px}
+.auth-status{min-height:28px;margin:12px auto 0;font-size:14px}
