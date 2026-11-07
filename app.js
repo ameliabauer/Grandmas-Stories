@@ -49,7 +49,7 @@ async function syncCloudPhotos(){
   await refreshPhotos();
 }
 function transcriptForCloud(lines){
-  return (lines||[]).filter(line=>line.text).map(line=>(line.who==='user'?'Betty':'A gentle thought')+': '+line.text).join('\\n');
+  return (lines||[]).filter(line=>line.text).map(line=>(line.who==='user'?'Betty':'A gentle thought')+': '+line.text).join('\n');
 }
 async function syncStoryToCloud(story){
   if(!cloudUser||!cloudFamilyId)return false;
@@ -92,7 +92,7 @@ async function syncCloudStories(){
     if(known.has(row.id))continue;
     let audio=null;const audioLink=(links||[]).find(l=>l.story_id===row.id&&l.relationship==='audio_narration');const audioFile=audioLink&&byAsset.get(audioLink.media_asset_id);
     if(audioFile){const {data:signed,error:signedError}=await supabaseClient.storage.from('family-archive').createSignedUrl(audioFile.object_key,3600);if(signedError)throw signedError;const response=await fetch(signed.signedUrl);if(!response.ok)throw Error('A saved story recording could not be downloaded.');audio=await response.blob();}
-    const storyLines=(row.original_text||'').split('\\n').map(line=>{const m=line.match(/^(Betty|A gentle thought):\\s*(.*)$/);return m?{who:m[1]==='Betty'?'user':'ai',text:m[2]}:{who:'user',text:line};}).filter(l=>l.text);
+    const storyLines=(row.original_text||'').split('\n').map(line=>{const m=line.match(/^(Betty|A gentle thought):\s*(.*)$/);return m?{who:m[1]==='Betty'?'user':'ai',text:m[2]}:{who:'user',text:line};}).filter(l=>l.text);
     const cover=(links||[]).find(l=>l.story_id===row.id&&l.relationship==='cover');
     const localPhoto=localPhotos.find(p=>p.cloudAssetId===cover?.media_asset_id);
     await store('stories','readwrite',st=>st.put({id:'cloud-story-'+row.id,cloudStoryId:row.id,photoId:localPhoto?.id||null,photoTitle:row.title,lines:storyLines,createdAt:row.created_at,audio}));
