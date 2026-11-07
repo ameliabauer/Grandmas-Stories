@@ -1,4 +1,4 @@
-const CACHE='grandmas-stories-v21';
+const CACHE='grandmas-stories-v22';
 const SHELL=['/','/style.css?v=21','/app.js?v=21','/manifest.webmanifest'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('grandmas-stories-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));

@@ -221,3 +221,23 @@ button,.upload-box{touch-action:manipulation}
 .live-panel[data-audio-state="thinking"] .record{animation-play-state:paused!important;}
 
 @media(prefers-reduced-motion:reduce){.record.is-spinning{animation:none!important;rotate:0deg!important;}}
+
+
+/* Photo adding should feel like placing prints into the family album,
+   not completing an upload form. */
+#addPanel{background:linear-gradient(145deg,#f5f0e5,#e8e0d2);border:1px solid #c9b99f;box-shadow:0 14px 36px #35251b22,inset 0 0 0 6px #f9f4e9;position:relative}
+#addPanel:after{content:"";position:absolute;inset:12px;border:1px solid #d8cbb6;pointer-events:none}
+#addPanel>*{position:relative;z-index:1}
+#addPanel h1{color:#29474b}
+#addPanel>p{max-width:470px;color:#66594b;line-height:1.55}
+#addPanel .eyebrow{color:#b76543}
+.upload-box{width:min(100%,480px);min-height:190px;margin:24px 0 12px;border:1px solid #c5ae8f;border-radius:3px;background:linear-gradient(145deg,#eee5d5,#e2d8c7);box-shadow:inset 0 0 0 5px #f5eee2,0 5px 14px #4a302411;color:#36575a;gap:10px}
+.upload-box .upload-icon{display:grid;place-items:center;width:52px;height:52px;border-radius:50%;background:#c45d36;color:#fff4e6;font:400 36px/1 'Fraunces',Georgia,serif;box-shadow:0 3px 0 #8c4329}
+.upload-box strong{font:600 22px 'Fraunces',Georgia,serif}
+.upload-box small{font-size:13px;color:#746957}
+.selected-files{width:min(100%,480px);min-height:24px;margin:8px 0 16px;color:#766650;font-size:14px;text-align:center}
+#addPanel .primary{width:min(100%,480px);margin:0 auto}
+#addPanel .text{color:#52696b}
+#addPanel .local-note{display:block;text-align:center;margin-top:16px;color:#827766}
+#addPanel .upload-box:active{transform:translateY(1px)}
+@media(max-width:760px){#addPanel{padding:28px 20px}#addPanel .upload-box{min-height:170px;margin-top:20px}}
