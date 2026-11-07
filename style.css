@@ -219,3 +219,5 @@ button,.upload-box{touch-action:manipulation}
 @keyframes record-spin{from{rotate:0deg}to{rotate:360deg}}
 .live-panel[data-audio-state="speaking"] .record{animation-play-state:paused!important;}
 .live-panel[data-audio-state="thinking"] .record{animation-play-state:paused!important;}
+
+@media(prefers-reduced-motion:reduce){.record.is-spinning{animation:none!important;rotate:0deg!important;}}
