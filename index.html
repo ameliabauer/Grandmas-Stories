@@ -14,10 +14,10 @@
     <p id="homeMessage">Real stories. Lasting memories.</p>
     <button class="primary start-home" id="startSession" disabled>Start <b>→</b></button>
     <small class="muted" id="photoCount">Your family album is waiting.</small>
-    <small id="homeHint" class="home-hint">A quiet moment, one photograph at a time.</small><small class="local-home-note">Our family album · kept on this iPad for now</small>
+    <small id="homeHint" class="home-hint">A quiet moment, one photograph at a time.</small><button class="archive-link" id="connectArchive">Connect our private family archive</button><small class="local-home-note">Our family album · kept on this iPad for now</small>
   </div>
 </section>
-<section id="addPanel" class="panel hidden">
+<section id="cloudAuth" class="panel hidden"><div class="eyebrow">Our private family archive</div><h1 id="cloudAuthTitle">Connect our family archive.</h1><p id="cloudAuthDescription">A secure sign-in link will arrive by email. No password to remember.</p><label class="auth-label" for="archiveEmail">Email address</label><input class="auth-input" id="archiveEmail" type="email" autocomplete="email" value="Abauer4@alumni.nd.edu" required><button class="primary" id="sendArchiveLink">Send my sign-in link <b>→</b></button><p id="cloudAuthStatus" class="auth-status" aria-live="polite"></p><button class="text" id="closeCloudAuth">Return Home</button></section>\n<section id="addPanel" class="panel hidden">
   <div class="eyebrow">Our family album</div><h1>Photographs</h1>
   <section id="selectedPreview" class="album-preview selected-preview hidden" aria-live="polite"><h2 id="selectedPhotoHeading"></h2><div id="selectedPhotoGrid" class="album-photo-grid"></div></section>
   <section id="albumPreview" class="album-preview hidden" aria-live="polite"><h2 id="albumPhotoHeading"></h2><div id="albumPhotoGrid" class="album-photo-grid"></div></section><p id="emptyAlbumPrompt" class="empty-album-prompt hidden">Our album is waiting for its first photographs. Let’s add a few, then we can begin sharing their stories.</p>
@@ -56,4 +56,4 @@
 <section id="error" class="panel hidden"><div class="flower">♡</div><h1>Let’s try again.</h1><p id="errorText">We couldn’t start the conversation right now.</p><button class="primary" id="retry">Try again <b>→</b></button><button class="text" id="errorBack">Back home</button></section>
 <audio id="remoteAudio" autoplay playsinline></audio>
 <footer>Made with love, for the stories that matter. <span>♥</span><small class="image-credit">Room image: <a href="https://roomai.com/ideas/orange-sofa-and-teal-cone-fireplace-lounge-1580" target="_blank" rel="noreferrer">Room AI</a> · Turntable: <a href="https://unsplash.com/photos/black-vinyl-record-player-on-brown-wooden-table-ytOQrHL0V4w" target="_blank" rel="noreferrer">Samuel Regan-Asante / Unsplash</a></small></footer>
-</main><script src="/app.js?v=28" defer></script></body></html>
+</main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.min.js" defer></script><script src="/app.js?v=29" defer></script></body></html>
