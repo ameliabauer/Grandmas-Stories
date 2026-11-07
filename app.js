@@ -1,7 +1,80 @@
 const $=id=>document.getElementById(id);
-const screens=['welcome','addPanel','consent','live','saving','saved','error'];
+const screens=['accountPanel','familySetup','welcome','addPanel','consent','live','saving','saved','error'];
+let supabaseClient=null,currentUser=null,currentFamily=null;
 let db,photos=[],selectedFiles=[],currentPhoto=null,pc=null,dc=null,stream=null,recorder=null,chunks=[],lines=[],started=0,tick=null,sessionPhase='idle',photoQueue=[],lastPhotoId=null;
 function show(id){screens.forEach(name=>$(name).classList.toggle('hidden',name!==id));document.body.classList.toggle('home-mode',id==='welcome');document.body.classList.toggle('live-mode',id==='live');window.scrollTo({top:0,behavior:'smooth'});}
+async function routeForUser(){
+  if(!currentUser){currentFamily=null;$('familySessionBar').classList.add('hidden');show('accountPanel');return;}
+  const {data:memberships,error:membershipError}=await supabaseClient.from('family_members').select('family_id,role').eq('user_id',currentUser.id).eq('status','active');
+  if(membershipError)throw membershipError;
+  if(!memberships||!memberships.length){currentFamily=null;$('familySessionBar').classList.add('hidden');show('familySetup');return;}
+  const familyIds=memberships.map(m=>m.family_id);
+  const {data:families,error:familyError}=await supabaseClient.from('families').select('id,name').in('id',familyIds);
+  if(familyError)throw familyError;
+  currentFamily=(families||[])[0]||null;
+  if(!currentFamily){show('familySetup');return;}
+  $('familyGreeting').textContent=currentFamily.name;
+  $('familySessionBar').classList.remove('hidden');
+  await refreshPhotos();
+  show('welcome');
+}
+async function initCloudAccount(){
+  const response=await fetch('/api/config',{cache:'no-store'});
+  const config=await response.json().catch(()=>({}));
+  if(!response.ok||!config.url||!config.publishableKey)throw Error(config.error||'The family sign-in service is not configured yet.');
+  if(!window.supabase||!window.supabase.createClient)throw Error('The secure sign-in library did not load. Please refresh this page.');
+  supabaseClient=window.supabase.createClient(config.url,config.publishableKey,{auth:{autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}});
+  const {data,error}=await supabaseClient.auth.getSession();
+  if(error)throw error;
+  currentUser=data.session?.user||null;
+  await routeForUser();
+  supabaseClient.auth.onAuthStateChange((_event,session)=>{
+    currentUser=session?.user||null;
+    setTimeout(()=>routeForUser().catch(error=>showAccountError(error)),0);
+  });
+}
+function showAccountError(error){
+  const message=error?.message||'Something went wrong while opening your family archive.';
+  if($('authMessage'))$('authMessage').textContent=message;
+  if($('familySetupMessage'))$('familySetupMessage').textContent=message;
+}
+async function sendMagicLink(){
+  const email=$('authEmail').value.trim();
+  if(!email){$('authEmail').focus();return;}
+  const button=$('sendMagicLink');button.disabled=true;button.textContent='Sending…';
+  $('authMessage').textContent='';
+  try{
+    const {error}=await supabaseClient.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.origin+window.location.pathname,shouldCreateUser:true}});
+    if(error)throw error;
+    $('authMessage').textContent='Your sign-in link is on its way. Check your email, then open the link on this device.';
+  }catch(error){$('authMessage').textContent=error.message||'We could not send the email. Please try again.';}
+  finally{button.disabled=false;button.innerHTML='Email me a sign-in link <b>→</b>';}
+}
+async function createFamilySpace(){
+  const familyName=$('familyName').value.trim();
+  const personName=$('firstPersonName').value.trim()||'Betty';
+  if(!familyName){$('familyName').focus();return;}
+  const button=$('createFamily');button.disabled=true;button.textContent='Creating your family space…';$('familySetupMessage').textContent='';
+  try{
+    const {data:familyId,error}=await supabaseClient.rpc('create_family',{p_name:familyName});
+    if(error)throw error;
+    const {error:personError}=await supabaseClient.from('people').insert({family_id:familyId,full_name:personName,created_by:currentUser.id});
+    if(personError)throw Error('Your family space was created, but the first profile could not be added: '+personError.message);
+    const {data:family,error:loadError}=await supabaseClient.from('families').select('id,name').eq('id',familyId).single();
+    if(loadError)throw loadError;
+    currentFamily=family;
+    $('familyGreeting').textContent=family.name;
+    $('familySessionBar').classList.remove('hidden');
+    await refreshPhotos();
+    show('welcome');
+  }catch(error){$('familySetupMessage').textContent=error.message||'We could not create the family space. Please try again.';}
+  finally{button.disabled=false;button.innerHTML='Create our family space <b>→</b>';}
+}
+async function signOut(){
+  if(!supabaseClient)return;
+  const {error}=await supabaseClient.auth.signOut();
+  if(error)showAccountError(error);
+}
 function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open('grandmas-stories-local',2);req.onupgradeneeded=()=>{const d=req.result;if(!d.objectStoreNames.contains('stories'))d.createObjectStore('stories',{keyPath:'id'});if(!d.objectStoreNames.contains('photos'))d.createObjectStore('photos',{keyPath:'id'});};req.onsuccess=()=>{db=req.result;resolve(db)};req.onerror=()=>reject(req.error)});}
 function store(name,mode,work){return new Promise((resolve,reject)=>{const tx=db.transaction(name,mode);const result=work(tx.objectStore(name));tx.oncomplete=()=>resolve(result);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error)});}
 function allPhotos(){return new Promise((resolve,reject)=>{const req=db.transaction('photos').objectStore('photos').getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error)});}
@@ -38,11 +111,12 @@ async function start(){if(!currentPhoto)return;show('saving');$('saving').queryS
   const context=currentPhoto.notes?'Family-provided context (not verified): '+currentPhoto.notes+'. ':'';
   dc.send(JSON.stringify({type:'response.create',response:{instructions:`You are sharing a quiet, natural photo-album moment with Betty. She is looking at this actual family photograph. ${context}Look carefully at the image, but do not guess identities, relationships, dates, locations, or details you cannot know. Do not claim to recognise anyone. Begin by gently noticing one specific, clearly visible detail in the photograph, then ask a simple, pointed question that invites a memory. As Betty responds, listen closely and build your next question from the actual detail she just shared. Prefer specific, curious follow-ups over vague invitations: if she mentions a room, ask what it felt like to be there; if she mentions a person, ask who they were or what they were like; if she describes an event, ask what happened next or how she felt. Ask only one question at a time, and do not interrogate or keep probing if she seems finished. Avoid phrases like 'if you want, you can tell me more'. Never ask her to choose a photo or operate the app. Never tell her what the photo means. Let her lead, follow tangents, and allow pauses. Speak in short, clear sentences and avoid talking over her.`,modalities:['audio','text']}}));
 }catch(e){cleanup();$('errorText').textContent=e.message||'We could not start the conversation right now.';show('error')}}
+$('sendMagicLink').onclick=sendMagicLink;$('createFamily').onclick=createFamilySpace;$('signOut').onclick=signOut;$('setupSignOut').onclick=signOut;
 $('addFromHome').onclick=()=>show('addPanel');$('cancelAdd').onclick=async()=>{await refreshPhotos();show('welcome')};
 $('photoFiles').onchange=e=>{selectedFiles=[...e.target.files].filter(f=>f.type.startsWith('image/'));$('selectedFiles').textContent=selectedFiles.length?selectedFiles.length+' photograph'+(selectedFiles.length===1?'':'s')+' selected.':'No photographs selected yet.';$('savePhotos').disabled=!selectedFiles.length;};
 $('savePhotos').onclick=async()=>{if(!selectedFiles.length)return;const button=$('savePhotos');button.disabled=true;button.textContent='Adding photographs…';try{for(const file of selectedFiles){const image=await compressImage(file);await store('photos','readwrite',s=>s.put({id:crypto.randomUUID(),title:$('photoTitle').value.trim()||file.name.replace(/\.[^.]+$/,''),notes:$('photoNotes').value.trim(),image,createdAt:new Date().toISOString()}));}$('photoFiles').value='';$('photoTitle').value='';$('photoNotes').value='';selectedFiles=[];$('selectedFiles').textContent='Photographs added.';photoQueue=[];await refreshPhotos();show('welcome');}catch(e){alert(e.message||'We could not add those photographs.');}finally{button.textContent='Add to our album →';button.disabled=!selectedFiles.length;}};
 $('startSession').onclick=async()=>{try{await refreshPhotos();if(!photos.length){show('addPanel');return;}currentPhoto=chooseRandomPhoto();if(!currentPhoto)return;if(localStorage.getItem('grandmas-stories-consent-v1')==='yes'){start();}else{$('agree').checked=false;$('accept').disabled=true;show('consent');}}catch(e){$('errorText').textContent='We could not open the family album on this iPad.';show('error');}};
 $('agree').onchange=e=>$('accept').disabled=!e.target.checked;$('accept').onclick=()=>{if(!$('agree').checked)return;localStorage.setItem('grandmas-stories-consent-v1','yes');start();};$('notnow').onclick=()=>show('welcome');
 $('stop').onclick=()=>end(false);$('nextPhoto').onclick=()=>end(true);$('retry').onclick=start;$('errorBack').onclick=()=>show('welcome');$('anotherStory').onclick=()=>{$('timer').textContent='0:00';currentPhoto=chooseRandomPhoto();if(currentPhoto)start();else show('welcome');};$('finish').onclick=()=>show('welcome');
-(async()=>{try{await openDB();await refreshPhotos();}catch(e){$('errorText').textContent='This iPad could not open the local family album. Please ask a family member for help.';show('error');}})();
+(async()=>{try{await openDB();await initCloudAccount();}catch(e){showAccountError(e);show('accountPanel');}})();
 if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
