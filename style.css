@@ -53,17 +53,18 @@ p{font-size:18px;line-height:1.6;color:#526669;max-width:590px;margin:0 0 22px}
 .live-story-side{min-width:0;width:100%;display:flex;flex-direction:column;align-items:center;gap:13px;padding:10px 0}
 .audio-brand{font:600 clamp(30px,4vw,48px)/1 'Fraunces',Georgia,serif;color:#29474b;letter-spacing:-.04em;margin-bottom:4px}
 .turntable{width:min(100%,420px);aspect-ratio:1.42;position:relative;display:grid;place-items:center;overflow:hidden;background-color:#4a3024;background-image:linear-gradient(135deg,rgba(22,17,13,.16),rgba(22,17,13,.35)),url("https://images.unsplash.com/photo-1613311106434-89edb8bb30c8?auto=format&fit=crop&fm=jpg&q=75&w=1400");background-size:cover;background-position:center 43%;border:10px solid #4b3024;box-shadow:0 10px 22px #28190f45,inset 0 0 0 2px #b18a60}
-.record{width:58%;aspect-ratio:1;border-radius:50%;position:absolute;left:8%;top:50%;transform:translateY(-50%);background:repeating-radial-gradient(circle at center,#090b0b 0 2px,#343632 2.5px 3.4px,#101211 4px 5px);box-shadow:0 8px 15px #160f0c77,inset 0 0 0 2px #55534b;animation:spin 4s linear infinite;animation-play-state:paused}
-.record:before{content:"";position:absolute;inset:8%;border-radius:50%;border:1px solid #88847a66}
-.record-label{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:39%;height:39%;border-radius:50%;background:var(--rust);display:grid;place-items:center;color:#fff2df;font-size:clamp(7px,.7vw,10px);line-height:1.2;letter-spacing:.08em;font-weight:700;text-align:center;border:3px solid #e3a16c;box-shadow:0 0 0 1px #5b3828}
-.record-label:after{content:"";position:absolute;width:5px;height:5px;border-radius:50%;background:#272724}
-.record-grooves{position:absolute;inset:0;border-radius:50%;background:repeating-radial-gradient(circle at center,transparent 0 5px,#ffffff0a 5.5px 6px,transparent 6.5px 9px);pointer-events:none}
+.record{width:58%;aspect-ratio:1;position:absolute;left:8%;top:50%;transform:translateY(-50%);}
+.record-disc{width:100%;height:100%;position:relative;border-radius:50%;background:repeating-radial-gradient(circle at center,#090b0b 0 2px,#343632 2.5px 3.4px,#101211 4px 5px);box-shadow:0 8px 15px #160f0c77,inset 0 0 0 2px #55534b;transform-origin:50% 50%;animation:none;}
+.record-disc:before{content:"";position:absolute;inset:8%;border-radius:50%;border:1px solid #88847a66}
+.record-disc .record-label{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:39%;height:39%;border-radius:50%;background:var(--rust);display:grid;place-items:center;color:#fff2df;font-size:clamp(7px,.7vw,10px);line-height:1.2;letter-spacing:.08em;font-weight:700;text-align:center;border:3px solid #e3a16c;box-shadow:0 0 0 1px #5b3828}
+.record-disc .record-label:after{content:"";position:absolute;width:5px;height:5px;border-radius:50%;background:#272724}
+.record-disc .record-grooves{position:absolute;inset:0;border-radius:50%;background:repeating-radial-gradient(circle at center,transparent 0 5px,#ffffff0a 5.5px 6px,transparent 6.5px 9px);pointer-events:none}
 .tonearm{position:absolute;right:13%;top:7%;width:7px;height:65%;border-radius:8px;background:linear-gradient(90deg,#9a9b91,#e6e1d5,#77796f);transform:rotate(32deg);transform-origin:top center;box-shadow:1px 2px 3px #3335}
 .tonearm span{position:absolute;bottom:-5px;left:-4px;width:15px;height:10px;border-radius:3px;background:#77796f}
 @keyframes spin{to{transform:translateY(-50%) rotate(360deg)}}
-.live-panel[data-audio-state="listening"] .record,.live-panel[data-audio-state="speaking"] .record{animation-play-state:running}
-.live-panel[data-audio-state="speaking"] .record{animation-duration:2.8s}
-.live-panel[data-audio-state="thinking"] .record{animation-duration:8s;animation-play-state:running}
+.live-panel[data-audio-state="listening"] .record-disc,.live-panel[data-audio-state="speaking"] .record-disc{animation-play-state:running}
+.live-panel[data-audio-state="speaking"] .record-disc{animation-duration:2.8s}
+.live-panel[data-audio-state="thinking"] .record-disc{animation-duration:8s;animation-play-state:running}
 .live-panel[data-audio-state="thinking"] .tonearm{transform:rotate(24deg)}
 .voice-status{display:flex;align-items:center;justify-content:center;gap:12px;color:#365355;font-size:15px;margin:0;min-height:30px}
 .voice-dot{width:14px;height:14px;flex:none;border-radius:50%;background:#df783c;box-shadow:0 0 0 6px #df783c25,0 0 15px #df783c88;animation:listen 1.5s ease-in-out infinite}
@@ -197,13 +198,13 @@ button,.upload-box{touch-action:manipulation}
 .primary:disabled{filter:saturate(.55)}
 /* The vinyl is the live listening indicator. Drive it from the voice state,
    rather than relying only on a CSS data-attribute selector. */
-.record.is-spinning{animation:spin 4s linear infinite;animation-play-state:running}
-.live-panel[data-audio-state="thinking"] .record.is-spinning{animation-duration:8s}
-.live-panel[data-audio-state="speaking"] .record.is-spinning{animation-duration:2.8s}
+.record-disc.is-spinning{animation:spin 4s linear infinite;animation-play-state:running}
+.live-panel[data-audio-state="thinking"] .record-disc.is-spinning{animation-duration:8s}
+.live-panel[data-audio-state="speaking"] .record-disc.is-spinning{animation-duration:2.8s}
 @media(prefers-reduced-motion:reduce){
- .record.is-spinning{animation:spin 4s linear infinite!important;animation-play-state:running!important}
- .live-panel[data-audio-state="thinking"] .record.is-spinning{animation-duration:8s!important}
- .live-panel[data-audio-state="speaking"] .record.is-spinning{animation-duration:2.8s!important}
+ .record-disc.is-spinning{animation:spin 4s linear infinite!important;animation-play-state:running!important}
+ .live-panel[data-audio-state="thinking"] .record-disc.is-spinning{animation-duration:8s!important}
+ .live-panel[data-audio-state="speaking"] .record-disc.is-spinning{animation-duration:2.8s!important}
 }
 
 
@@ -213,14 +214,14 @@ button,.upload-box{touch-action:manipulation}
 
 /* Stable vinyl rotation: animate the independent rotate property, never transform.
    This keeps the record centred in place on iPad and desktop while it spins. */
-.record{animation:none!important;rotate:0deg;}
-.record.is-spinning{animation:record-spin 8s linear infinite!important;animation-play-state:running!important;}
-.record:not(.is-spinning){animation:none!important;rotate:0deg;}
-@keyframes record-spin{from{rotate:0deg}to{rotate:360deg}}
-.live-panel[data-audio-state="speaking"] .record{animation-play-state:paused!important;}
-.live-panel[data-audio-state="thinking"] .record{animation-play-state:paused!important;}
+.record-disc{animation:none!important;transform:rotate(0deg);}
+.record-disc.is-spinning{animation:record-spin 8s linear infinite!important;animation-play-state:running!important;}
+.record-disc:not(.is-spinning){animation:none!important;transform:rotate(0deg);}
+@keyframes record-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.live-panel[data-audio-state="speaking"] .record-disc{animation-play-state:paused!important;}
+.live-panel[data-audio-state="thinking"] .record-disc{animation-play-state:paused!important;}
 
-@media(prefers-reduced-motion:reduce){.record.is-spinning{animation:none!important;rotate:0deg!important;}}
+@media(prefers-reduced-motion:reduce){.record-disc.is-spinning{animation:none!important;transform:rotate(0deg)!important;}}
 
 
 /* Photo adding should feel like placing prints into the family album,
