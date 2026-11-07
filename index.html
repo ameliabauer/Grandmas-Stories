@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#183b40"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/style.css?v=21"><title>Grandma’s Stories</title>
+<link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/style.css?v=22"><title>Grandma’s Stories</title>
 </head>
 <body class="home-mode"><main class="shell">
 <header><div class="brand"><span>♥</span> Grandma’s Stories</div><button class="add-top" id="addFromHome" aria-label="Add family photographs" title="Add family photographs">＋</button></header>
@@ -19,14 +19,12 @@
 </section>
 <section id="addPanel" class="panel hidden">
   <div class="eyebrow">Add to the family album</div><h1>Bring out the old photos.</h1>
-  <p>Choose photographs from your device. You can add a little context, but it’s absolutely fine to leave the details blank and let the stories unfold.</p>
-  <label class="upload-box" for="photoFiles"><span>＋</span><strong>Choose photographs</strong><small>JPG, PNG or HEIC images</small></label>
+  <p>Choose the photographs you’d like to add. That’s all — we can discover the stories together later.</p>
+  <label class="upload-box" for="photoFiles"><span class="upload-icon">＋</span><strong>Choose photographs</strong><small>Pick one or several from your photo library</small></label>
   <input id="photoFiles" type="file" accept="image/*" multiple hidden>
-  <div id="selectedFiles" class="selected-files">No photographs selected yet.</div>
-  <label class="field-label" for="photoTitle">A note about these photographs (optional)</label><input id="photoTitle" class="field" type="text" maxlength="100" placeholder="e.g. Betty’s school days">
-  <label class="field-label" for="photoNotes">Anything the family already knows? (optional)</label><textarea id="photoNotes" class="field" rows="3" maxlength="500" placeholder="Names, places or a little background…"></textarea>
-  <button class="primary" id="savePhotos" disabled>Add to our album <b>＋</b></button><button class="text" id="cancelAdd">Back home</button>
-  <small class="local-note">Photographs are currently kept on this iPad only. Remote family uploads are coming later.</small>
+  <div id="selectedFiles" class="selected-files">No photographs chosen yet.</div>
+  <button class="primary" id="savePhotos" disabled>Add to our album <b>＋</b></button><button class="text" id="cancelAdd">Back to the album</button>
+  <small class="local-note">Your photographs stay on this iPad for now.</small>
 </section>
 <section id="consent" class="panel hidden">
   <div class="eyebrow">Before we begin</div><h1>A little note.</h1>
@@ -59,4 +57,4 @@
 <section id="error" class="panel hidden"><div class="flower">♡</div><h1>Let’s try again.</h1><p id="errorText">We couldn’t start the conversation right now.</p><button class="primary" id="retry">Try again <b>→</b></button><button class="text" id="errorBack">Back home</button></section>
 <audio id="remoteAudio" autoplay playsinline></audio>
 <footer>Made with love, for the stories that matter. <span>♥</span><small class="image-credit">Room image: <a href="https://roomai.com/ideas/orange-sofa-and-teal-cone-fireplace-lounge-1580" target="_blank" rel="noreferrer">Room AI</a> · Turntable: <a href="https://unsplash.com/photos/black-vinyl-record-player-on-brown-wooden-table-ytOQrHL0V4w" target="_blank" rel="noreferrer">Samuel Regan-Asante / Unsplash</a></small></footer>
-</main><script src="/app.js?v=21" defer></script></body></html>
+</main><script src="/app.js?v=22" defer></script></body></html>
