@@ -75,6 +75,8 @@ async function syncStoryToCloud(story){
 }
 async function syncCloudStories(){
   if(!cloudUser||!cloudFamilyId)return;
+  const pendingStories=await allStories();
+  for(const story of pendingStories){if(!story.cloudStoryId)await syncStoryToCloud(story);}
   const {data:rows,error}=await supabaseClient.from('stories').select('id,title,original_text,created_at').eq('family_id',cloudFamilyId).order('created_at',{ascending:false});
   if(error)throw error;if(!rows?.length)return;
   const ids=rows.map(r=>r.id);
