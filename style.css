@@ -62,8 +62,8 @@ p{font-size:18px;line-height:1.6;color:#526669;max-width:590px;margin:0 0 22px}
 .tonearm{position:absolute;right:13%;top:7%;width:7px;height:65%;border-radius:8px;background:linear-gradient(90deg,#9a9b91,#e6e1d5,#77796f);transform:rotate(32deg);transform-origin:top center;box-shadow:1px 2px 3px #3335}
 .tonearm span{position:absolute;bottom:-5px;left:-4px;width:15px;height:10px;border-radius:3px;background:#77796f}
 @keyframes spin{to{transform:translateY(-50%) rotate(360deg)}}
-.live-panel[data-audio-state="listening"] .record,.live-panel[data-audio-state="speaking"] .record-disc{animation-play-state:running}
-.live-panel[data-audio-state="speaking"] .record{animation-duration:2.8s}
+.live-panel[data-audio-state="listening"] .record-disc,.live-panel[data-audio-state="speaking"] .record-disc{animation-play-state:running}
+.live-panel[data-audio-state="speaking"] .record-disc{animation-duration:2.8s}
 .live-panel[data-audio-state="thinking"] .record-disc{animation-duration:8s;animation-play-state:running}
 .live-panel[data-audio-state="thinking"] .tonearm{transform:rotate(24deg)}
 .voice-status{display:flex;align-items:center;justify-content:center;gap:12px;color:#365355;font-size:15px;margin:0;min-height:30px}
@@ -199,12 +199,12 @@ button,.upload-box{touch-action:manipulation}
 /* The vinyl is the live listening indicator. Drive it from the voice state,
    rather than relying only on a CSS data-attribute selector. */
 .record-disc.is-spinning{animation:spin 4s linear infinite;animation-play-state:running}
-.live-panel[data-audio-state="thinking"] .record.is-spinning{animation-duration:8s}
-.live-panel[data-audio-state="speaking"] .record.is-spinning{animation-duration:2.8s}
+.live-panel[data-audio-state="thinking"] .record-disc.is-spinning{animation-duration:8s}
+.live-panel[data-audio-state="speaking"] .record-disc.is-spinning{animation-duration:2.8s}
 @media(prefers-reduced-motion:reduce){
- .record.is-spinning{animation:spin 4s linear infinite!important;animation-play-state:running!important}
- .live-panel[data-audio-state="thinking"] .record.is-spinning{animation-duration:8s!important}
- .live-panel[data-audio-state="speaking"] .record.is-spinning{animation-duration:2.8s!important}
+ .record-disc.is-spinning{animation:spin 4s linear infinite!important;animation-play-state:running!important}
+ .live-panel[data-audio-state="thinking"] .record-disc.is-spinning{animation-duration:8s!important}
+ .live-panel[data-audio-state="speaking"] .record-disc.is-spinning{animation-duration:2.8s!important}
 }
 
 
@@ -215,11 +215,11 @@ button,.upload-box{touch-action:manipulation}
 /* Stable vinyl rotation: animate the independent rotate property, never transform.
    This keeps the record centred in place on iPad and desktop while it spins. */
 .record-disc{animation:none!important;transform:rotate(0deg);}
-.record.is-spinning{animation:record-spin 8s linear infinite!important;animation-play-state:running!important;}
+.record-disc.is-spinning{animation:record-spin 8s linear infinite!important;animation-play-state:running!important;}
 .record-disc:not(.is-spinning){animation:none!important;transform:rotate(0deg);}
 @keyframes record-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-.live-panel[data-audio-state="speaking"] .record{animation-play-state:paused!important;}
-.live-panel[data-audio-state="thinking"] .record{animation-play-state:paused!important;}
+.live-panel[data-audio-state="speaking"] .record-disc{animation-play-state:paused!important;}
+.live-panel[data-audio-state="thinking"] .record-disc{animation-play-state:paused!important;}
 
 @media(prefers-reduced-motion:reduce){.record-disc.is-spinning{animation:none!important;transform:rotate(0deg)!important;}}
 
