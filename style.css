@@ -265,3 +265,6 @@ button,.upload-box{touch-action:manipulation}
 .album-photo-grid img{display:block;width:100%;aspect-ratio:1;object-fit:cover;background:#ded2bd;}
 .album-photo-grid figcaption{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:7px;color:#685641;font:italic 12px 'Fraunces',Georgia,serif;text-align:center;}
 @media(max-width:760px){.album-preview{padding:13px 12px}.album-photo-grid{grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:9px}.album-photo-grid figcaption{font-size:11px}}
+
+.selected-preview{border-color:#d18a5d;background:linear-gradient(145deg,#f4e6d4,#f7efe2);}
+.selected-preview h2{color:#a65332;}
