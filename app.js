@@ -1,6 +1,6 @@
 const $=id=>document.getElementById(id);
 const screens=['welcome','addPanel','consent','live','saving','saved','error'];
-let db,photos=[],selectedFiles=[],currentPhoto=null,pc=null,dc=null,stream=null,recorder=null,chunks=[],lines=[],started=0,tick=null,sessionPhase='idle',photoQueue=[],lastPhotoId=null;
+let db,photos=[],selectedFiles=[],currentPhoto=null,pc=null,dc=null,stream=null,recorder=null,chunks=[],lines=[],started=0,tick=null,sessionPhase='idle',photoQueue=[],lastPhotoId=null,supabaseClient=null,cloudUser=null,cloudFamilyId=null,authBusy=false;
 function show(id){screens.forEach(name=>$(name).classList.toggle('hidden',name!==id));document.body.classList.toggle('home-mode',id==='welcome');document.body.classList.toggle('live-mode',id==='live');window.scrollTo({top:0,behavior:'smooth'});}
 function show(id){screens.forEach(name=>$(name).classList.toggle('hidden',name!==id));document.body.classList.toggle('home-mode',id==='welcome');document.body.classList.toggle('live-mode',id==='live');window.scrollTo({top:0,behavior:'smooth'});}
 function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open('grandmas-stories-local',2);req.onupgradeneeded=()=>{const d=req.result;if(!d.objectStoreNames.contains('stories'))d.createObjectStore('stories',{keyPath:'id'});if(!d.objectStoreNames.contains('photos'))d.createObjectStore('photos',{keyPath:'id'});};req.onsuccess=()=>{db=req.result;resolve(db)};req.onerror=()=>reject(req.error)});}
@@ -8,7 +8,55 @@ function store(name,mode,work){return new Promise((resolve,reject)=>{const tx=db
 function allPhotos(){return new Promise((resolve,reject)=>{const req=db.transaction('photos').objectStore('photos').getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error)});}
 function readAsDataURL(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(r.error);r.readAsDataURL(file)});}
 function compressImage(file){return new Promise((resolve,reject)=>{const url=URL.createObjectURL(file),img=new Image();img.onload=()=>{const scale=Math.min(1,1400/Math.max(img.width,img.height)),canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);URL.revokeObjectURL(url);canvas.toBlob(blob=>blob?resolve(blob):reject(Error('Could not prepare this photograph.')),'image/jpeg',.82)};img.onerror=()=>{URL.revokeObjectURL(url);reject(Error('This photograph could not be opened.'))};img.src=url;});}
-async function refreshPhotos(){photos=await allPhotos();photos.sort((a,b)=>a.createdAt.localeCompare(b.createdAt));$('startSession').disabled=!photos.length;$('photoCount').textContent=photos.length?photos.length+' photograph'+(photos.length===1?'':'s')+' ready in the family album.':'Your family album is waiting for its first photographs.';document.body.classList.toggle('no-photos',!photos.length);$('homeMessage').textContent='Real stories. Lasting memories.';$('homeHint').textContent=photos.length?'A quiet moment, one photograph at a time.':'Add family photographs with the ＋ button above.';renderAlbumPhotos();}
+
+const SUPABASE_URL='https://zxsumrlxfuqnjjuaszbs.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_LtISsb2h1FDOayTDinoZ2g_PDmqfzbb';
+async function connectCloudSession(user){
+  cloudUser=user;
+  $('cloudAuthTitle').textContent='Your family archive is connected.';
+  $('cloudAuthDescription').textContent='Signed in as '+user.email+'. Your private family space is being prepared.';
+  $('archiveEmail').value=user.email||'';
+  $('archiveEmail').classList.add('hidden');
+  $('sendArchiveLink').classList.add('hidden');
+  $('cloudAuthStatus').textContent='Checking your family space…';
+  const {data:membership,error:memberError}=await supabaseClient.from('family_members').select('family_id,role').eq('user_id',user.id).eq('status','active').limit(1).maybeSingle();
+  if(memberError)throw memberError;
+  if(membership){cloudFamilyId=membership.family_id;}
+  else{
+    const {data:familyId,error:createError}=await supabaseClient.rpc('create_family',{p_name:"Grandma’s Stories"});
+    if(createError)throw createError;
+    cloudFamilyId=familyId;
+  }
+  $('cloudAuthStatus').textContent='Your private family space is ready. Cloud photo and story syncing is the next step.';
+  $('cloudAuthDescription').textContent='Signed in as '+user.email+'.';
+  $('connectArchive').textContent='Family archive connected';
+}
+async function initCloudAuth(){
+  if(!window.supabase?.createClient)return;
+  supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+  const {data:{session},error}=await supabaseClient.auth.getSession();
+  if(error)console.warn('Could not restore family archive session',error);
+  if(session?.user){try{await connectCloudSession(session.user)}catch(e){$('cloudAuthStatus').textContent='We could not prepare the family space: '+(e.message||'Please try again.');}}
+  supabaseClient.auth.onAuthStateChange((event,session)=>{
+    if(event==='SIGNED_OUT'){cloudUser=null;cloudFamilyId=null;$('connectArchive').textContent='Connect our private family archive';}
+    if(event==='SIGNED_IN'&&session?.user)setTimeout(()=>connectCloudSession(session.user).catch(e=>{$('cloudAuthStatus').textContent='We could not prepare the family space: '+(e.message||'Please try again.');}),0);
+  });
+}
+$('connectArchive').onclick=()=>{if(cloudUser){$('cloudAuthTitle').textContent='Your family archive is connected.';$('cloudAuthDescription').textContent='Signed in as '+cloudUser.email+'.';$('archiveEmail').classList.add('hidden');$('sendArchiveLink').classList.add('hidden');$('cloudAuthStatus').textContent='Your family space is ready. Cloud syncing is being built.';}else{$('cloudAuthTitle').textContent='Connect our family archive.';$('cloudAuthDescription').textContent='A secure sign-in link will arrive by email. No password to remember.';$('archiveEmail').classList.remove('hidden');$('sendArchiveLink').classList.remove('hidden');$('cloudAuthStatus').textContent='';}show('cloudAuth');};
+$('closeCloudAuth').onclick=()=>show('welcome');
+$('sendArchiveLink').onclick=async()=>{
+  if(authBusy||!supabaseClient){$('cloudAuthStatus').textContent='The secure sign-in service is not ready. Please try again shortly.';return;}
+  const email=$('archiveEmail').value.trim();
+  if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)){$('cloudAuthStatus').textContent='Please enter a valid email address.';return;}
+  authBusy=true;$('sendArchiveLink').disabled=true;$('cloudAuthStatus').textContent='Sending your secure sign-in link…';
+  try{
+    const {error}=await supabaseClient.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.origin+window.location.pathname,shouldCreateUser:true}});
+    if(error)throw error;
+    $('cloudAuthStatus').textContent='Check '+email+' for your sign-in link. Open it on this device to connect your family archive.';
+  }catch(e){$('cloudAuthStatus').textContent=e.message||'We could not send the email. Please try again.';}
+  finally{authBusy=false;$('sendArchiveLink').disabled=false;}
+};
+\nasync function refreshPhotos(){photos=await allPhotos();photos.sort((a,b)=>a.createdAt.localeCompare(b.createdAt));$('startSession').disabled=!photos.length;$('photoCount').textContent=photos.length?photos.length+' photograph'+(photos.length===1?'':'s')+' ready in the family album.':'Your family album is waiting for its first photographs.';document.body.classList.toggle('no-photos',!photos.length);$('homeMessage').textContent='Real stories. Lasting memories.';$('homeHint').textContent=photos.length?'A quiet moment, one photograph at a time.':'Add family photographs with the ＋ button above.';renderAlbumPhotos();}
 function renderAlbumPhotos(){const grid=$('albumPhotoGrid'),section=$('albumPreview');grid.innerHTML='';section.classList.toggle('hidden',!photos.length);$('albumPhotoHeading').textContent='';$('uploadTitle').textContent=photos.length||selectedFiles.length?'Add more photographs':'Choose photographs';$('uploadHint').textContent='';for(const photo of photos){const figure=document.createElement('figure'),img=document.createElement('img'),caption=document.createElement('figcaption');img.src=URL.createObjectURL(photo.image);img.alt=photo.title||'Family photograph';caption.textContent=photo.title||'Family photograph';figure.append(img,caption);grid.append(figure);}}
 function chooseRandomPhoto(){if(!photos.length)return null;const available=new Set(photos.map(p=>p.id));photoQueue=photoQueue.filter(id=>available.has(id));if(!photoQueue.length){photoQueue=photos.map(p=>p.id);for(let i=photoQueue.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[photoQueue[i],photoQueue[j]]=[photoQueue[j],photoQueue[i]];}if(photoQueue.length>1&&photoQueue[photoQueue.length-1]===lastPhotoId)[photoQueue[0],photoQueue[photoQueue.length-1]]=[photoQueue[photoQueue.length-1],photoQueue[0]];}const id=photoQueue.pop();lastPhotoId=id;return photos.find(p=>p.id===id)||null;}
 function addLine(who,text){if(!text)return;lines.push({who,text,at:new Date().toISOString()});const p=document.createElement('p'),label=document.createElement('strong');label.textContent=who==='ai'?'A gentle thought':'Betty';p.append(label,document.createTextNode(text));$('transcript').append(p);$('transcript').scrollTop=$('transcript').scrollHeight;}
@@ -57,5 +105,5 @@ $('savePhotos').onclick=async()=>{const button=$('savePhotos');if(button.dataset
 $('startSession').onclick=async()=>{try{await refreshPhotos();if(!photos.length){$('emptyAlbumPrompt').classList.remove('hidden');show('addPanel');return;}$('emptyAlbumPrompt').classList.add('hidden');currentPhoto=chooseRandomPhoto();if(!currentPhoto)return;if(localStorage.getItem('grandmas-stories-consent-v1')==='yes'){start();}else{show('consent');}}catch(e){$('errorText').textContent='We could not open the family album on this iPad.';show('error');}};
 $('accept').onclick=()=>{localStorage.setItem('grandmas-stories-consent-v1','yes');start();};$('notnow').onclick=()=>show('welcome');
 $('stop').onclick=()=>end(false);$('nextPhoto').onclick=()=>end(true);$('retry').onclick=start;$('errorBack').onclick=()=>show('welcome');$('anotherStory').onclick=()=>{$('timer').textContent='0:00';currentPhoto=chooseRandomPhoto();if(currentPhoto)start();else show('welcome');};$('finish').onclick=()=>show('welcome');
-(async()=>{try{await openDB();await refreshPhotos();show('welcome');}catch(e){$('errorText').textContent='We could not open the family album on this iPad.';show('error');}})();
+(async()=>{try{await openDB();await refreshPhotos();show('welcome');await initCloudAuth();}catch(e){$('errorText').textContent='We could not open the family album on this iPad.';show('error');}})();
 if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
