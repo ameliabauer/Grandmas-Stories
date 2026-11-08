@@ -52,7 +52,7 @@ p{font-size:18px;line-height:1.6;color:#526669;max-width:590px;margin:0 0 22px}
 .quote-mark{font:600 46px/.8 'Fraunces',Georgia,serif;color:var(--rust)}
 .live-story-side{min-width:0;width:100%;display:flex;flex-direction:column;align-items:center;gap:13px;padding:10px 0}
 .audio-brand{font:600 clamp(30px,4vw,48px)/1 'Fraunces',Georgia,serif;color:#29474b;letter-spacing:-.04em;margin-bottom:4px}
-.turntable{width:min(100%,420px);aspect-ratio:1.42;position:relative;display:grid;place-items:center;overflow:hidden;background-color:#4a3024;background-image:linear-gradient(135deg,rgba(22,17,13,.16),rgba(22,17,13,.35)),url("https://images.unsplash.com/photo-1613311106434-89edb8bb30c8?auto=format&fit=crop&fm=jpg&q=75&w=1400");background-size:cover;background-position:center 43%;border:10px solid #4b3024;box-shadow:0 10px 22px #28190f45,inset 0 0 0 2px #b18a60}
+.turntable{width:min(100%,420px);aspect-ratio:1.42;position:relative;display:grid;place-items:center;overflow:hidden;background-color:#4a3024;background-image:linear-gradient(135deg,rgba(22,17,13,.16),rgba(22,17,13,.35)),url("/assets/grandmas-turntable.webp");background-size:cover;background-position:center 43%;border:10px solid #4b3024;box-shadow:0 10px 22px #28190f45,inset 0 0 0 2px #b18a60}
 .record{width:58%;aspect-ratio:1;position:absolute;left:8%;top:50%;transform:translateY(-50%);}
 .record-disc{width:100%;height:100%;position:relative;border-radius:50%;background:repeating-radial-gradient(circle at center,#090b0b 0 2px,#343632 2.5px 3.4px,#101211 4px 5px);box-shadow:0 8px 15px #160f0c77,inset 0 0 0 2px #55534b;transform-origin:50% 50%;animation:none;}
 .record-disc:before{content:"";position:absolute;inset:8%;border-radius:50%;border:1px solid #88847a66}
@@ -138,7 +138,7 @@ button,.upload-box{touch-action:manipulation}
  .album-paper img#livePhoto{height:54svh;max-height:54svh}
  .live-story-side{grid-column:2;grid-row:1;gap:6px}
  .audio-brand{display:block;font-size:25px}
- .turntable{width:min(100%,240px);aspect-ratio:1.42;background-image:linear-gradient(135deg,rgba(22,17,13,.16),rgba(22,17,13,.35)),url("https://images.unsplash.com/photo-1613311106434-89edb8bb30c8?auto=format&fit=crop&fm=jpg&q=75&w=1400");border:7px solid #4b3024}
+ .turntable{width:min(100%,240px);aspect-ratio:1.42;background-image:linear-gradient(135deg,rgba(22,17,13,.16),rgba(22,17,13,.35)),url("/assets/grandmas-turntable.webp");border:7px solid #4b3024}
  .record{width:58%;left:8%;top:50%;transform:translateY(-50%)}
  .tonearm{display:block}
  .voice-status{font-size:11px}.live-actions{gap:6px}
@@ -171,7 +171,7 @@ button,.upload-box{touch-action:manipulation}
 
 @media(max-width:760px){.live-story-side .turntable{width:82px;max-width:82px;background:none}}
 @media(max-width:420px){.live-story-side .turntable{width:76px;max-width:76px}}
-@media(max-height:620px) and (orientation:landscape){.live-story-side .turntable{width:min(100%,240px);max-width:240px;background-image:linear-gradient(135deg,rgba(22,17,13,.16),rgba(22,17,13,.35)),url("https://images.unsplash.com/photo-1613311106434-89edb8bb30c8?auto=format&fit=crop&fm=jpg&q=75&w=1400")}}
+@media(max-height:620px) and (orientation:landscape){.live-story-side .turntable{width:min(100%,240px);max-width:240px;background-image:linear-gradient(135deg,rgba(22,17,13,.16),rgba(22,17,13,.35)),url("/assets/grandmas-turntable.webp")}}
 
 
 /* Tactile, fine-ribbed corduroy on the main controls */
@@ -326,7 +326,7 @@ button,.upload-box{touch-action:manipulation}
  .live-mode .live-panel .album-paper img#livePhoto{height:58svh;max-height:58svh;}
  .live-mode .live-story-side{display:flex;max-height:calc(100svh - 28px);overflow:auto;gap:7px;padding:10px;}
  .live-mode .audio-brand{font-size:22px;}
- .live-mode .turntable{width:min(100%,150px);aspect-ratio:1.42;background-image:linear-gradient(135deg,rgba(22,17,13,.16),rgba(22,17,13,.35)),url('https://images.unsplash.com/photo-1613311106434-89edb8bb30c8?auto=format&fit=crop&fm=jpg&q=75&w=1400');border:6px solid #4b3024;}
+ .live-mode .turntable{width:min(100%,150px);aspect-ratio:1.42;background-image:linear-gradient(135deg,rgba(22,17,13,.16),rgba(22,17,13,.35)),url('/assets/grandmas-turntable.webp');border:6px solid #4b3024;}
  .live-mode .record{width:58%;left:8%;top:50%;transform:translateY(-50%);}
  .live-mode .tonearm{display:block;}
  .live-mode #transcript{max-height:44px;}
@@ -397,3 +397,11 @@ button,.upload-box{touch-action:manipulation}
 @media(max-width:760px){#stories{width:100%;margin:8px auto;padding:26px 14px;border-width:7px;gap:14px}.story-card{padding:12px;border-width:5px}.story-card h2{font-size:19px}.story-transcript p{font-size:14px}}
 .record-disc.is-spinning{animation:record-spin 8s linear infinite!important;animation-play-state:running!important}
 .live-panel[data-audio-state="thinking"] .record-disc.is-spinning,.live-panel[data-audio-state="speaking"] .record-disc.is-spinning{animation-play-state:paused!important}
+
+/* The bespoke overhead turntable photograph replaces the old stock image.
+   Keep the cabinet still and rotate only the vinyl overlay. */
+.turntable{aspect-ratio:1.094!important;background-size:100% 100%!important;background-position:center!important}
+.record{width:58.7%;left:18.4%;top:46%;transform:translateY(-50%)}
+.record-disc .record-label{width:31%;height:31%;background:#eee0c9;color:#594633;border:2px solid #d8c6aa;box-shadow:0 0 0 1px #8b755e}
+.tonearm{display:none!important}
+@media(max-width:760px){.turntable{aspect-ratio:1!important}}
