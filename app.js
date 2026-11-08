@@ -136,16 +136,20 @@ async function connectCloudSession(user){
     $('archiveEmail').value=user.email||'';$('archiveEmail').classList.add('hidden');$('sendArchiveLink').classList.add('hidden');
     $('cloudAuthStatus').textContent='Checking your family space…';
     const {data:membership,error:memberError}=await supabaseClient.from('family_members').select('family_id,role').eq('user_id',user.id).eq('status','active').limit(1).maybeSingle();
+    if(generation!==cloudSessionGeneration||cloudUser?.id!==user.id)return;
     if(memberError)throw memberError;
-    if(membership)cloudFamilyId=membership.family_id;
-    else{
-      const {data:familyId,error:createError}=await supabaseClient.rpc('create_family',{p_name:"Grandma’s Stories"});
+    let familyId=membership?.family_id||null;
+    if(!familyId){
+      const {data:createdFamilyId,error:createError}=await supabaseClient.rpc('create_family',{p_name:"Grandma’s Stories"});
+      if(generation!==cloudSessionGeneration||cloudUser?.id!==user.id)return;
       if(createError)throw createError;
-      cloudFamilyId=familyId;
+      familyId=createdFamilyId;
     }
     if(generation!==cloudSessionGeneration||cloudUser?.id!==user.id)return;
+    cloudFamilyId=familyId;
     $('cloudAuthStatus').textContent='Syncing your family album…';
     await syncCloudPhotos();
+    if(generation!==cloudSessionGeneration||cloudUser?.id!==user.id)return;
     await syncCloudStories();
     if(generation!==cloudSessionGeneration||cloudUser?.id!==user.id)return;
     cloudReady=true;
