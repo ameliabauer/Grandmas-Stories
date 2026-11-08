@@ -91,9 +91,8 @@ async function syncStoryToCloud(story){
     links.push({family_id:cloudFamilyId,story_id:storyId,media_asset_id:audioAssetId,relationship:'audio_narration'});
   }
   for(const link of links){
-    const {data:existing,error:lookupError}=await supabaseClient.from('story_media').select('id').eq('family_id',link.family_id).eq('story_id',link.story_id).eq('media_asset_id',link.media_asset_id).eq('relationship',link.relationship).limit(1);
-    if(lookupError)throw lookupError;
-    if(!existing?.length){const {error:linkError}=await supabaseClient.from('story_media').insert(link);if(linkError)throw linkError;}
+    const {error:linkError}=await supabaseClient.from('story_media').upsert(link,{onConflict:'story_id,media_asset_id,relationship',ignoreDuplicates:true});
+    if(linkError)throw linkError;
   }
   const updated={...story,cloudStoryId:storyId};
   await store('stories','readwrite',st=>st.put(updated));
@@ -129,7 +128,7 @@ async function connectCloudSession(user){
   if(cloudConnectPromise&&cloudConnectUserId===user.id)return cloudConnectPromise;
   const generation=++cloudSessionGeneration;
   cloudConnectUserId=user.id;
-  cloudConnectPromise=(async()=>{
+  const connectionPromise=(async()=>{
     cloudUser=user;cloudReady=false;cloudError=null;
     $('archiveConnectionStatus').textContent='Connecting to your private family archive…';
     $('cloudAuthTitle').textContent='Your family archive is connected.';
@@ -155,23 +154,29 @@ async function connectCloudSession(user){
     $('connectArchive').textContent='Family archive connected';
     $('archiveConnectionStatus').textContent='Private family archive connected. Photos and stories are saved online.';
   })().catch(error=>{
-    cloudReady=false;cloudError=error;
-    $('cloudAuthStatus').textContent='We could not prepare the family space: '+(error.message||'Please try again.');
-    $('archiveConnectionStatus').textContent='Archive connection needs attention: '+(error.message||'Please try again.');
+    if(generation===cloudSessionGeneration){
+      cloudReady=false;cloudError=error;
+      $('cloudAuthStatus').textContent='We could not prepare the family space: '+(error.message||'Please try again.');
+      $('archiveConnectionStatus').textContent='Archive connection needs attention: '+(error.message||'Please try again.');
+    }
     throw error;
-  }).finally(()=>{if(cloudConnectUserId===user.id){cloudConnectPromise=null;cloudConnectUserId=null;}});
-  return cloudConnectPromise;
+  });
+  cloudConnectPromise=connectionPromise;
+  connectionPromise.finally(()=>{
+    if(cloudConnectPromise===connectionPromise){cloudConnectPromise=null;cloudConnectUserId=null;}
+  }).catch(()=>{});
+  return connectionPromise;
 }
 async function initCloudAuth(){
   if(!window.supabase?.createClient)return;
   supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
   supabaseClient.auth.onAuthStateChange((event,session)=>{
     if(event==='SIGNED_OUT'){
-      cloudSessionGeneration++;cloudUser=null;cloudFamilyId=null;cloudReady=false;cloudError=null;
+      cloudSessionGeneration++;cloudUser=null;cloudFamilyId=null;cloudReady=false;cloudError=null;cloudConnectPromise=null;cloudConnectUserId=null;
       $('connectArchive').textContent='Connect our private family archive';
       $('archiveConnectionStatus').textContent='Saved on this iPad only until the family archive is connected.';
     }
-    if((event==='SIGNED_IN'||event==='TOKEN_REFRESHED')&&session?.user){
+    if(event==='SIGNED_IN'&&session?.user){
       Promise.resolve().then(()=>connectCloudSession(session.user)).catch(()=>{});
     }
   });
