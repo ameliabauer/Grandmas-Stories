@@ -1,6 +1,6 @@
 const $=id=>document.getElementById(id);
 const screens=['welcome','cloudAuth','addPanel','stories','consent','live','saving','saved','error'];
-let db,photos=[],selectedFiles=[],currentPhoto=null,pc=null,dc=null,stream=null,recorder=null,chunks=[],lines=[],started=0,tick=null,sessionPhase='idle',photoQueue=[],lastPhotoId=null,supabaseClient=null,cloudUser=null,cloudFamilyId=null,authBusy=false,cloudConnectPromise=null,cloudConnectUserId=null,cloudSessionGeneration=0,cloudReady=false,cloudError=null;
+let db,photos=[],selectedFiles=[],currentPhoto=null,pc=null,dc=null,stream=null,recorder=null,chunks=[],lines=[],started=0,tick=null,sessionPhase='idle',photoQueue=[],lastPhotoId=null,supabaseClient=null,cloudUser=null,cloudFamilyId=null,authBusy=false,cloudConnectPromise=null,cloudConnectUserId=null,cloudSessionGeneration=0,cloudReady=false,cloudError=null,cloudSyncPromise=null;
 function show(id){screens.forEach(name=>$(name).classList.toggle('hidden',name!==id));document.body.classList.toggle('home-mode',id==='welcome');document.body.classList.toggle('live-mode',id==='live');window.scrollTo({top:0,behavior:'smooth'});}
 function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open('grandmas-stories-local',2);req.onupgradeneeded=()=>{const d=req.result;if(!d.objectStoreNames.contains('stories'))d.createObjectStore('stories',{keyPath:'id'});if(!d.objectStoreNames.contains('photos'))d.createObjectStore('photos',{keyPath:'id'});};req.onsuccess=()=>{db=req.result;resolve(db)};req.onerror=()=>reject(req.error)});}
 function store(name,mode,work){return new Promise((resolve,reject)=>{const tx=db.transaction(name,mode);const result=work(tx.objectStore(name));tx.oncomplete=()=>resolve(result);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error)});}
@@ -171,12 +171,32 @@ async function connectCloudSession(user){
   }).catch(()=>{});
   return connectionPromise;
 }
+async function retryPendingCloudSync(){
+  if(!cloudReady||!cloudUser||!cloudFamilyId||!supabaseClient||!navigator.onLine)return;
+  if(cloudSyncPromise)return cloudSyncPromise;
+  const generation=cloudSessionGeneration,userId=cloudUser.id;
+  const task=(async()=>{
+    await syncCloudPhotos();
+    if(generation!==cloudSessionGeneration||cloudUser?.id!==userId)return;
+    await syncCloudStories();
+    if(generation!==cloudSessionGeneration||cloudUser?.id!==userId)return;
+    cloudError=null;
+    $('archiveConnectionStatus').textContent='Private family archive connected. Photos and stories are saved online.';
+  })().catch(error=>{
+    if(generation===cloudSessionGeneration&&cloudUser?.id===userId){
+      cloudError=error;
+      $('archiveConnectionStatus').textContent='Some items are still waiting to back up. We’ll retry when the connection is available.';
+    }
+  }).finally(()=>{if(cloudSyncPromise===task)cloudSyncPromise=null;});
+  cloudSyncPromise=task;
+  return task;
+}
 async function initCloudAuth(){
   if(!window.supabase?.createClient)return;
   supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
   supabaseClient.auth.onAuthStateChange((event,session)=>{
     if(event==='SIGNED_OUT'){
-      cloudSessionGeneration++;cloudUser=null;cloudFamilyId=null;cloudReady=false;cloudError=null;cloudConnectPromise=null;cloudConnectUserId=null;
+      cloudSessionGeneration++;cloudUser=null;cloudFamilyId=null;cloudReady=false;cloudError=null;cloudConnectPromise=null;cloudConnectUserId=null;cloudSyncPromise=null;
       $('connectArchive').textContent='Connect our private family archive';
       $('archiveConnectionStatus').textContent='Saved on this iPad only until the family archive is connected.';
     }
@@ -188,7 +208,7 @@ async function initCloudAuth(){
   if(error)console.warn('Could not restore family archive session',error);
   if(session?.user){try{await connectCloudSession(session.user)}catch(e){console.warn('Family archive connection needs attention',e);}}
 }
-$('connectArchive').onclick=async()=>{show('cloudAuth');if(cloudUser){$('cloudAuthTitle').textContent='Your private family archive';$('cloudAuthDescription').textContent='Signed in as '+cloudUser.email+'.';$('archiveEmail').classList.add('hidden');$('sendArchiveLink').classList.add('hidden');if(!cloudFamilyId){$('cloudAuthStatus').textContent='Finishing the connection…';try{await connectCloudSession(cloudUser);}catch(e){$('cloudAuthStatus').textContent='We could not prepare your family space: '+(e.message||'Please try again.');$('archiveConnectionStatus').textContent='Archive connection needs attention: '+(e.message||'Please try again.');}}else{$('cloudAuthStatus').textContent='Your private family archive is connected. Photos and stories are saved online.';}}else{$('cloudAuthTitle').textContent='Connect our family archive.';$('cloudAuthDescription').textContent='A secure sign-in link will arrive by email. No password to remember.';$('archiveEmail').classList.remove('hidden');$('sendArchiveLink').classList.remove('hidden');$('cloudAuthStatus').textContent='';}};
+$('connectArchive').onclick=async()=>{show('cloudAuth');if(cloudUser){$('cloudAuthTitle').textContent='Your private family archive';$('cloudAuthDescription').textContent='Signed in as '+cloudUser.email+'.';$('archiveEmail').classList.add('hidden');$('sendArchiveLink').classList.add('hidden');if(!cloudReady){$('cloudAuthStatus').textContent='Finishing the connection…';try{await connectCloudSession(cloudUser);}catch(e){$('cloudAuthStatus').textContent='We could not prepare your family space: '+(e.message||'Please try again.');$('archiveConnectionStatus').textContent='Archive connection needs attention: '+(e.message||'Please try again.');}}else{$('cloudAuthStatus').textContent='Your private family archive is connected. Photos and stories are saved online.';await retryPendingCloudSync();}}else{$('cloudAuthTitle').textContent='Connect our family archive.';$('cloudAuthDescription').textContent='A secure sign-in link will arrive by email. No password to remember.';$('archiveEmail').classList.remove('hidden');$('sendArchiveLink').classList.remove('hidden');$('cloudAuthStatus').textContent='';}};
 $('closeCloudAuth').onclick=()=>show('welcome');
 $('sendArchiveLink').onclick=async()=>{
   if(authBusy||!supabaseClient){$('cloudAuthStatus').textContent='The secure sign-in service is not ready. Please try again shortly.';return;}
@@ -270,4 +290,6 @@ $('startSession').onclick=async()=>{try{await refreshPhotos();if(!photos.length)
 $('accept').onclick=()=>{localStorage.setItem('grandmas-stories-consent-v1','yes');start();};$('notnow').onclick=()=>show('welcome');
 $('stop').onclick=()=>end(false);$('nextPhoto').onclick=()=>end(true);$('retry').onclick=start;$('errorBack').onclick=()=>show('welcome');$('anotherStory').onclick=()=>{$('timer').textContent='0:00';currentPhoto=chooseRandomPhoto();if(currentPhoto)start();else show('welcome');};$('finish').onclick=()=>show('welcome');
 (async()=>{try{await openDB();await refreshPhotos();show('welcome');await initCloudAuth();}catch(e){$('errorText').textContent='We could not open the family album on this iPad.';show('error');}})();
+window.addEventListener('online',()=>retryPendingCloudSync());
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)retryPendingCloudSync();});
 if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
