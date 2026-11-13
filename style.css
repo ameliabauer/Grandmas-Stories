@@ -724,3 +724,19 @@ body.live-mode .live-actions button{
 .home-mode #openStories.archive-link:active{transform:translateY(1px);box-shadow:0 1px 0 rgba(65,39,24,.65),0 5px 12px rgba(8,20,19,.25);}
 .home-mode #openStories.archive-link:focus-visible{outline:3px solid #f2c69b;outline-offset:4px;}
 @media(max-width:760px){.home-mode #openStories.archive-link{width:min(100%,340px);min-height:60px;font-size:19px;}}
+
+/* Larger, arrow-free home controls with generous touch targets for older hands. */
+.home-mode .home-panel .start-home{
+  width:min(100%,360px);min-width:0;min-height:78px;margin:16px 0 4px;
+  padding:0 30px;font-size:30px;letter-spacing:.01em;
+}
+.home-mode .home-panel .start-home b{display:none!important}
+.home-mode #openStories.archive-link{
+  justify-content:center;gap:0;width:min(100%,360px);min-height:78px;
+  margin:12px 0 4px;padding:0 28px;font-size:23px;
+}
+.home-mode #openStories.archive-link:after{content:none!important;display:none!important}
+@media(max-width:760px){
+  .home-mode .home-panel .start-home{width:min(100%,360px);min-height:76px;font-size:29px}
+  .home-mode #openStories.archive-link{width:min(100%,360px);min-height:76px;font-size:22px}
+}
