@@ -2,7 +2,7 @@ const $=id=>document.getElementById(id);
 const previewMode=new URLSearchParams(window.location.search).get('preview')==='1';
 const consentKey=previewMode?'grandmas-stories-preview-consent-v1':'grandmas-stories-consent-v1';
 const screens=['welcome','cloudAuth','addPanel','stories','consent','live','saving','saved','error'];
-let db,photos=[],selectedFiles=[],currentPhoto=null,pc=null,dc=null,stream=null,recorder=null,chunks=[],lines=[],started=0,tick=null,sessionPhase='idle',photoQueue=[],lastPhotoId=null,supabaseClient=null,cloudUser=null,cloudFamilyId=null,authBusy=false,cloudConnectPromise=null,cloudConnectUserId=null,cloudSessionGeneration=0,cloudReady=false,cloudError=null,cloudSyncPromise=null;
+let db,photos=[],selectedFiles=[],currentPhoto=null,pc=null,dc=null,stream=null,recorder=null,chunks=[],lines=[],started=0,tick=null,sessionPhase='idle',photoQueue=[],lastPhotoId=null,photoHistory=[],navigationPhoto=null,supabaseClient=null,cloudUser=null,cloudFamilyId=null,authBusy=false,cloudConnectPromise=null,cloudConnectUserId=null,cloudSessionGeneration=0,cloudReady=false,cloudError=null,cloudSyncPromise=null;
 function show(id){screens.forEach(name=>$(name).classList.toggle('hidden',name!==id));document.body.classList.toggle('home-mode',id==='welcome');document.body.classList.toggle('live-mode',id==='live');document.body.classList.toggle('album-mode',id==='addPanel');window.scrollTo({top:0,behavior:'smooth'});}
 function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(previewMode?'grandmas-stories-preview':'grandmas-stories-local',2);req.onupgradeneeded=()=>{const d=req.result;if(!d.objectStoreNames.contains('stories'))d.createObjectStore('stories',{keyPath:'id'});if(!d.objectStoreNames.contains('photos'))d.createObjectStore('photos',{keyPath:'id'});};req.onsuccess=()=>{db=req.result;resolve(db)};req.onerror=()=>reject(req.error)});}
 function store(name,mode,work){return new Promise((resolve,reject)=>{const tx=db.transaction(name,mode);const result=work(tx.objectStore(name));tx.oncomplete=()=>resolve(result);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error)});}
@@ -331,7 +331,7 @@ async function saveStory(blob){
     $('savedCloudStatus').textContent='Saved on this iPad only. Connect your private family archive to back it up online.';
   }
 }
-async function end(advance=false){if(sessionPhase!=='live')return;sessionPhase='saving';if(!advance)show('saving');else setVoiceStatus('Saving this story…','thinking');let blob=null;try{if(recorder&&recorder.state!=='inactive')await new Promise(resolve=>{recorder.addEventListener('stop',resolve,{once:true});recorder.stop()});if(chunks.length)blob=new Blob(chunks,{type:recorder?.mimeType||'audio/webm'});cleanup();await saveStory(blob);if(advance){currentPhoto=chooseRandomPhoto();if(currentPhoto){$('timer').textContent='0:00';$('transcript').innerHTML='';start();return;}}const thumb=$('savedPhoto');thumb.innerHTML='';if(currentPhoto){const img=document.createElement('img');img.src=URL.createObjectURL(currentPhoto.image);img.alt='The photograph connected to this story';thumb.append(img)}show('saved')}catch(e){cleanup();$('errorText').textContent='We could not save this story on the iPad. Please keep this page open and ask a family member for help.';show('error')}}
+async function end(advance=false){if(sessionPhase!=='live')return;sessionPhase='saving';if(!advance)show('saving');else setVoiceStatus('Saving this story…','thinking');let blob=null;try{if(recorder&&recorder.state!=='inactive')await new Promise(resolve=>{recorder.addEventListener('stop',resolve,{once:true});recorder.stop()});if(chunks.length)blob=new Blob(chunks,{type:recorder?.mimeType||'audio/webm'});cleanup();await saveStory(blob);if(advance){if(navigationPhoto){currentPhoto=navigationPhoto;navigationPhoto=null;}else{if(currentPhoto)photoHistory.push(currentPhoto);currentPhoto=chooseRandomPhoto();}if(currentPhoto){$('timer').textContent='0:00';$('transcript').innerHTML='';start();return;}}const thumb=$('savedPhoto');thumb.innerHTML='';if(currentPhoto){const img=document.createElement('img');img.src=URL.createObjectURL(currentPhoto.image);img.alt='The photograph connected to this story';thumb.append(img)}show('saved')}catch(e){cleanup();$('errorText').textContent='We could not save this story on the iPad. Please keep this page open and ask a family member for help.';show('error')}}
 async function start(){if(!currentPhoto)return;
   // Go straight to the photograph. The connection happens in place; there is no
   // separate "getting ready" page between the album and the conversation.
@@ -370,9 +370,27 @@ $('openStories').onclick=async()=>{await refreshPhotos();await renderAlbumPhotos
 $('storiesHome').onclick=()=>show('welcome');$('storiesHomeTop').onclick=()=>show('welcome');
 $('photoFiles').onchange=async e=>{const files=[...e.target.files].filter(f=>f.type.startsWith('image/'));e.target.value='';if(!files.length)return;const hint=$('uploadHint');hint.classList.remove('hidden');hint.textContent='Adding photographs…';try{if(cloudUser&&!cloudReady)await connectCloudSession(cloudUser);let added=0;for(const file of files){const image=await compressImage(file);let photo={id:crypto.randomUUID(),title:'',notes:'',image,createdAt:new Date().toISOString()};await store('photos','readwrite',st=>st.put(photo));if(cloudUser&&cloudReady)photo=await uploadPhotoToCloud(photo);added++;}photoQueue=[];await refreshPhotos();hint.classList.remove('hidden');hint.textContent=added+' photograph'+(added===1?'':'s')+(cloudUser?' saved to your private family archive.':' added to this iPad album.');}catch(e){await refreshPhotos();label.textContent='Add more photographs';hint.classList.remove('hidden');hint.textContent=e.message||'We could not add those photographs. Please try again.';}};
 $('savePhotos').onclick=async()=>{await refreshPhotos();show('welcome')};
-$('startSession').onclick=async()=>{try{await refreshPhotos();if(!photos.length){$('emptyAlbumPrompt').classList.remove('hidden');await renderAlbumPhotos();show('stories');return;}$('emptyAlbumPrompt').classList.add('hidden');currentPhoto=chooseRandomPhoto();if(!currentPhoto)return;if(localStorage.getItem(consentKey)==='yes'){start();}else{show('consent');}}catch(e){$('errorText').textContent='We could not open the family album on this iPad.';show('error');}};
+$('startSession').onclick=async()=>{try{photoHistory=[];navigationPhoto=null;await refreshPhotos();if(!photos.length){$('emptyAlbumPrompt').classList.remove('hidden');await renderAlbumPhotos();show('stories');return;}$('emptyAlbumPrompt').classList.add('hidden');currentPhoto=chooseRandomPhoto();if(!currentPhoto)return;if(localStorage.getItem(consentKey)==='yes'){start();}else{show('consent');}}catch(e){$('errorText').textContent='We could not open the family album on this iPad.';show('error');}};
 $('accept').onclick=()=>{localStorage.setItem(consentKey,'yes');start();};$('notnow').onclick=()=>show('welcome');
-$('stop').onclick=()=>end(false);$('nextPhoto').onclick=()=>end(true);$('retry').onclick=start;$('errorBack').onclick=()=>show('welcome');$('anotherStory').onclick=()=>{$('timer').textContent='0:00';currentPhoto=chooseRandomPhoto();if(currentPhoto)start();else show('welcome');};$('finish').onclick=()=>show('welcome');
+$('stop').onclick=()=>end(false);$('nextPhoto').onclick=()=>end(true);
+// Swipe across the photograph to navigate. Left = next, right = previous.
+// A swipe saves the current conversation before changing photographs.
+(()=>{
+ const surface=$('livePhotoWrap');let startX=0,startY=0,tracking=false;
+ surface.addEventListener('touchstart',e=>{
+  if(sessionPhase!=='live'||!e.touches||e.touches.length!==1)return;
+  startX=e.touches[0].clientX;startY=e.touches[0].clientY;tracking=true;
+ },{passive:true});
+ surface.addEventListener('touchend',e=>{
+  if(!tracking||sessionPhase!=='live')return;tracking=false;
+  const t=e.changedTouches?.[0];if(!t)return;
+  const dx=t.clientX-startX,dy=t.clientY-startY;
+  if(Math.abs(dx)<65||Math.abs(dx)<Math.abs(dy)*1.25)return;
+  if(dx<0){end(true);}
+  else if(photoHistory.length){navigationPhoto=photoHistory.pop();end(true);}
+ },{passive:true});
+})();
+$('retry').onclick=start;$('errorBack').onclick=()=>show('welcome');$('anotherStory').onclick=()=>{$('timer').textContent='0:00';currentPhoto=chooseRandomPhoto();if(currentPhoto)start();else show('welcome');};$('finish').onclick=()=>show('welcome');
 (async()=>{try{await openDB();await refreshPhotos();show('welcome');if(previewMode){document.body.classList.add('preview-mode');$('previewNotice').classList.remove('hidden');$('connectArchive').classList.add('hidden');$('archiveConnectionStatus').textContent='Preview only. No sign-in emails, cloud uploads or changes to your private family archive. Photos and stories stay in this browser.';$('consent').querySelector('p').textContent='This is a visual preview. Microphone access and AI voice conversations are switched off. Any sample stories you save stay in this separate preview on this device.';}else{await initCloudAuth();}}catch(e){$('errorText').textContent='We could not open the family album on this iPad.';show('error');}})();
 window.addEventListener('online',()=>retryPendingCloudSync());
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)retryPendingCloudSync();});
