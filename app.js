@@ -261,18 +261,53 @@ async function removePhotoFromAlbum(photo){
  photoQueue=photoQueue.filter(id=>id!==photo.id);await refreshPhotos();
 }
 async function renderStories(){
- const list=$('storyList');list.innerHTML='';const stories=(await allStories()).sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
- $('storiesHeading').textContent=stories.length?'The stories we’ve gathered':'Our stories';$('storiesEmpty').classList.toggle('hidden',stories.length>0);
+ const list=$('storyList');list.innerHTML='';
+ const stories=(await allStories()).sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
+ $('storiesHeading').textContent=stories.length?'The stories we’ve gathered':'Our stories';
+ $('storiesEmpty').classList.toggle('hidden',stories.length>0);
+
+ // A photograph is the organising page in the album. Every conversation
+ // recorded against it is kept together beneath one copy of that photograph.
+ const pages=new Map();
  for(const story of stories){
+  const key=story.photoId?'photo:'+story.photoId:'story:'+story.id;
+  if(!pages.has(key))pages.set(key,{photoId:story.photoId,stories:[]});
+  pages.get(key).stories.push(story);
+ }
+ for(const page of pages.values()){
   const card=document.createElement('article');card.className='story-card';
-  const date=document.createElement('p');date.className='story-date';date.textContent=new Date(story.createdAt).toLocaleString(undefined,{dateStyle:'long',timeStyle:'short'});card.append(date);
-  const photo=photos.find(p=>p.id===story.photoId);
-  if(photo?.image){const frame=document.createElement('div');frame.className='story-photo-frame';const img=document.createElement('img');img.src=URL.createObjectURL(photo.image);img.alt='Photograph connected to this story';frame.append(img,...cornerPieces());card.append(frame);}
-  const transcript=document.createElement('div');transcript.className='story-transcript';
-  for(const line of story.lines||[]){if(!line.text)continue;const p=document.createElement('p'),speaker=document.createElement('strong');speaker.textContent=line.who==='user'?'Betty':'A gentle thought';p.append(speaker,document.createTextNode(line.text));transcript.append(p);}
-  if(transcript.childElementCount)card.append(transcript);
-  if(story.audio){const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.src=URL.createObjectURL(story.audio);audio.setAttribute('aria-label','Listen to this recorded story');card.append(audio);}else{const note=document.createElement('p');note.className='story-date';note.textContent='No audio recording was saved for this story.';card.append(note);}
-  list.append(card);
+  const photo=page.photoId?photos.find(p=>p.id===page.photoId):null;
+  if(photo?.image){
+   const frame=document.createElement('div');frame.className='story-photo-frame';
+   const img=document.createElement('img');img.src=URL.createObjectURL(photo.image);
+   img.alt='Photograph connected to these family stories';
+   frame.append(img,...cornerPieces());card.append(frame);
+  }
+  const conversations=document.createElement('div');conversations.className='story-conversations';
+  page.stories.forEach((story,index)=>{
+   const entry=document.createElement('section');entry.className='story-entry';
+   const date=document.createElement('p');date.className='story-date';
+   date.textContent=new Date(story.createdAt).toLocaleString(undefined,{dateStyle:'long',timeStyle:'short'});
+   entry.append(date);
+   const transcript=document.createElement('div');transcript.className='story-transcript';
+   for(const line of story.lines||[]){
+    if(!line.text)continue;
+    const p=document.createElement('p'),speaker=document.createElement('strong');
+    speaker.textContent=line.who==='user'?'Betty':'A gentle thought';
+    p.append(speaker,document.createTextNode(line.text));transcript.append(p);
+   }
+   if(transcript.childElementCount)entry.append(transcript);
+   if(story.audio){
+    const audio=document.createElement('audio');audio.controls=true;audio.preload='none';
+    audio.src=URL.createObjectURL(story.audio);audio.setAttribute('aria-label','Listen to this recorded story');
+    entry.append(audio);
+   }else{
+    const note=document.createElement('p');note.className='story-date';
+    note.textContent='No audio recording was saved for this story.';entry.append(note);
+   }
+   conversations.append(entry);
+  });
+  card.append(conversations);list.append(card);
  }
 }
 function cornerPieces(){return ['tl','tr','br','bl'].map(pos=>{const span=document.createElement('span');span.className='photo-corner '+pos;return span;});}
