@@ -520,3 +520,9 @@ body.album-mode footer{width:100%;box-sizing:border-box;text-align:center}
  body.album-mode #albumPhotoGrid,body.album-mode .album-photo-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
  body.album-mode button.album-add-tile{min-height:112px}
 }
+
+/* Story capture: remove the cream mounting board and paper mat behind the photograph. */
+.live-mode .live-photo-wrap{padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;}
+.live-mode .album-paper{padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;}
+.live-mode .album-paper img#livePhoto{background:transparent!important;border:0!important;box-shadow:0 5px 16px #160f0b35!important;}
+.live-mode .live-photo-frame{padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;}
