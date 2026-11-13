@@ -155,8 +155,8 @@ async function connectCloudSession(user){
     cloudReady=true;
     $('cloudAuthStatus').textContent='Your private family archive is ready. Photos and stories are synced.';
     $('cloudAuthDescription').textContent='Signed in as '+user.email+'.';
-    $('connectArchive').textContent='Family archive connected';
-    $('archiveConnectionStatus').textContent='Private family archive connected. Photos and stories are saved online.';
+    $('connectArchive').textContent='Family archive connected';$('connectArchive').classList.add('hidden');
+    $('archiveConnectionStatus').textContent='Private family archive connected. Photos and stories are saved online.';$('connectArchive').classList.add('hidden');
   })().catch(error=>{
     if(generation===cloudSessionGeneration){
       cloudReady=false;cloudError=error;
@@ -197,7 +197,7 @@ async function initCloudAuth(){
   supabaseClient.auth.onAuthStateChange((event,session)=>{
     if(event==='SIGNED_OUT'){
       cloudSessionGeneration++;cloudUser=null;cloudFamilyId=null;cloudReady=false;cloudError=null;cloudConnectPromise=null;cloudConnectUserId=null;cloudSyncPromise=null;
-      $('connectArchive').textContent='Connect our private family archive';
+      $('connectArchive').textContent='Connect our private family archive';$('connectArchive').classList.remove('hidden');
       $('archiveConnectionStatus').textContent='Saved on this iPad only until the family archive is connected.';
     }
     if(event==='SIGNED_IN'&&session?.user){

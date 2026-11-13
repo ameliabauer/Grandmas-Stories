@@ -477,3 +477,5 @@ body.album-mode .upload-feedback{display:none;}
 body.album-mode #emptyAlbumPrompt{color:#f1dfc5;}
 .home-hint{display:none!important;}
 @media(max-width:760px){body.album-mode #addPanel{padding:70px 14px 26px;}body.album-mode .album-photo-grid{grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:12px;}}
+
+body.album-mode .upload-feedback{display:none!important;}
