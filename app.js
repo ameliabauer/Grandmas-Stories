@@ -224,7 +224,7 @@ $('sendArchiveLink').onclick=async()=>{
 };
 async function refreshPhotos(){photos=await allPhotos();photos.sort((a,b)=>a.createdAt.localeCompare(b.createdAt));$('startSession').disabled=!photos.length;$('photoCount').textContent=photos.length?photos.length+' photograph'+(photos.length===1?'':'s')+' in our family album.':'Your family album is waiting for its first photographs.';document.body.classList.toggle('no-photos',!photos.length);$('homeMessage').textContent='Real stories. Lasting memories.';$('homeHint').textContent=photos.length?'A quiet moment, one photograph at a time.':'Add family photographs with the ＋ button above.';if(photos.length)$('emptyAlbumPrompt').classList.add('hidden');renderAlbumPhotos();}
 async function renderAlbumPhotos(){
- const grid=$('albumPhotoGrid'),section=$('albumPreview');grid.innerHTML='';section.classList.toggle('hidden',!photos.length);
+ const grid=$('albumPhotoGrid'),section=$('albumPreview');grid.innerHTML='';section.classList.remove('hidden');
  $('uploadTitle').textContent=photos.length?'Add more photographs':'Choose photographs';
  const stories=await allStories();
  for(const photo of photos){
