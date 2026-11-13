@@ -876,3 +876,58 @@ body:not(.home-mode) .preview-notice{background:#f0dfc7;color:#553824;border-col
  body:not(.home-mode) .panel:not(.home-panel){border-width:6px;border-radius:6px}
  body.live-mode .live-actions button{min-height:52px!important;font-size:14px!important}
 }
+
+
+/* Application-wide 1960s/70s living-room finish — home screen and story photo fixes */
+.home-mode .home-panel{
+ background-color:#422719!important;
+ background-image:
+  linear-gradient(90deg,rgba(19,9,4,.34),rgba(19,9,4,.08) 60%,rgba(19,9,4,.24)),
+  repeating-linear-gradient(90deg,rgba(18,8,3,.36) 0 2px,transparent 2px 6px,rgba(238,185,126,.08) 7px 9px,transparent 10px 74px,rgba(17,7,3,.32) 75px 79px),
+  repeating-linear-gradient(0deg,rgba(255,221,173,.045) 0 1px,transparent 1px 7px),
+  linear-gradient(100deg,#6f4329 0%,#3c2418 48%,#70452b 100%)!important;
+ background-size:cover!important;
+}
+.home-mode .home-panel:after{
+ display:block!important;content:"";position:absolute;z-index:1;pointer-events:none;
+ left:0;right:0;bottom:0;top:auto;height:clamp(72px,15vh,150px);
+ border:0!important;inset:auto 0 0!important;
+ background-image:linear-gradient(0deg,rgba(34,17,9,.08),rgba(34,17,9,.08)),data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDACAWGBwYFCAcGhwkIiAmMFA0MCwsMGJGSjpQdGZ6eHJmcG6AkLicgIiuim5woNqirr7EztDOfJri8uDI8LjKzsb/2wBDASIkJDAqMF40NF7GhHCExsbGxsbGxsbGxsbGxsbGxsbGxsbGxsbGxsbGxsbGxsbGxsbGxsbGxsbGxsbGxsbGxsb/wAARCAAhAJYDASIAAhEBAxEB/8QAGQAAAwEBAQAAAAAAAAAAAAAAAAIDBAEF/8QAMRAAAQMCBAUBBwQDAAAAAAAAAQACEQMhBDFBURIyYXGBIhMUM0JykbEFocHhFdHw/8QAGAEBAQEBAQAAAAAAAAAAAAAAAQACAwT/xAAaEQEAAwEBAQAAAAAAAAAAAAAAAQIREiEx/9oADAMBAAIRAxEAPwDNTo1KpkWG5/662U8K0CHcTtBIgKrQGNjTLaF0uZMHwvO74G0GA+ljRsU/CMyGzspmrwkiB0XDiCAUbByTOoUXXcxueqk/BNvwENMZG4TjEjUSfsm95bMEECM09QOZYagdSfGRyDtFsoVfat9djtuqwyqNwvPxFJ9B3GHktm24Wmfi9TDuaZZ6pOURCkHAif2VsPig8w8hv8qr6LKgBAAMWKxNXSLMbgHC+XSy5BbYT31HRWdReIJ9XZISA/LwVlrSguk59pVWVC1sz/aQETNkOtBMz0shNDKxPNMQuGpTi7QfCzGq2JJ0vZSNUnlyPRXqxpqVKIyZJPVJ7ZughZRf/ao2k90S0gHda9XkLGs3SYQnZh6bGy71E7hCeRNoK+rxSDl9khfIGyQiP6QZAFlmTBjMg5jqUzjMi90ml1wuiRqIsSjCcWiE1rTM6qDqkjsFx1V2meVinlNLXlkFq0Co2tTLXa2K89uIcLOE9VQVAY4Sd0+wJjSYil7Ork0g5b+U1LFuowLOHbJWZUFYcDzc/usdWiaRE+oX0yW4nXKYx6dLEMqixvsquAOYnS68QHMqrcRUYSeMmMlLXpHDUiDAI6gpDhGEn1uAjKVjGOqCbN7RknH6jcei2qsPS5wFPMOeT3Xfc6IvDr9VH/IiOQzrBSHHnJgAJ3Kl02Mp02E8IElLVxFOlYm+wXnVMVVeIc6+yi5xPNmrBrVVxT6hlkgdEJsHhnVpIyjUISD1viO+o/lK3lPj8oQudvrrX458j/pWYcp7IQqpddn90DI90IWiNWop857IQpLjl8laa3wndv4QhFWLPLHI7sF35WoQtuTj8z2QeVCEojeZU+U90IUhV18Lh5fCEIT3sB8I+PwhCFqFL//Z;
+ background-size:100% 100%;background-position:center bottom;
+ box-shadow:0 -10px 28px rgba(24,11,5,.2);
+}
+.home-mode .home-copy{z-index:2;width:min(560px,58%);margin-left:clamp(18px,7vw,110px);padding-bottom:clamp(80px,12vh,140px)}
+.home-mode .home-panel p{color:#f7ead7;text-shadow:0 2px 8px #1d0e08}
+.home-mode .home-panel .start-home{
+ min-height:78px!important;width:min(100%,360px)!important;border-radius:10px!important;
+ border:2px solid #d7a16f!important;
+ background-image:repeating-linear-gradient(90deg,rgba(255,226,195,.15) 0 1px,rgba(40,17,8,.14) 1px 2px,transparent 2px 4px),linear-gradient(180deg,#c66b3d,#963e24)!important;
+ color:#fff0dc!important;font-size:32px!important;box-shadow:0 5px 0 #552b1b,0 12px 24px #170b0780!important;
+}
+.home-mode .home-panel #openStories.archive-link{
+ display:flex;align-items:center;justify-content:center;width:min(100%,420px);min-height:78px;
+ padding:16px 28px;border-radius:10px;border:2px solid #d4b88f;
+ background-image:repeating-linear-gradient(90deg,rgba(130,83,48,.06) 0 1px,transparent 1px 4px),linear-gradient(145deg,#f5e8d1,#dfc69e);
+ color:#49301f;font:600 25px 'Fraunces',Georgia,serif;box-shadow:0 5px 0 #6b452c,0 10px 20px #160b0670;
+}
+.home-mode .home-panel #connectArchive,.home-mode .home-panel #archiveConnectionStatus{color:#f5e6ce;text-shadow:0 1px 5px #160b06}
+.home-mode .home-panel .home-copy>*{max-width:100%}
+.home-mode .home-panel .eyebrow{color:#f0c49a}
+.home-mode .home-panel p{font-size:clamp(19px,2.1vw,25px)}
+/* The live-photo markup uses .live-photo-wrap and .album-paper (not .live-photo-frame). */
+body.live-mode .live-photo-wrap{background:transparent!important;padding:0!important;box-shadow:none!important}
+body.live-mode .album-paper{
+ background:linear-gradient(145deg,#f3e5cd,#ddc39b)!important;
+ border:9px solid #563720!important;
+ box-shadow:inset 0 0 0 2px #c19a6b,0 10px 24px rgba(13,7,3,.55)!important;
+ padding:clamp(10px,2vw,22px)!important;
+}
+body.live-mode .album-paper img{display:block;width:100%;max-height:58vh;object-fit:contain;background:#21150e;box-shadow:0 8px 20px #160b0670}
+body.live-mode .live-story-side{color:#f4e6d0}
+@media(max-width:760px){
+ .home-mode .home-panel{background-position:center!important}
+ .home-mode .home-copy{width:calc(100% - 36px);margin:0 18px;padding:0 0 110px;justify-content:center}
+ .home-mode .home-panel:after{height:76px}
+ .home-mode .home-panel .start-home,.home-mode .home-panel #openStories.archive-link{width:100%!important;min-height:72px!important;font-size:24px!important}
+ body.live-mode .album-paper img{max-height:48vh}
+}
