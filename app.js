@@ -390,7 +390,7 @@ $('stop').onclick=()=>end(false);$('nextPhoto').onclick=()=>end(true);
   else if(photoHistory.length){navigationPhoto=photoHistory.pop();end(true);}
  },{passive:true});
 })();
-$('retry').onclick=start;$('errorBack').onclick=()=>show('welcome');$('anotherStory').onclick=()=>{$('timer').textContent='0:00';currentPhoto=chooseRandomPhoto();if(currentPhoto)start();else show('welcome');};$('finish').onclick=()=>show('welcome');
+$('retry').onclick=start;$('errorBack').onclick=()=>show('welcome');$('finish').onclick=()=>show('welcome');
 (async()=>{try{await openDB();await refreshPhotos();show('welcome');if(previewMode){document.body.classList.add('preview-mode');$('previewNotice').classList.remove('hidden');$('connectArchive').classList.add('hidden');$('archiveConnectionStatus').textContent='Preview only. No sign-in emails, cloud uploads or changes to your private family archive. Photos and stories stay in this browser.';$('consent').querySelector('p').textContent='This is a visual preview. Microphone access and AI voice conversations are switched off. Any sample stories you save stay in this separate preview on this device.';}else{await initCloudAuth();}}catch(e){$('errorText').textContent='We could not open the family album on this iPad.';show('error');}})();
 window.addEventListener('online',()=>retryPendingCloudSync());
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)retryPendingCloudSync();});
