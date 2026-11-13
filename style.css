@@ -1004,3 +1004,62 @@ p,.text,.local-note,.selected-files,footer{color:#ead8bd!important}
 body.album-mode .album-preview{background:linear-gradient(rgba(38,22,13,.25),rgba(38,22,13,.25)),var(--room-photo)!important;background-size:cover!important;background-position:center!important;border:7px solid #563720!important;box-shadow:inset 0 0 0 2px #b9956d,0 8px 18px #1d120d66!important;}
 body.album-mode .story-card{background:#f1e2ca!important;border:7px solid #563720!important;box-shadow:inset 0 0 0 2px #c19a6b,0 8px 18px #1d120d66!important;}
 body.album-mode button.album-add-tile{background:linear-gradient(rgba(45,22,12,.18),rgba(45,22,12,.32)),var(--corduroy-photo)!important;background-size:cover!important;background-position:center!important;border:2px dashed #e2bd91!important;color:#fff2df!important;}
+
+
+/* Real photographed room backdrop; remove the remaining CSS wood-grain imitations. */
+body.album-mode,
+body:not(.home-mode),
+body.live-mode {
+  background-color:#2d1c13!important;
+  background-image:linear-gradient(rgba(25,13,8,.30),rgba(25,13,8,.52)),var(--room-photo)!important;
+  background-size:cover!important;background-position:center center!important;
+  background-attachment:fixed!important;
+}
+body.album-mode .panel:not(.home-panel),
+body:not(.home-mode) .panel:not(.home-panel),
+body.live-mode .live-panel {
+  background-image:linear-gradient(rgba(28,15,9,.42),rgba(28,15,9,.58)),var(--room-photo)!important;
+  background-size:cover!important;background-position:center!important;
+  background-color:transparent!important;
+  border:0!important;
+}
+body.album-mode .panel:not(.home-panel):after,
+body:not(.home-mode) .panel:not(.home-panel):after {display:none!important}
+body.live-mode .album-paper {
+  background:transparent!important;border:0!important;box-shadow:none!important;
+}
+body.album-mode .story-card {
+  background-image:linear-gradient(rgba(35,19,11,.42),rgba(35,19,11,.58)),var(--room-photo)!important;
+  background-size:cover!important;background-position:center!important;
+  color:#fff0dc!important;border:0!important;
+}
+.album-page-title {
+  display:block!important;
+  margin:clamp(48px,7vh,76px) 0 28px!important;
+  color:#fff0dc!important;
+  font-size:clamp(30px,4.4vw,48px)!important;
+  line-height:1.05!important;
+  letter-spacing:.10em!important;
+  font-weight:700!important;
+  text-shadow:0 3px 12px rgba(0,0,0,.65)!important;
+}
+.album-return,
+body.album-mode .album-return,
+body:not(.home-mode) .album-return {
+  border:0!important;
+  background-image:linear-gradient(rgba(38,17,8,.22),rgba(38,17,8,.38)),var(--corduroy-photo)!important;
+  background-size:cover!important;background-position:center!important;
+  color:#fff4e4!important;
+  box-shadow:0 4px 0 rgba(30,13,6,.65),0 9px 22px rgba(0,0,0,.42)!important;
+  text-shadow:0 1px 4px rgba(0,0,0,.7)!important;
+}
+button,.primary,.next-photo,.stop,.archive-link {
+  border:0!important;
+  box-shadow:0 4px 0 rgba(30,13,6,.58),0 9px 20px rgba(0,0,0,.38)!important;
+}
+.home-mode .home-panel .start-home,
+.home-mode .home-panel #openStories.archive-link,
+.primary,.next-photo,.stop {
+  border:0!important;
+  box-shadow:0 5px 0 rgba(30,13,6,.62),0 12px 24px rgba(0,0,0,.42)!important;
+}
