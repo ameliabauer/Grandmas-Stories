@@ -223,8 +223,57 @@ $('sendArchiveLink').onclick=async()=>{
   finally{authBusy=false;$('sendArchiveLink').disabled=false;}
 };
 async function refreshPhotos(){photos=await allPhotos();photos.sort((a,b)=>a.createdAt.localeCompare(b.createdAt));$('startSession').disabled=!photos.length;$('photoCount').textContent=photos.length?photos.length+' photograph'+(photos.length===1?'':'s')+' in our family album.':'Your family album is waiting for its first photographs.';document.body.classList.toggle('no-photos',!photos.length);$('homeMessage').textContent='Real stories. Lasting memories.';$('homeHint').textContent=photos.length?'A quiet moment, one photograph at a time.':'Add family photographs with the ＋ button above.';if(photos.length)$('emptyAlbumPrompt').classList.add('hidden');renderAlbumPhotos();}
-function renderAlbumPhotos(){const grid=$('albumPhotoGrid'),section=$('albumPreview');grid.innerHTML='';section.classList.toggle('hidden',!photos.length);$('albumPhotoHeading').textContent=photos.length?'In our album':'';$('uploadTitle').textContent=photos.length?'Add more photographs':'Choose photographs';for(const photo of photos){const figure=document.createElement('figure'),img=document.createElement('img'),caption=document.createElement('figcaption');img.src=URL.createObjectURL(photo.image);img.alt=photo.title||'Family photograph';caption.textContent=photo.title||'Family photograph';figure.append(img,caption);grid.append(figure);}}
-async function renderStories(){const list=$('storyList');list.innerHTML='';const stories=(await allStories()).sort((a,b)=>b.createdAt.localeCompare(a.createdAt));$('storiesHeading').textContent=stories.length?'The stories we’ve gathered':'Our stories';$('storiesEmpty').classList.toggle('hidden',stories.length>0);for(const story of stories){const card=document.createElement('article');card.className='story-card';const heading=document.createElement('h2');heading.textContent=story.photoTitle||'A family photograph';const date=document.createElement('p');date.className='story-date';date.textContent=new Date(story.createdAt).toLocaleString(undefined,{dateStyle:'long',timeStyle:'short'});card.append(heading,date);const photo=photos.find(p=>p.id===story.photoId);if(photo?.image){const img=document.createElement('img');img.className='story-photo';img.src=URL.createObjectURL(photo.image);img.alt=story.photoTitle||'Photograph connected to this story';card.append(img);}const transcript=document.createElement('div');transcript.className='story-transcript';for(const line of story.lines||[]){if(!line.text)continue;const p=document.createElement('p'),speaker=document.createElement('strong');speaker.textContent=line.who==='user'?'Betty':'A gentle thought';p.append(speaker,document.createTextNode(line.text));transcript.append(p);}if(transcript.childElementCount)card.append(transcript);if(story.audio){const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.src=URL.createObjectURL(story.audio);audio.setAttribute('aria-label','Listen to this recorded story');card.append(audio);}else{const note=document.createElement('p');note.className='story-date';note.textContent='No audio recording was saved for this story.';card.append(note);}list.append(card);}}
+async function renderAlbumPhotos(){
+ const grid=$('albumPhotoGrid'),section=$('albumPreview');grid.innerHTML='';section.classList.toggle('hidden',!photos.length);
+ $('uploadTitle').textContent=photos.length?'Add more photographs':'Choose photographs';
+ const stories=await allStories();
+ for(const photo of photos){
+  const figure=document.createElement('figure'),img=document.createElement('img'),remove=document.createElement('button');
+  img.src=URL.createObjectURL(photo.image);img.alt='Family photograph';
+  const attached=stories.some(story=>story.photoId===photo.id);
+  remove.className='photo-remove';remove.type='button';remove.textContent='×';remove.setAttribute('aria-label','Remove photograph from album');
+  remove.disabled=attached;remove.title=attached?'This photograph has a story and cannot be removed':'Remove photograph';
+  if(!attached)remove.onclick=()=>removePhotoFromAlbum(photo);
+  figure.append(img,remove);grid.append(figure);
+ }
+ const add=document.createElement('label');add.className='album-add-tile';add.htmlFor='photoFiles';add.textContent='+';add.setAttribute('aria-label','Add photographs');grid.append(add);
+}
+async function removePhotoFromAlbum(photo){
+ const stories=await allStories();
+ if(stories.some(story=>story.photoId===photo.id)){alert('This photograph has a story attached, so it cannot be removed.');return;}
+ if(!confirm('Remove this photograph from the family album?'))return;
+ if(photo.cloudAssetId&&cloudUser&&cloudFamilyId){
+  const {data:links,error:linkError}=await supabaseClient.from('story_media').select('story_id').eq('family_id',cloudFamilyId).eq('media_asset_id',photo.cloudAssetId).eq('relationship','cover').limit(1);
+  if(linkError)throw linkError;
+  if(links?.length){alert('This photograph has a story attached, so it cannot be removed.');return;}
+  const {data:files,error:fileError}=await supabaseClient.from('media_files').select('object_key').eq('family_id',cloudFamilyId).eq('media_asset_id',photo.cloudAssetId);
+  if(fileError)throw fileError;
+  const keys=(files||[]).map(f=>f.object_key);
+  if(keys.length){const {error}=await supabaseClient.storage.from('family-archive').remove(keys);if(error)throw error;}
+  const {error:metaError}=await supabaseClient.from('media_files').delete().eq('family_id',cloudFamilyId).eq('media_asset_id',photo.cloudAssetId);
+  if(metaError)throw metaError;
+  const {error:assetError}=await supabaseClient.from('media_assets').delete().eq('family_id',cloudFamilyId).eq('id',photo.cloudAssetId);
+  if(assetError)throw assetError;
+ }
+ await store('photos','readwrite',st=>st.delete(photo.id));
+ photoQueue=photoQueue.filter(id=>id!==photo.id);await refreshPhotos();
+}
+async function renderStories(){
+ const list=$('storyList');list.innerHTML='';const stories=(await allStories()).sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
+ $('storiesHeading').textContent=stories.length?'The stories we’ve gathered':'Our stories';$('storiesEmpty').classList.toggle('hidden',stories.length>0);
+ for(const story of stories){
+  const card=document.createElement('article');card.className='story-card';
+  const date=document.createElement('p');date.className='story-date';date.textContent=new Date(story.createdAt).toLocaleString(undefined,{dateStyle:'long',timeStyle:'short'});card.append(date);
+  const photo=photos.find(p=>p.id===story.photoId);
+  if(photo?.image){const frame=document.createElement('div');frame.className='story-photo-frame';const img=document.createElement('img');img.src=URL.createObjectURL(photo.image);img.alt='Photograph connected to this story';frame.append(img,...cornerPieces());card.append(frame);}
+  const transcript=document.createElement('div');transcript.className='story-transcript';
+  for(const line of story.lines||[]){if(!line.text)continue;const p=document.createElement('p'),speaker=document.createElement('strong');speaker.textContent=line.who==='user'?'Betty':'A gentle thought';p.append(speaker,document.createTextNode(line.text));transcript.append(p);}
+  if(transcript.childElementCount)card.append(transcript);
+  if(story.audio){const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.src=URL.createObjectURL(story.audio);audio.setAttribute('aria-label','Listen to this recorded story');card.append(audio);}else{const note=document.createElement('p');note.className='story-date';note.textContent='No audio recording was saved for this story.';card.append(note);}
+  list.append(card);
+ }
+}
+function cornerPieces(){return ['tl','tr','br','bl'].map(pos=>{const span=document.createElement('span');span.className='photo-corner '+pos;return span;});}
 function chooseRandomPhoto(){if(!photos.length)return null;const available=new Set(photos.map(p=>p.id));photoQueue=photoQueue.filter(id=>available.has(id));if(!photoQueue.length){photoQueue=photos.map(p=>p.id);for(let i=photoQueue.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[photoQueue[i],photoQueue[j]]=[photoQueue[j],photoQueue[i]];}if(photoQueue.length>1&&photoQueue[photoQueue.length-1]===lastPhotoId)[photoQueue[0],photoQueue[photoQueue.length-1]]=[photoQueue[photoQueue.length-1],photoQueue[0]];}const id=photoQueue.pop();lastPhotoId=id;return photos.find(p=>p.id===id)||null;}
 function addLine(who,text){if(!text)return;lines.push({who,text,at:new Date().toISOString()});const p=document.createElement('p'),label=document.createElement('strong');label.textContent=who==='ai'?'A gentle thought':'Betty';p.append(label,document.createTextNode(text));$('transcript').append(p);$('transcript').scrollTop=$('transcript').scrollHeight;}
 function setVoiceStatus(text,state='listening'){$('voiceStatus').lastElementChild.textContent=text;$('live').dataset.audioState=state;const record=$('turntable').querySelector('.record-disc');if(record)record.classList.toggle('is-spinning',state==='listening');$('turntable').setAttribute('aria-label','Audio status: '+state);}
@@ -251,7 +300,7 @@ async function start(){if(!currentPhoto)return;
   // Go straight to the photograph. The connection happens in place; there is no
   // separate "getting ready" page between the album and the conversation.
   $('transcript').innerHTML='';
-  $('livePhoto').src=URL.createObjectURL(currentPhoto.image);
+  const liveFrame=document.createElement('div');liveFrame.className='live-photo-frame';const liveImg=$('livePhoto');liveImg.src=URL.createObjectURL(currentPhoto.image);liveImg.style.display='block';liveFrame.append(liveImg,...cornerPieces());const oldFrame=$('livePhotoWrap').querySelector('.live-photo-frame');if(oldFrame)oldFrame.remove();$('livePhotoWrap').querySelector('.album-paper').insertBefore(liveFrame,$('livePhotoWrap').querySelector('.album-caption'));
   $('liveQuestion').textContent='Tell me about this time…';
   $('stop').disabled=true;$('nextPhoto').disabled=true;
   setVoiceStatus('Getting things ready…','thinking');
@@ -284,7 +333,7 @@ async function start(){if(!currentPhoto)return;
 $('addFromHome').onclick=async()=>{await refreshPhotos();$('emptyAlbumPrompt').classList.add('hidden');show('addPanel')};
 $('openStories').onclick=async()=>{await refreshPhotos();await renderStories();show('stories')};
 $('storiesHome').onclick=()=>show('welcome');
-$('photoFiles').onchange=async e=>{const files=[...e.target.files].filter(f=>f.type.startsWith('image/'));e.target.value='';if(!files.length)return;const label=$('uploadTitle'),hint=$('uploadHint');label.textContent='Adding photographs…';hint.classList.remove('hidden');hint.textContent='Placing your photographs in the album…';try{let added=0;for(const file of files){const image=await compressImage(file);let photo={id:crypto.randomUUID(),title:file.name.replace(/\.[^.]+$/,''),notes:'',image,createdAt:new Date().toISOString()};await store('photos','readwrite',st=>st.put(photo));if(cloudUser)photo=await uploadPhotoToCloud(photo);added++;}photoQueue=[];await refreshPhotos();label.textContent='Add more photographs';hint.classList.remove('hidden');hint.textContent=added+' photograph'+(added===1?'':'s')+(cloudUser?' saved to your private family archive.':' added to this iPad album.');}catch(e){await refreshPhotos();label.textContent='Add more photographs';hint.classList.remove('hidden');hint.textContent=e.message||'We could not add those photographs. Please try again.';}};
+$('photoFiles').onchange=async e=>{const files=[...e.target.files].filter(f=>f.type.startsWith('image/'));e.target.value='';if(!files.length)return;const label=$('uploadTitle'),hint=$('uploadHint');label.textContent='Adding photographs…';hint.classList.remove('hidden');hint.textContent='Placing your photographs in the album…';try{let added=0;for(const file of files){const image=await compressImage(file);let photo={id:crypto.randomUUID(),title:'',notes:'',image,createdAt:new Date().toISOString()};await store('photos','readwrite',st=>st.put(photo));if(cloudUser)photo=await uploadPhotoToCloud(photo);added++;}photoQueue=[];await refreshPhotos();label.textContent='Add more photographs';hint.classList.remove('hidden');hint.textContent=added+' photograph'+(added===1?'':'s')+(cloudUser?' saved to your private family archive.':' added to this iPad album.');}catch(e){await refreshPhotos();label.textContent='Add more photographs';hint.classList.remove('hidden');hint.textContent=e.message||'We could not add those photographs. Please try again.';}};
 $('savePhotos').onclick=async()=>{await refreshPhotos();show('welcome')};
 $('startSession').onclick=async()=>{try{await refreshPhotos();if(!photos.length){$('emptyAlbumPrompt').classList.remove('hidden');show('addPanel');return;}$('emptyAlbumPrompt').classList.add('hidden');currentPhoto=chooseRandomPhoto();if(!currentPhoto)return;if(localStorage.getItem('grandmas-stories-consent-v1')==='yes'){start();}else{show('consent');}}catch(e){$('errorText').textContent='We could not open the family album on this iPad.';show('error');}};
 $('accept').onclick=()=>{localStorage.setItem('grandmas-stories-consent-v1','yes');start();};$('notnow').onclick=()=>show('welcome');
