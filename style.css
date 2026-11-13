@@ -706,3 +706,21 @@ body.live-mode .live-actions button{
 .story-entry .story-date{font-weight:600}
 .story-entry .story-transcript{margin:0}
 .story-entry audio{width:100%;max-width:100%}
+
+/* Home screen: make the Family Album a clear, welcoming primary destination. */
+.home-mode #openStories.archive-link{
+  display:inline-flex;align-items:center;justify-content:space-between;gap:24px;
+  width:min(100%,360px);min-height:64px;margin:10px 0 2px;padding:0 22px;
+  border:1px solid rgba(255,235,210,.78);border-radius:12px;
+  background:linear-gradient(135deg,rgba(250,239,220,.97),rgba(232,211,180,.96));
+  color:#493020;text-decoration:none;text-underline-offset:0;
+  font:600 20px 'Fraunces',Georgia,serif;letter-spacing:-.015em;
+  box-shadow:0 3px 0 rgba(65,39,24,.65),0 10px 24px rgba(8,20,19,.28);
+  transition:transform .16s ease,box-shadow .16s ease,background .16s ease;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.home-mode #openStories.archive-link:after{content:'→';font:400 26px 'DM Sans',sans-serif;color:#a45132;}
+.home-mode #openStories.archive-link:hover{transform:translateY(-2px);box-shadow:0 5px 0 rgba(65,39,24,.65),0 14px 28px rgba(8,20,19,.32);}
+.home-mode #openStories.archive-link:active{transform:translateY(1px);box-shadow:0 1px 0 rgba(65,39,24,.65),0 5px 12px rgba(8,20,19,.25);}
+.home-mode #openStories.archive-link:focus-visible{outline:3px solid #f2c69b;outline-offset:4px;}
+@media(max-width:760px){.home-mode #openStories.archive-link{width:min(100%,340px);min-height:60px;font-size:19px;}}
