@@ -261,7 +261,8 @@ async function removePhotoFromAlbum(photo){
 }
 async function renderStories(){
  const list=$('storyList');list.innerHTML='';
- const stories=(await allStories()).sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
+ // Only include stories with a saved recording; transcript text alone is not an album story.
+ const stories=(await allStories()).filter(story=>story.audio?.size>0).sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
  $('storiesHeading').textContent='Family Album';
  $('storiesEmpty').classList.toggle('hidden',stories.length>0);
 
@@ -296,14 +297,9 @@ async function renderStories(){
     p.append(speaker,document.createTextNode(line.text));transcript.append(p);
    }
    if(transcript.childElementCount)entry.append(transcript);
-   if(story.audio){
-    const audio=document.createElement('audio');audio.controls=true;audio.preload='none';
-    audio.src=URL.createObjectURL(story.audio);audio.setAttribute('aria-label','Listen to this recorded story');
-    entry.append(audio);
-   }else{
-    const note=document.createElement('p');note.className='story-date';
-    note.textContent='No audio recording was saved for this story.';entry.append(note);
-   }
+   const audio=document.createElement('audio');audio.controls=true;audio.preload='none';
+   audio.src=URL.createObjectURL(story.audio);audio.setAttribute('aria-label','Listen to this recorded story');
+   entry.append(audio);
    conversations.append(entry);
   });
   card.append(conversations);list.append(card);
