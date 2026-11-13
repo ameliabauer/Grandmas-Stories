@@ -697,3 +697,12 @@ body.live-mode .live-actions button{
  body.live-mode .live-actions{grid-template-columns:1fr}
  body.live-mode .album-paper img#livePhoto{height:48svh!important;max-height:48svh!important}
 }
+
+
+/* Keep all conversations inspired by one photograph together on its album page. */
+.story-conversations{display:grid;gap:18px;min-width:0}
+.story-entry{display:grid;gap:10px;min-width:0}
+.story-entry+.story-entry{border-top:1px solid #b9956d;padding-top:18px}
+.story-entry .story-date{font-weight:600}
+.story-entry .story-transcript{margin:0}
+.story-entry audio{width:100%;max-width:100%}
