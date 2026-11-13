@@ -405,3 +405,30 @@ button,.upload-box{touch-action:manipulation}
 .record-disc .record-label{width:31%;height:31%;background:#eee0c9;color:#594633;border:2px solid #d8c6aa;box-shadow:0 0 0 1px #8b755e}
 .tonearm{display:none!important}
 @media(max-width:760px){.turntable{aspect-ratio:1!important}}
+
+/* Scrapbook album refinements */
+.album-preview{width:100%;margin:12px 0 18px}
+.album-photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:18px;width:100%;align-items:start}
+.album-photo-grid figure{position:relative;margin:0;min-width:0;padding:10px;background:transparent;box-shadow:none}
+.album-photo-grid figure img{display:block;width:100%;height:auto;max-height:260px;aspect-ratio:4/3;object-fit:contain;background:#e7dfd0;box-shadow:0 3px 12px #34251820}
+.album-photo-grid figure figcaption{display:none}
+.photo-remove{position:absolute;z-index:3;top:0;right:0;width:34px;height:34px;border:1px solid #d7c7a9;border-radius:50%;background:#f7f0e3;color:#29474b;font-size:22px;line-height:1;box-shadow:0 2px 7px #34251830;cursor:pointer}
+.photo-remove:disabled{display:none}
+.album-add-tile{min-height:170px;display:grid;place-items:center;border:1px dashed #b99a70;background:#eee5d5;color:#29474b;font-size:52px;cursor:pointer}
+.upload-feedback{display:flex;flex-direction:column;gap:5px;min-height:20px;color:#526669;font-size:13px;margin:0 0 14px}
+.upload-feedback small{font-size:12px}
+.story-photo-frame,.live-photo-frame{position:relative;display:inline-block;max-width:100%;padding:0;background:transparent;border:0;box-shadow:none;line-height:0}
+.story-photo-frame img,.live-photo-frame img{display:block;max-width:100%;max-height:56svh;width:auto;height:auto;object-fit:contain;border:0!important;background:transparent!important;box-shadow:0 5px 16px #30251b25!important}
+.photo-corner{position:absolute;width:clamp(24px,5vw,42px);height:clamp(24px,5vw,42px);z-index:2;pointer-events:none;background:linear-gradient(135deg,#c69b61,#e3c38a 48%,#9b7044);filter:drop-shadow(1px 2px 2px #35251b55);clip-path:polygon(0 0,100% 0,100% 22%,22% 22%,22% 100%,0 100%)}
+.photo-corner.tl{top:-3px;left:-3px}
+.photo-corner.tr{top:-3px;right:-3px;transform:rotate(90deg)}
+.photo-corner.br{bottom:-3px;right:-3px;transform:rotate(180deg)}
+.photo-corner.bl{bottom:-3px;left:-3px;transform:rotate(270deg)}
+.live-photo-wrap{padding:0!important;background:none!important;border:0!important;box-shadow:none!important}
+.album-paper{padding:clamp(12px,2vw,22px)}
+.album-paper img#livePhoto{display:none}
+.live-photo-frame{margin:6px auto 0}
+.story-photo-frame{margin:12px auto 8px}
+.story-photo-frame img{max-height:340px}
+.turntable{background-image:linear-gradient(135deg,rgba(22,17,13,.12),rgba(22,17,13,.28)),url("/assets/grandmas-turntable.webp");background-size:cover;background-position:center}
+@media(max-width:760px){.album-photo-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.album-photo-grid figure{padding:7px}.album-add-tile{min-height:135px}.story-photo-frame img,.live-photo-frame img{max-height:36svh}}
