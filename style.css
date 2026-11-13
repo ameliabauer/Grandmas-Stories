@@ -998,3 +998,9 @@ p,.text,.local-note,.selected-files,footer{color:#ead8bd!important}
 /* Corrected photographic material sources: actual corduroy and shag-pile rug. */
 :root{--corduroy-photo:url("https://www.innovationliving.com/admin/public/getimage.ashx?Crop=0&Format=jpg&Height=600&Image=%2Ffiles%2Fimages%2Finnovationliving%2FFabrics%2FFabric-Drape-varekort-hover%2F595-Fabric.jpg&Quality=75&Width=600");--shag-photo:url("https://i.etsystatic.com/64022319/r/il/364bb5/7785044773/il_fullxfull.7785044773_ryv9.jpg");}
 .home-mode .home-panel .start-home,.home-mode .home-panel #openStories.archive-link,.primary,.next-photo,.stop{background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important;background-blend-mode:normal!important;}
+
+
+/* Remove the remaining synthetic stripe textures from album surfaces. */
+body.album-mode .album-preview{background:linear-gradient(rgba(38,22,13,.25),rgba(38,22,13,.25)),var(--room-photo)!important;background-size:cover!important;background-position:center!important;border:7px solid #563720!important;box-shadow:inset 0 0 0 2px #b9956d,0 8px 18px #1d120d66!important;}
+body.album-mode .story-card{background:#f1e2ca!important;border:7px solid #563720!important;box-shadow:inset 0 0 0 2px #c19a6b,0 8px 18px #1d120d66!important;}
+body.album-mode button.album-add-tile{background:linear-gradient(rgba(45,22,12,.18),rgba(45,22,12,.32)),var(--corduroy-photo)!important;background-size:cover!important;background-position:center!important;border:2px dashed #e2bd91!important;color:#fff2df!important;}
