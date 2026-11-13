@@ -526,3 +526,9 @@ body.album-mode footer{width:100%;box-sizing:border-box;text-align:center}
 .live-mode .album-paper{padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;}
 .live-mode .album-paper img#livePhoto{background:transparent!important;border:0!important;box-shadow:0 5px 16px #160f0b35!important;}
 .live-mode .live-photo-frame{padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;}
+
+/* High-contrast prompt on the dark walnut story-capture background. */
+.live-mode .album-caption,
+.live-mode .album-caption h2,
+.live-mode #liveQuestion{color:#f5e8d2!important;text-shadow:0 1px 3px rgba(20,12,8,.72);}
+.live-mode .album-caption .quote-mark{color:#d9a16f!important;}
