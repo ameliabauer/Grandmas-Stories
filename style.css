@@ -1115,3 +1115,14 @@ button,.primary,.next-photo,.stop,.archive-link {
 }
 .record-disc:before{border:1px solid rgba(255,255,255,.35)!important}
 .record-disc .record-grooves{display:none!important}
+
+
+/* Hold home-button texture choices open for the user: no texture is selected yet. */
+.home-mode .home-panel .start-home,
+.home-mode .home-panel #openStories.archive-link,
+.home-mode .home-panel #connectArchive {
+  background-image:none!important;
+  background-size:auto!important;
+  background-position:initial!important;
+  text-shadow:none!important;
+}
