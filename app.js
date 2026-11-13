@@ -303,7 +303,6 @@ async function start(){if(!currentPhoto)return;
   // separate "getting ready" page between the album and the conversation.
   $('transcript').innerHTML='';
   const liveFrame=document.createElement('div');liveFrame.className='live-photo-frame';const liveImg=$('livePhoto');liveImg.src=URL.createObjectURL(currentPhoto.image);liveImg.style.display='block';liveFrame.append(liveImg,...cornerPieces());const oldFrame=$('livePhotoWrap').querySelector('.live-photo-frame');if(oldFrame)oldFrame.remove();$('livePhotoWrap').querySelector('.album-paper').insertBefore(liveFrame,$('livePhotoWrap').querySelector('.album-caption'));
-  $('liveQuestion').textContent='Tell me about this time…';
   $('stop').disabled=true;$('nextPhoto').disabled=true;
   setVoiceStatus('Getting things ready…','thinking');
   show('live');sessionPhase='connecting';
