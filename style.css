@@ -1141,3 +1141,18 @@ button,.primary,.next-photo,.stop,.archive-link {
   background-image:none!important;
   text-shadow:none!important;
 }
+
+
+/* Match the user's approved home-button materials exactly: corduroy and brown leather. */
+.home-mode .home-panel .start-home {
+  background-image:linear-gradient(rgba(48,19,7,.10),rgba(48,19,7,.24)),var(--corduroy-photo)!important;
+  background-size:cover!important;background-position:center 48%!important;
+}
+.home-mode .home-panel #openStories.archive-link {
+  background-image:linear-gradient(rgba(35,17,9,.10),rgba(35,17,9,.24)),url("https://www.crofthouse.com/cdn/shop/products/Rodeo_Brown.jpg?v=1671747898")!important;
+  background-size:cover!important;background-position:center!important;
+}
+.home-mode .home-panel #connectArchive {
+  background-image:none!important;background-color:rgba(48,31,21,.92)!important;
+  color:#fff4e4!important;text-shadow:none!important;
+}
