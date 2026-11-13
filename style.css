@@ -931,3 +931,65 @@ body.live-mode .live-story-side{color:#f4e6d0}
  .home-mode .home-panel .start-home,.home-mode .home-panel #openStories.archive-link{width:100%!important;min-height:72px!important;font-size:24px!important}
  body.live-mode .album-paper img{max-height:48vh}
 }
+
+
+/* Photographic 1970s material system: real source photography, not simulated stripes. */
+:root{
+ --room-photo:url("https://cdn.shopify.com/s/files/1/0672/6916/5224/files/retro-1970s-living-room-with-vintage-furniture-in-earthy-tones.jpg?v=1772675454");
+ --corduroy-photo:url("https://www.velcorex.fr/wp-content/uploads/2021/04/seersucker.jpg");
+ --shag-photo:url("https://i.etsystatic.com/56427773/r/il/96f87d/7757210331/il_fullxfull.7757210331_16r1.jpg");
+ --walnut-dark:#29180f;--walnut-mid:#573521;--ivory:#f4e8d3;--rust:#b94f2c;--olive:#626342;
+}
+html,body{background:#2d1c13!important}
+body{
+ background-image:linear-gradient(rgba(25,13,8,.42),rgba(25,13,8,.64)),var(--room-photo)!important;
+ background-size:cover!important;background-position:center center!important;background-attachment:fixed!important;
+ color:var(--ivory)!important;
+}
+.shell{isolation:isolate;background:transparent!important}
+.shell:after{
+ content:"";position:fixed;z-index:-1;left:0;right:0;bottom:0;height:clamp(52px,11vh,118px);
+ background-image:linear-gradient(0deg,rgba(30,17,10,.18),rgba(30,17,10,.08)),var(--shag-photo);
+ background-size:cover;background-position:center 55%;box-shadow:0 -12px 35px rgba(22,12,7,.3);pointer-events:none;
+}
+.panel:not(.home-panel){
+ background:linear-gradient(115deg,rgba(42,24,15,.93),rgba(57,34,21,.86)),var(--room-photo)!important;
+ background-size:cover!important;background-position:center top!important;
+ color:var(--ivory)!important;border:1px solid rgba(223,184,139,.55)!important;
+ box-shadow:0 18px 48px rgba(12,7,4,.52)!important;
+}
+.panel:not(.home-panel):after{border-color:rgba(239,210,171,.28)!important}
+h1,h2,.field-label,.brand,.audio-brand{color:var(--ivory)!important}
+p,.text,.local-note,.selected-files,footer{color:#ead8bd!important}
+.home-mode .home-panel{
+ background-image:linear-gradient(90deg,rgba(24,13,8,.76),rgba(24,13,8,.34) 52%,rgba(24,13,8,.08)),var(--room-photo)!important;
+ background-size:cover!important;background-position:center center!important;
+}
+.home-mode .home-panel:after{display:none!important}
+.primary,.home-mode .home-panel .start-home,.home-mode .home-panel #openStories.archive-link,
+.next-photo,.stop{
+ background-image:linear-gradient(rgba(40,18,8,.13),rgba(40,18,8,.28)),var(--corduroy-photo)!important;
+ background-size:cover!important;background-position:center 48%!important;
+ border:2px solid #d69b69!important;color:#fff4e4!important;
+ text-shadow:0 1px 3px rgba(36,16,7,.65)!important;
+ box-shadow:0 5px 0 #492516,0 10px 22px rgba(13,7,4,.45)!important;
+}
+.home-mode .home-panel #openStories.archive-link{color:#fff4e4!important}
+.upload-box{
+ background-image:linear-gradient(rgba(40,23,13,.68),rgba(40,23,13,.68)),var(--corduroy-photo)!important;
+ background-size:cover!important;color:#fff0dc!important;border:2px dashed #d8ae7e!important;
+}
+.upload-box strong,.upload-box small{color:#fff0dc!important}
+.live-panel{background:linear-gradient(135deg,rgba(45,26,16,.94),rgba(63,38,22,.91)),var(--room-photo)!important;color:var(--ivory)!important}
+.live-panel p,.live-panel #transcript p{color:#f0dfc5!important}
+.album-paper{background:#e9d8bb!important;border:8px solid #75492d!important;box-shadow:0 12px 30px rgba(15,8,4,.55)!important}
+.album-paper img#livePhoto{background:#21150e!important}
+.field{background:#fff8eb!important;color:#382518!important;border:2px solid #b98b5e!important}
+.notice,.preview-notice{background:#e6d2b0!important;color:#432b1b!important;border-color:#b78c5d!important}
+.saved-photo img{border-color:#f0e1c7!important;box-shadow:0 0 0 6px #795035,0 12px 28px #170b06!important}
+@media(max-width:760px){
+ body{background-attachment:scroll!important;background-position:58% center!important}
+ .shell:after{height:62px}
+ .panel:not(.home-panel){background-color:rgba(42,24,15,.94)!important}
+ .home-mode .home-panel{background-position:58% center!important}
+}
