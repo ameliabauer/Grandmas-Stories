@@ -1126,3 +1126,18 @@ button,.primary,.next-photo,.stop,.archive-link {
   background-position:initial!important;
   text-shadow:none!important;
 }
+
+
+/* User-selected home button materials: orange corduroy for Start, brown leather for Our Family Album. */
+.home-mode .home-panel .start-home {
+  background-image:linear-gradient(rgba(48,19,7,.12),rgba(48,19,7,.27)),var(--corduroy-photo)!important;
+  background-size:cover!important;background-position:center 48%!important;
+}
+.home-mode .home-panel #openStories.archive-link {
+  background-image:linear-gradient(rgba(35,17,9,.18),rgba(35,17,9,.32)),url("https://cdn.shopify.com/s/files/1/0191/3966/files/3_8714db46-86ea-4557-a4e7-5e06a7bcb813_480x480.png?v=1652260749")!important;
+  background-size:cover!important;background-position:center!important;
+}
+.home-mode .home-panel #connectArchive {
+  background-image:none!important;
+  text-shadow:none!important;
+}
