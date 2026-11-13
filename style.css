@@ -1063,3 +1063,55 @@ button,.primary,.next-photo,.stop,.archive-link {
   border:0!important;
   box-shadow:0 5px 0 rgba(30,13,6,.62),0 12px 24px rgba(0,0,0,.42)!important;
 }
+
+
+/* Preview refinement: each home action gets its own real photographed material. */
+.home-mode .home-panel .start-home,
+.home-mode .home-panel #openStories.archive-link,
+.home-mode .home-panel #connectArchive {
+  width:min(100%,360px)!important;
+  min-height:76px!important;
+  margin:12px 0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border:0!important;
+  border-radius:14px!important;
+  box-shadow:0 5px 0 rgba(24,12,7,.68),0 13px 26px rgba(0,0,0,.46)!important;
+  color:#fff4e4!important;
+  font-weight:700!important;
+  text-shadow:0 2px 5px rgba(20,9,4,.75)!important;
+  background-size:cover!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+}
+.home-mode .home-panel .start-home {
+  background-image:linear-gradient(rgba(50,20,7,.12),rgba(50,20,7,.28)),var(--corduroy-photo)!important;
+  font-size:29px!important;
+}
+.home-mode .home-panel #openStories.archive-link {
+  background-image:linear-gradient(rgba(36,15,8,.20),rgba(36,15,8,.36)),url("https://maxbloch.be/25834-large_default/tissu-vintage-authentique-fleurs-sur-fond-brun.jpg")!important;
+  font-size:22px!important;
+}
+.home-mode .home-panel #connectArchive {
+  background-image:linear-gradient(rgba(26,18,12,.42),rgba(26,18,12,.58)),var(--shag-photo)!important;
+  font-size:20px!important;
+}
+.home-mode .home-panel #openStories.archive-link:after{display:none!important;content:none!important}
+.home-mode .home-panel .start-home b{display:none!important}
+@media(max-width:760px){
+ .home-mode .home-panel .start-home,
+ .home-mode .home-panel #openStories.archive-link,
+ .home-mode .home-panel #connectArchive{width:100%!important;min-height:72px!important}
+}
+
+/* The listening indicator is a photograph of a real vinyl record, not CSS grooves. */
+.record-disc {
+ background-image:url("https://images.pexels.com/photos/5764283/pexels-photo-5764283.jpeg?auto=compress&dpr=1&h=750&w=1260")!important;
+ background-size:cover!important;
+ background-position:center!important;
+ background-repeat:no-repeat!important;
+ box-shadow:0 8px 18px rgba(0,0,0,.55),inset 0 0 0 2px rgba(225,218,198,.30)!important;
+}
+.record-disc:before{border:1px solid rgba(255,255,255,.35)!important}
+.record-disc .record-grooves{display:none!important}
