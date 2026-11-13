@@ -6,7 +6,7 @@
 <link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/style.css?v=40"><title>Grandma’s Stories</title>
 </head>
 <body class="home-mode"><main class="shell">
-<header><button class="add-top" id="addFromHome" aria-label="Add family photographs" title="Add family photographs">＋</button></header>
+<header></header>
 <div id="previewNotice" class="preview-notice hidden">PREVIEW MODE · Changes stay on this device · No email sign-in</div>
 <section id="welcome" class="panel home-panel">
   <div class="home-copy">
@@ -14,20 +14,20 @@
     
     <p id="homeMessage">Real stories. Lasting memories.</p>
     <button class="primary start-home" id="startSession" disabled>Start <b>→</b></button>
-    <small class="muted" id="photoCount">Your family album is waiting.</small><button class="archive-link" id="openStories">Our stories</button>
+    <small class="muted" id="photoCount">Your family album is waiting.</small><button class="archive-link" id="openStories">Our Family Album</button>
     <button class="archive-link" id="connectArchive">Connect our private family archive</button><small id="archiveConnectionStatus" class="local-home-note" aria-live="polite">Connect once to begin saving your family photographs and stories online.</small>
   </div>
 </section>
 <section id="cloudAuth" class="panel hidden"><div class="eyebrow">Our private family archive</div><h1 id="cloudAuthTitle">Connect our family archive.</h1><p id="cloudAuthDescription">A secure sign-in link will arrive by email. No password to remember.</p><label class="auth-label" for="archiveEmail">Email address</label><input class="auth-input" id="archiveEmail" type="email" autocomplete="email" value="Abauer4@alumni.nd.edu" required><button class="primary" id="sendArchiveLink">Send my sign-in link <b>→</b></button><p id="cloudAuthStatus" class="auth-status" aria-live="polite"></p><button class="text" id="closeCloudAuth">Return Home</button></section>
 <section id="addPanel" class="panel hidden">
   <button class="album-return" id="savePhotos" type="button">← <span>Return Home</span></button><div class="eyebrow">Our family album</div><h1>Family Album</h1>
-  <section id="albumPreview" class="album-preview hidden" aria-live="polite"><div id="albumPhotoGrid" class="album-photo-grid"></div></section><p id="emptyAlbumPrompt" class="empty-album-prompt hidden">Our album is waiting for its first photographs. Let’s add a few, then we can begin sharing their stories.</p>
-  <div class="upload-feedback"><strong id="uploadTitle">Add photographs</strong><small id="uploadHint" class="hidden"></small></div>
+  <p id="emptyAlbumPrompt" class="empty-album-prompt hidden">Our album is waiting for its first photographs. Let’s add a few, then we can begin sharing their stories.</p>
+  <div class="upload-feedback"><small id="uploadHint" class="hidden" role="status" aria-live="polite"></small></div>
   <input id="photoFiles" type="file" accept="image/*" multiple hidden>
   
   
 </section>
-<section id="stories" class="panel hidden"><div class="eyebrow">Our family album</div><h1 id="storiesHeading">Our stories</h1><p id="storiesEmpty" class="stories-empty hidden">The stories we gather will live here, beside the photographs that inspired them.</p><div id="storyList" class="story-list"></div><button class="primary" id="storiesHome">Return Home <b>→</b></button></section>
+<section id="stories" class="panel hidden"><button class="album-return" id="storiesHomeTop" type="button">← <span>Return Home</span></button><div class="eyebrow">Our family album</div><h1 id="storiesHeading">Family Album</h1><section id="albumPreview" class="album-preview hidden" aria-live="polite"><div id="albumPhotoGrid" class="album-photo-grid"></div></section><p id="storiesEmpty" class="stories-empty hidden">The stories we gather will live here, beside the photographs that inspired them.</p><div id="storyList" class="story-list"></div><button class="primary" id="storiesHome">Return Home <b>→</b></button></section>
 <section id="consent" class="panel hidden">
   <div class="eyebrow">Before we begin</div><h1>A little note.</h1>
   <p>This is an AI voice companion, not a person. If you choose to talk, your voice and the conversation will be recorded and saved in your private family archive for your family to keep.</p>
