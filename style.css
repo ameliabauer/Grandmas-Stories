@@ -936,8 +936,8 @@ body.live-mode .live-story-side{color:#f4e6d0}
 /* Photographic 1970s material system: real source photography, not simulated stripes. */
 :root{
  --room-photo:url("https://cdn.shopify.com/s/files/1/0672/6916/5224/files/retro-1970s-living-room-with-vintage-furniture-in-earthy-tones.jpg?v=1772675454");
- --corduroy-photo:url("https://www.velcorex.fr/wp-content/uploads/2021/04/seersucker.jpg");
- --shag-photo:url("https://i.etsystatic.com/56427773/r/il/96f87d/7757210331/il_fullxfull.7757210331_16r1.jpg");
+ --corduroy-photo:url("https://www.innovationliving.com/admin/public/getimage.ashx?Crop=0&Format=jpg&Height=600&Image=%2Ffiles%2Fimages%2Finnovationliving%2FFabrics%2FFabric-Drape-varekort-hover%2F595-Fabric.jpg&Quality=75&Width=600");
+ --shag-photo:url("https://i.etsystatic.com/64022319/r/il/364bb5/7785044773/il_fullxfull.7785044773_ryv9.jpg");
  --walnut-dark:#29180f;--walnut-mid:#573521;--ivory:#f4e8d3;--rust:#b94f2c;--olive:#626342;
 }
 html,body{background:#2d1c13!important}
@@ -993,3 +993,8 @@ p,.text,.local-note,.selected-files,footer{color:#ead8bd!important}
  .panel:not(.home-panel){background-color:rgba(42,24,15,.94)!important}
  .home-mode .home-panel{background-position:58% center!important}
 }
+
+
+/* Corrected photographic material sources: actual corduroy and shag-pile rug. */
+:root{--corduroy-photo:url("https://www.innovationliving.com/admin/public/getimage.ashx?Crop=0&Format=jpg&Height=600&Image=%2Ffiles%2Fimages%2Finnovationliving%2FFabrics%2FFabric-Drape-varekort-hover%2F595-Fabric.jpg&Quality=75&Width=600");--shag-photo:url("https://i.etsystatic.com/64022319/r/il/364bb5/7785044773/il_fullxfull.7785044773_ryv9.jpg");}
+.home-mode .home-panel .start-home,.home-mode .home-panel #openStories.archive-link,.primary,.next-photo,.stop{background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important;background-blend-mode:normal!important;}
