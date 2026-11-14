@@ -125,13 +125,14 @@ async function syncCloudStories(){
     await store('stories','readwrite',st=>st.put({id:'cloud-story-'+row.id,cloudStoryId:row.id,photoId:localPhoto?.id||null,photoTitle:row.title,lines:storyLines,createdAt:row.created_at,audio}));
   }
 }
+function updateHomeActions(){const archiveReady=!!cloudUser&&cloudReady;$('startSession').disabled=!archiveReady||!photos.length;$('openStories').disabled=!archiveReady;$('startSession').setAttribute('aria-disabled',String($('startSession').disabled));$('openStories').setAttribute('aria-disabled',String($('openStories').disabled));}
 async function connectCloudSession(user){
   if(!user||!supabaseClient)return;
   if(cloudConnectPromise&&cloudConnectUserId===user.id)return cloudConnectPromise;
   const generation=++cloudSessionGeneration;
   cloudConnectUserId=user.id;
   const connectionPromise=(async()=>{
-    cloudUser=user;cloudReady=false;cloudError=null;
+    cloudUser=user;cloudReady=false;cloudError=null;updateHomeActions();
     $('archiveConnectionStatus').textContent='Connecting to your private family archive…';
     $('cloudAuthTitle').textContent='Your family archive is connected.';
     $('cloudAuthDescription').textContent='Signed in as '+user.email+'. Your private family space is being prepared.';
@@ -198,7 +199,7 @@ async function initCloudAuth(){
   supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
   supabaseClient.auth.onAuthStateChange((event,session)=>{
     if(event==='SIGNED_OUT'){
-      cloudSessionGeneration++;cloudUser=null;cloudFamilyId=null;cloudReady=false;cloudError=null;cloudConnectPromise=null;cloudConnectUserId=null;cloudSyncPromise=null;
+      cloudSessionGeneration++;cloudUser=null;cloudFamilyId=null;cloudReady=false;cloudError=null;cloudConnectPromise=null;cloudConnectUserId=null;cloudSyncPromise=null;updateHomeActions();
       $('connectArchive').textContent='Connect our private family archive';$('connectArchive').classList.remove('hidden');
       $('archiveConnectionStatus').textContent='Saved on this iPad only until the family archive is connected.';
     }
@@ -224,7 +225,7 @@ $('sendArchiveLink').onclick=async()=>{
   }catch(e){$('cloudAuthStatus').textContent=e.message||'We could not send the email. Please try again.';}
   finally{authBusy=false;$('sendArchiveLink').disabled=false;}
 };
-async function refreshPhotos(){photos=await allPhotos();photos.sort((a,b)=>a.createdAt.localeCompare(b.createdAt));$('startSession').disabled=!photos.length;$('photoCount').textContent=photos.length?photos.length+' photograph'+(photos.length===1?'':'s')+' in our family album.':'Your family album is waiting for its first photographs.';document.body.classList.toggle('no-photos',!photos.length);$('homeMessage').textContent='Real stories. Lasting memories.';if(photos.length)$('emptyAlbumPrompt').classList.add('hidden');await renderAlbumPhotos();}
+async function refreshPhotos(){photos=await allPhotos();photos.sort((a,b)=>a.createdAt.localeCompare(b.createdAt));updateHomeActions();$('photoCount').textContent=photos.length?photos.length+' photograph'+(photos.length===1?'':'s')+' in our family album.':'Your family album is waiting for its first photographs.';document.body.classList.toggle('no-photos',!photos.length);$('homeMessage').textContent='Real stories. Lasting memories.';if(photos.length)$('emptyAlbumPrompt').classList.add('hidden');await renderAlbumPhotos();}
 async function renderAlbumPhotos(){
  const grid=$('albumPhotoGrid'),section=$('albumPreview');grid.innerHTML='';section.classList.remove('hidden');
  const stories=await allStories();
