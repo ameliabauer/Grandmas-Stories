@@ -1414,74 +1414,72 @@ body:not(.home-mode) .add-top {
 }
 
 
-/* HOME LAYOUT REPAIR — explicit placement prevents the heading, copy and
-   actions from being auto-flowed into the wrong grid cells. */
+/* Restore the original photographic hero composition. The home copy is a
+   vertical flex column; only the connected actions share a row. */
 .home-mode .home-copy {
-  display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  grid-auto-flow: row !important;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
   align-content: center !important;
-  align-items: start !important;
-  justify-items: stretch !important;
-  width: min(820px, 72vw) !important;
-  min-height: 0 !important;
-  margin: 0 0 0 4% !important;
-  padding: 0 !important;
-  gap: 16px 24px !important;
+  gap: 14px 18px !important;
+  width: min(560px, 48%) !important;
+  min-height: 100% !important;
+  margin-left: 7% !important;
+  padding: 0 0 3% !important;
 }
 .home-mode .home-copy > .eyebrow,
 .home-mode .home-copy > h1,
 .home-mode .home-copy > p {
-  grid-column: 1 / -1 !important;
+  flex: 0 0 100% !important;
   width: 100% !important;
 }
-.home-mode .home-copy > .eyebrow { grid-row: 1 !important; }
-.home-mode .home-copy > h1 { grid-row: 2 !important; }
-.home-mode .home-copy > p { grid-row: 3 !important; }
-.home-mode.archive-disconnected .home-copy #connectArchive {
-  grid-column: 1 / -1 !important;
-  grid-row: 4 !important;
-  justify-self: start !important;
-  width: min(100%, 560px) !important;
-  min-height: 76px !important;
-  margin: 8px 0 0 !important;
-  padding: 12px 28px !important;
-  white-space: normal !important;
+.home-mode .home-copy > .eyebrow { order: 1 !important; }
+.home-mode .home-copy > h1 { order: 2 !important; }
+.home-mode .home-copy > p { order: 3 !important; }
+.home-mode .home-copy #connectArchive {
+  order: 4 !important;
+  flex: 0 0 min(100%, 420px) !important;
+  width: min(100%, 420px) !important;
+  min-height: 68px !important;
+  margin: 10px 0 0 !important;
+  padding: 12px 24px !important;
+  font-size: clamp(18px, 1.7vw, 23px) !important;
 }
-.home-mode.archive-connected .home-copy #startSession {
-  grid-column: 1 !important;
-  grid-row: 4 !important;
+.home-mode .home-copy #startSession,
+.home-mode .home-copy #openStories {
+  flex: 1 1 calc(50% - 10px) !important;
+  width: calc(50% - 10px) !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 112px !important;
+  min-height: 112px !important;
+  margin: 10px 0 0 !important;
 }
-.home-mode.archive-connected .home-copy #openStories {
-  grid-column: 2 !important;
-  grid-row: 4 !important;
-}
-.home-mode.archive-connected .home-copy #photoCount {
-  grid-column: 1 / -1 !important;
-  grid-row: 5 !important;
-  margin: 0 !important;
-}
+.home-mode .home-copy #startSession { order: 4 !important; }
+.home-mode .home-copy #openStories { order: 5 !important; }
+.home-mode .home-copy #photoCount { order: 6 !important; }
 @media (max-width: 760px) {
   .home-mode .home-copy {
-    width: min(100%, 520px) !important;
+    width: min(100%, 560px) !important;
+    min-height: auto !important;
     margin: 0 auto !important;
-    gap: 13px !important;
+    padding: 0 !important;
+    gap: 12px !important;
   }
-  .home-mode .home-copy > h1 {
-    font-size: clamp(48px, 13vw, 68px) !important;
-  }
-  .home-mode.archive-disconnected .home-copy #connectArchive {
-    justify-self: stretch !important;
+  .home-mode .home-copy #connectArchive {
+    flex-basis: 100% !important;
     width: 100% !important;
-    min-height: 68px !important;
-    margin-top: 7px !important;
+    min-height: 64px !important;
+    margin-top: 8px !important;
   }
-  .home-mode.archive-connected .home-copy #startSession,
-  .home-mode.archive-connected .home-copy #openStories {
-    height: 96px !important;
-    min-height: 96px !important;
-    max-height: 96px !important;
-    padding: 0 10px !important;
-    font-size: clamp(21px, 6vw, 29px) !important;
+  .home-mode .home-copy #startSession,
+  .home-mode .home-copy #openStories {
+    flex-basis: 100% !important;
+    width: 100% !important;
+    height: 92px !important;
+    min-height: 92px !important;
+    margin-top: 6px !important;
   }
 }
