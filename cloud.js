@@ -103,7 +103,9 @@
       const photo=photoById.get(photoId);
       const entries=Array.isArray(stories[photoId])?stories[photoId]:[];
       for(let i=0;i<entries.length;i++){
-        if(!entries[i].cloudStoryId){
+        // Only sync stories attached to a real cloud-backed photograph.
+        // This keeps the UI prototype's sample stories local.
+        if(!entries[i].cloudStoryId&&photo&&photo.cloudAssetId){
           entries[i]=await uploadStory(photo,entries[i]);changed=true;
         }
       }
