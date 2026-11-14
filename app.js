@@ -167,6 +167,7 @@
     await store.set("photos", state.photos.filter(p => p.custom));
     await store.set("hidden", state.hidden);
     await store.set("stories", state.stories);
+    window.dispatchEvent(new CustomEvent("gs:local-change", { detail: { type: "photos" } }));
   }
 
   function askRemove(id) {
@@ -286,6 +287,7 @@
     if (changed) {
       state.stories[photo.id] = list;
       await store.set("stories", state.stories);
+      window.dispatchEvent(new CustomEvent("gs:local-change", { detail: { type: "stories" } }));
       updateReadLink(photo);
     }
     if (!silent) {
@@ -358,7 +360,7 @@
         const audio = document.createElement("audio");
         audio.controls = true;
         audio.preload = "metadata";
-        audio.src = story.audio;
+        audio.src = story.audio instanceof Blob ? URL.createObjectURL(story.audio) : story.audio;
         player.appendChild(label);
         player.appendChild(audio);
         article.appendChild(player);
@@ -452,6 +454,29 @@
     const photo = state.photos[state.index];
     if (!photo) return;
     recPhotoId = photo.id;
+    if (window.gsRealtime && window.gsRealtime.start) {
+      transcript = "";
+      hideSaved();
+      const live = $("[data-live]");
+      live.textContent = "";
+      live.hidden = true;
+      try {
+        setListeningUI(true);
+        await window.gsRealtime.start(photo, {
+          onTranscript: (text) => { live.textContent = text; live.hidden = !text; },
+          onStatus: (message) => setStatus(message),
+          onComplete: async (entry) => {
+            setListeningUI(false);
+            await addEntry(photo.id, entry);
+          }
+        });
+        setStatus("Whenever you’re ready, I’m listening.");
+        return;
+      } catch (error) {
+        setListeningUI(false);
+        setStatus((error && error.message ? error.message : "The live voice service is unavailable.") + " You can still record a story or type it instead.");
+      }
+    }
     transcript = "";
     chunks = [];
     hideSaved();
@@ -519,6 +544,10 @@
   function stopListening() {
     if (!state.listening) return;
     setListeningUI(false);
+    if (window.gsRealtime && window.gsRealtime.isActive && window.gsRealtime.isActive()) {
+      window.gsRealtime.stop().catch(error => setStatus(error.message || "The story could not be saved."));
+      return;
+    }
     if (rec) {
       try { rec.stop(); } catch (e) {}
       rec = null;
@@ -567,6 +596,7 @@
     state.stories[photoId] = list;
 
     const ok = await store.set("stories", state.stories);
+    window.dispatchEvent(new CustomEvent("gs:local-change", { detail: { type: "stories" } }));
     if (!ok && entry.audio) {
       entry.audio = null;
       if (!entry.text) {
@@ -716,8 +746,13 @@
   });
   window.addEventListener("hashchange", route);
 
-  (async function init() {
+  window.gsAppHydrated = (async function init() {
     await hydrate();
     route();
+    window.dispatchEvent(new Event("gs:app-hydrated"));
   })();
+  window.addEventListener("gs:cloud-updated", async function () {
+    await hydrate();
+    route();
+  });
 })();
