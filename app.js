@@ -136,7 +136,7 @@ async function connectCloudSession(user){
     $('archiveConnectionStatus').textContent='Connecting to your private family archive…';
     $('cloudAuthTitle').textContent='Your family archive is connected.';
     $('cloudAuthDescription').textContent='Signed in as '+user.email+'. Your private family space is being prepared.';
-    $('archiveEmail').value=user.email||'';$('archiveEmail').classList.add('hidden');$('sendArchiveLink').classList.add('hidden');
+    $('archiveSignInForm').classList.add('hidden');
     $('cloudAuthStatus').textContent='Checking your family space…';
     const {data:membership,error:memberError}=await supabaseClient.from('family_members').select('family_id,role').eq('user_id',user.id).eq('status','active').limit(1).maybeSingle();
     if(generation!==cloudSessionGeneration||cloudUser?.id!==user.id)return;
@@ -211,20 +211,47 @@ async function initCloudAuth(){
   if(error)console.warn('Could not restore family archive session',error);
   if(session?.user){try{await connectCloudSession(session.user)}catch(e){console.warn('Family archive connection needs attention',e);}}
 }
-$('connectArchive').onclick=async()=>{show('cloudAuth');if(cloudUser){$('cloudAuthTitle').textContent='Your private family archive';$('cloudAuthDescription').textContent='Signed in as '+cloudUser.email+'.';$('archiveEmail').classList.add('hidden');$('sendArchiveLink').classList.add('hidden');if(!cloudReady){$('cloudAuthStatus').textContent='Finishing the connection…';try{await connectCloudSession(cloudUser);}catch(e){$('cloudAuthStatus').textContent='We could not prepare your family space: '+(e.message||'Please try again.');$('archiveConnectionStatus').textContent='Archive connection needs attention: '+(e.message||'Please try again.');}}else{$('cloudAuthStatus').textContent='Your private family archive is connected. Photos and stories are saved online.';await retryPendingCloudSync();}}else{$('cloudAuthTitle').textContent='Connect our family archive.';$('cloudAuthDescription').textContent='A secure sign-in link will arrive by email. No password to remember.';$('archiveEmail').classList.remove('hidden');$('sendArchiveLink').classList.remove('hidden');$('cloudAuthStatus').textContent='';}};
+$('connectArchive').onclick=async()=>{show('cloudAuth');if(cloudUser){$('cloudAuthTitle').textContent='Your private family archive';$('cloudAuthDescription').textContent='Signed in as '+cloudUser.email+'.';$('archiveSignInForm').classList.add('hidden');if(!cloudReady){$('cloudAuthStatus').textContent='Finishing the connection…';try{await connectCloudSession(cloudUser);}catch(e){$('cloudAuthStatus').textContent='We could not prepare your family space: '+(e.message||'Please try again.');$('archiveConnectionStatus').textContent='Archive connection needs attention: '+(e.message||'Please try again.');}}else{$('cloudAuthStatus').textContent='Your private family archive is connected. Photos and stories are saved online.';await retryPendingCloudSync();}}else{$('cloudAuthTitle').textContent='Welcome back to the family archive.';$('cloudAuthDescription').textContent="We'll email you a secure sign-in link. No password needed.";$('archiveSignInForm').classList.remove('hidden');$('sendArchiveLink').classList.remove('hidden');$('resendArchiveLink').classList.add('hidden');$('archiveEmail').value='';$('cloudAuthStatus').textContent='';$('archiveEmail').removeAttribute('aria-invalid');}};
 $('closeCloudAuth').onclick=()=>show('welcome');
-$('sendArchiveLink').onclick=async()=>{
-  if(authBusy||!supabaseClient){$('cloudAuthStatus').textContent='The secure sign-in service is not ready. Please try again shortly.';return;}
+async function sendArchiveSignInLink(isResend=false){
+  if(authBusy)return;
+  if(!supabaseClient){$('cloudAuthStatus').textContent='The secure sign-in service is not ready. Please try again shortly.';return;}
   const email=$('archiveEmail').value.trim();
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){$('cloudAuthStatus').textContent='Please enter a valid email address.';return;}
-  authBusy=true;$('sendArchiveLink').disabled=true;$('cloudAuthStatus').textContent='Sending your secure sign-in link…';
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    $('archiveEmail').setAttribute('aria-invalid','true');
+    $('cloudAuthStatus').textContent='Please enter a valid email address.';
+    $('archiveEmail').focus();
+    return;
+  }
+  $('archiveEmail').removeAttribute('aria-invalid');
+  authBusy=true;
+  $('sendArchiveLink').disabled=true;
+  $('resendArchiveLink').disabled=true;
+  $('cloudAuthStatus').textContent=isResend?'Sending another link…':'Sending your secure sign-in link…';
   try{
     const {error}=await supabaseClient.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.origin+window.location.pathname,shouldCreateUser:true}});
     if(error)throw error;
-    $('cloudAuthStatus').textContent='Check '+email+' for your sign-in link. Open it on this device to connect your family archive.';
-  }catch(e){$('cloudAuthStatus').textContent=e.message||'We could not send the email. Please try again.';}
-  finally{authBusy=false;$('sendArchiveLink').disabled=false;}
-};
+    $('cloudAuthStatus').textContent='Check your inbox - your link is on its way.';
+    $('sendArchiveLink').classList.add('hidden');
+    $('resendArchiveLink').classList.remove('hidden');
+  }catch(e){
+    $('cloudAuthStatus').textContent=e.message||'We could not send the email. Please try again.';
+    if(isResend)$('resendArchiveLink').classList.remove('hidden');
+    else $('sendArchiveLink').classList.remove('hidden');
+  }finally{
+    authBusy=false;
+    $('sendArchiveLink').disabled=false;
+    $('resendArchiveLink').disabled=false;
+  }
+}
+$('archiveSignInForm').addEventListener('submit',event=>{event.preventDefault();sendArchiveSignInLink(false);});
+$('resendArchiveLink').addEventListener('click',()=>sendArchiveSignInLink(true));
+$('archiveEmail').addEventListener('input',()=>{
+  $('cloudAuthStatus').textContent='';
+  $('archiveEmail').removeAttribute('aria-invalid');
+  $('sendArchiveLink').classList.remove('hidden');
+  $('resendArchiveLink').classList.add('hidden');
+});
 async function refreshPhotos(){photos=await allPhotos();photos.sort((a,b)=>a.createdAt.localeCompare(b.createdAt));updateHomeActions();$('photoCount').textContent=photos.length?photos.length+' photograph'+(photos.length===1?'':'s')+' in our family album.':'Your family album is waiting for its first photographs.';document.body.classList.toggle('no-photos',!photos.length);$('homeMessage').textContent='Real stories. Lasting memories.';if(photos.length)$('emptyAlbumPrompt').classList.add('hidden');await renderAlbumPhotos();}
 async function renderAlbumPhotos(){
  const grid=$('albumPhotoGrid'),section=$('albumPreview');grid.innerHTML='';section.classList.remove('hidden');
