@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#183b40"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/style.css?v=67"><title>Grandma’s Stories</title>
+<link rel="manifest" href="/manifest.webmanifest"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Young+Serif&display=swap" rel="stylesheet"><link rel="stylesheet" href="/style.css?v=68"><link rel="stylesheet" href="/textured-buttons.css"><title>Grandma’s Stories</title>
 </head>
 <body class="home-mode"><main class="shell">
 
@@ -14,9 +14,13 @@
     
     <h1>Grandma’s Stories</h1>
     <p id="homeMessage">Real stories. Lasting memories.</p>
-    <button class="primary start-home" id="startSession" disabled>Start <b>→</b></button>
-    <small class="muted" id="photoCount">Your family album is waiting.</small><button class="archive-link" id="openStories">Our Family Album</button>
-    <button class="archive-link" id="connectArchive">Connect to our family archive</button><small id="archiveConnectionStatus" class="local-home-note" aria-live="polite">Connect once to begin saving your family photographs and stories online.</small>
+    <div class="home-actions">
+      <button class="tx-btn tx-corduroy start-home" id="startSession" disabled>Start <span class="tx-arrow" aria-hidden="true">→</span></button>
+      <button class="tx-btn tx-leather tx-soft tx-stitched archive-link" id="openStories">Our family album</button>
+    </div>
+    <button class="tx-btn tx-linen tx-soft archive-link archive-connect" id="connectArchive">Connect to our family archive</button>
+    <small class="muted" id="photoCount">Your family album is waiting.</small>
+    <small id="archiveConnectionStatus" class="local-home-note" aria-live="polite">Connect once to begin saving your family photographs and stories online.</small>
   </div>
 </section>
 <section id="cloudAuth" class="panel hidden" aria-labelledby="cloudAuthTitle">
