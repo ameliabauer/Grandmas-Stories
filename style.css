@@ -1307,3 +1307,16 @@ button,.primary,.next-photo,.stop,.archive-link {
     flex-basis: 104px !important;
   }
 }
+
+
+/* The two archive actions are intentionally unavailable until archive sign-in is ready. */
+.home-mode .home-copy #startSession:disabled,
+.home-mode .home-copy #openStories:disabled {
+  opacity: .48 !important;
+  filter: grayscale(.72) saturate(.45) !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  box-shadow: none !important;
+}
+.home-mode .home-copy #startSession:disabled::after,
+.home-mode .home-copy #openStories:disabled::after { content: none !important; }
