@@ -1376,3 +1376,39 @@ body:not(.home-mode) .add-top {
   background-color: rgba(48,31,21,.92) !important;
   box-shadow: none !important;
 }
+
+
+/* Home screen has two mutually exclusive states:
+   disconnected = connect action only; connected = Start + Family Album only. */
+.home-mode .home-copy #startSession,
+.home-mode .home-copy #openStories,
+.home-mode .home-copy #photoCount,
+.home-mode .home-copy #archiveConnectionStatus,
+.home-mode .home-copy #connectArchive { display: none !important; }
+
+.home-mode.archive-disconnected .home-copy #connectArchive {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: min(100%, 560px) !important;
+  min-height: 82px !important;
+  margin: 24px 0 0 !important;
+}
+.home-mode.archive-connected .home-copy #startSession,
+.home-mode.archive-connected .home-copy #openStories {
+  display: flex !important;
+}
+.home-mode.archive-connected .home-copy #photoCount {
+  display: block !important;
+}
+.home-mode.archive-connected .home-copy #connectArchive,
+.home-mode.archive-connected .home-copy #archiveConnectionStatus {
+  display: none !important;
+}
+@media (max-width: 760px) {
+  .home-mode.archive-disconnected .home-copy #connectArchive {
+    width: 100% !important;
+    min-height: 68px !important;
+    margin-top: 16px !important;
+  }
+}
