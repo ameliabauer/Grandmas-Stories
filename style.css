@@ -1253,3 +1253,16 @@ button,.primary,.next-photo,.stop,.archive-link {
   color: #fff5e8 !important;
   text-shadow: 0 2px 4px rgba(35,18,10,.8) !important;
 }
+
+
+/* Final high-specificity override: use the uploaded leather asset on the album button. */
+.home-mode .home-copy #openStories {
+  background-image: url("https://raw.githubusercontent.com/ameliabauer/Grandmas-Stories/main/IMG_0126.png") !important;
+  background-position: center !important;
+  background-size: 100% 100% !important;
+  background-repeat: no-repeat !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
