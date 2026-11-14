@@ -125,7 +125,7 @@ async function syncCloudStories(){
     await store('stories','readwrite',st=>st.put({id:'cloud-story-'+row.id,cloudStoryId:row.id,photoId:localPhoto?.id||null,photoTitle:row.title,lines:storyLines,createdAt:row.created_at,audio}));
   }
 }
-function updateHomeActions(){const archiveReady=!!cloudUser&&cloudReady;$('startSession').disabled=!archiveReady||!photos.length;$('openStories').disabled=!archiveReady;$('startSession').setAttribute('aria-disabled',String($('startSession').disabled));$('openStories').setAttribute('aria-disabled',String($('openStories').disabled));}
+function updateHomeActions(){const archiveReady=!!cloudUser&&cloudReady;document.body.classList.toggle('archive-connected',archiveReady);document.body.classList.toggle('archive-disconnected',!archiveReady);$('startSession').disabled=!archiveReady||!photos.length;$('openStories').disabled=!archiveReady;$('startSession').setAttribute('aria-disabled',String($('startSession').disabled));$('openStories').setAttribute('aria-disabled',String($('openStories').disabled));}
 async function connectCloudSession(user){
   if(!user||!supabaseClient)return;
   if(cloudConnectPromise&&cloudConnectUserId===user.id)return cloudConnectPromise;
@@ -155,11 +155,11 @@ async function connectCloudSession(user){
     if(generation!==cloudSessionGeneration||cloudUser?.id!==user.id)return;
     await syncCloudStories();
     if(generation!==cloudSessionGeneration||cloudUser?.id!==user.id)return;
-    cloudReady=true;
+    cloudReady=true;updateHomeActions();
     $('cloudAuthStatus').textContent='Your private family archive is ready. Photos and stories are synced.';
     $('cloudAuthDescription').textContent='Signed in as '+user.email+'.';
-    $('connectArchive').textContent='Family archive connected';$('connectArchive').classList.add('hidden');
-    $('archiveConnectionStatus').textContent='Private family archive connected. Photos and stories are saved online.';$('connectArchive').classList.add('hidden');
+    $('connectArchive').textContent='Connect to our family archive';
+    $('archiveConnectionStatus').textContent='Private family archive connected. Photos and stories are saved online.';
   })().catch(error=>{
     if(generation===cloudSessionGeneration){
       cloudReady=false;cloudError=error;
@@ -388,7 +388,7 @@ $('stop').onclick=()=>end(false);$('nextPhoto').onclick=()=>end(true);
  },{passive:true});
 })();
 $('retry').onclick=start;$('errorBack').onclick=()=>show('welcome');$('finish').onclick=()=>show('welcome');
-(async()=>{try{await openDB();await refreshPhotos();show('welcome');if(previewMode){document.body.classList.add('preview-mode');$('previewNotice').classList.remove('hidden');$('connectArchive').classList.add('hidden');$('archiveConnectionStatus').textContent='Preview only. No sign-in emails, cloud uploads or changes to your private family archive. Photos and stories stay in this browser.';$('consent').querySelector('p').textContent='This is a visual preview. Microphone access and AI voice conversations are switched off. Any sample stories you save stay in this separate preview on this device.';}else{await initCloudAuth();}}catch(e){$('errorText').textContent='We could not open the family album on this iPad.';show('error');}})();
+(async()=>{try{await openDB();await refreshPhotos();show('welcome');if(previewMode){document.body.classList.add('preview-mode');$('previewNotice').classList.remove('hidden');$('archiveConnectionStatus').textContent='Preview only. No sign-in emails, cloud uploads or changes to your private family archive. Photos and stories stay in this browser.';$('consent').querySelector('p').textContent='This is a visual preview. Microphone access and AI voice conversations are switched off. Any sample stories you save stay in this separate preview on this device.';}else{await initCloudAuth();}}catch(e){$('errorText').textContent='We could not open the family album on this iPad.';show('error');}})();
 window.addEventListener('online',()=>retryPendingCloudSync());
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)retryPendingCloudSync();});
 if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
