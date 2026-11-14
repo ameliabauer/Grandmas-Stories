@@ -177,7 +177,8 @@
     return connecting;
   }
   async function sendLink(email,isResend){
-    if(authBusy||!client)return;
+    if(authBusy)return;
+    if(!client){const el=$("[data-error]");if(el){el.hidden=false;el.textContent="The secure sign-in service is still loading. Please try again in a moment.";}return;}
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){const e=$("[data-error]");if(e)e.hidden=false;return;}
     authBusy=true;
     const button=$("button[type='submit']",$("#archiveSignInForm")||document);
@@ -194,6 +195,7 @@
   }
   async function init(){
     try{
+      if(window.gsAppHydrated)await window.gsAppHydrated;
       const configResponse=await fetch("/api/config",{cache:"no-store"});
       const config=await configResponse.json();
       if(!configResponse.ok||!config.url||!config.publishableKey)throw Error(config.error||"Family sign-in is not configured yet.");
