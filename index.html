@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#183b40"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/style.css?v=65"><title>Grandma’s Stories</title>
+<link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/style.css?v=66"><title>Grandma’s Stories</title>
 </head>
 <body class="home-mode"><main class="shell">
 
@@ -19,7 +19,18 @@
     <button class="archive-link" id="connectArchive">Connect to our family archive</button><small id="archiveConnectionStatus" class="local-home-note" aria-live="polite">Connect once to begin saving your family photographs and stories online.</small>
   </div>
 </section>
-<section id="cloudAuth" class="panel hidden"><h1 id="cloudAuthTitle">Connect our family archive.</h1><p id="cloudAuthDescription">A secure sign-in link will arrive by email. No password to remember.</p><label class="auth-label" for="archiveEmail">Email address</label><input class="auth-input" id="archiveEmail" type="email" autocomplete="email" value="Abauer4@alumni.nd.edu" required><button class="primary" id="sendArchiveLink">Send my sign-in link <b>→</b></button><p id="cloudAuthStatus" class="auth-status" aria-live="polite"></p><button class="text" id="closeCloudAuth">Return Home</button></section>
+<section id="cloudAuth" class="panel hidden" aria-labelledby="cloudAuthTitle">
+  <h1 id="cloudAuthTitle">Welcome back to the family archive.</h1>
+  <p id="cloudAuthDescription">We'll email you a secure sign-in link. No password needed.</p>
+  <form id="archiveSignInForm" novalidate>
+    <label class="auth-label" for="archiveEmail">Email address</label>
+    <input class="auth-input" id="archiveEmail" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="none" spellcheck="false" aria-describedby="cloudAuthStatus" required>
+    <button class="primary" id="sendArchiveLink" type="submit">Email me a sign-in link <b aria-hidden="true">→</b></button>
+    <p id="cloudAuthStatus" class="auth-status" role="status" aria-live="polite"></p>
+    <button class="auth-resend hidden" id="resendArchiveLink" type="button">Resend link</button>
+  </form>
+  <button class="text auth-home-link" id="closeCloudAuth" type="button">Return home</button>
+</section>
 <section id="addPanel" class="panel hidden">
   <button class="album-return" id="savePhotos" type="button"><span>Return Home</span></button><div class="eyebrow album-page-title">OUR FAMILY ALBUM</div>
   <p id="emptyAlbumPrompt" class="empty-album-prompt hidden">Our album is waiting for its first photographs. Let’s add a few, then we can begin sharing their stories.</p>
@@ -57,5 +68,5 @@
 <section id="saved" class="panel hidden"><div class="flower">✿</div><h1>Thank you. That was lovely.</h1><p>Your story has been saved with this photograph on this iPad.</p><div id="savedPhoto" class="saved-photo"></div><div class="notice" id="savedCloudStatus" aria-live="polite">Saved on this iPad only.</div><button class="primary" id="finish">Return Home</button></section>
 <section id="error" class="panel hidden"><div class="flower">♡</div><h1>Let’s try again.</h1><p id="errorText">We couldn’t start the conversation right now.</p><button class="primary" id="retry">Try again <b>→</b></button><button class="text" id="errorBack">Back home</button></section>
 <audio id="remoteAudio" autoplay playsinline></audio>
-<footer>Made with love, for the stories that matter. <span>♥</span></footer>
-</main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.js" defer></script><script src="/app.js?v=41" defer></script></body></html>
+<footer>Made with love, for the stories that matter</footer>
+</main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.js" defer></script><script src="/app.js?v=42" defer></script></body></html>
