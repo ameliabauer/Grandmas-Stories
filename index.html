@@ -3,32 +3,35 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#183b40"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/style.css?v=28"><title>Grandma’s Stories</title>
+<link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/style.css?v=65"><title>Grandma’s Stories</title>
 </head>
 <body class="home-mode"><main class="shell">
-<header><div class="brand"><span>♥</span> Grandma’s Stories</div><button class="add-top" id="addFromHome" aria-label="Add family photographs" title="Add family photographs">＋</button></header>
+
+<div id="previewNotice" class="preview-notice hidden">PREVIEW MODE · Changes stay on this device · No email sign-in</div>
 <section id="welcome" class="panel home-panel">
   <div class="home-copy">
     <div class="eyebrow">A family album, shared</div>
-    <h1>Grandma’s<br>Stories</h1>
+    
+    <h1>Grandma’s Stories</h1>
     <p id="homeMessage">Real stories. Lasting memories.</p>
     <button class="primary start-home" id="startSession" disabled>Start <b>→</b></button>
-    <small class="muted" id="photoCount">Your family album is waiting.</small>
-    <small id="homeHint" class="home-hint">A quiet moment, one photograph at a time.</small><small class="local-home-note">Our family album · kept on this iPad for now</small>
+    <small class="muted" id="photoCount">Your family album is waiting.</small><button class="archive-link" id="openStories">Our Family Album</button>
+    <button class="archive-link" id="connectArchive">Connect to our family archive</button><small id="archiveConnectionStatus" class="local-home-note" aria-live="polite">Connect once to begin saving your family photographs and stories online.</small>
   </div>
 </section>
+<section id="cloudAuth" class="panel hidden"><h1 id="cloudAuthTitle">Connect our family archive.</h1><p id="cloudAuthDescription">A secure sign-in link will arrive by email. No password to remember.</p><label class="auth-label" for="archiveEmail">Email address</label><input class="auth-input" id="archiveEmail" type="email" autocomplete="email" value="Abauer4@alumni.nd.edu" required><button class="primary" id="sendArchiveLink">Send my sign-in link <b>→</b></button><p id="cloudAuthStatus" class="auth-status" aria-live="polite"></p><button class="text" id="closeCloudAuth">Return Home</button></section>
 <section id="addPanel" class="panel hidden">
-  <div class="eyebrow">Our family album</div><h1>Photographs</h1>
-  <section id="selectedPreview" class="album-preview selected-preview hidden" aria-live="polite"><h2 id="selectedPhotoHeading"></h2><div id="selectedPhotoGrid" class="album-photo-grid"></div></section>
-  <section id="albumPreview" class="album-preview hidden" aria-live="polite"><h2 id="albumPhotoHeading"></h2><div id="albumPhotoGrid" class="album-photo-grid"></div></section><p id="emptyAlbumPrompt" class="empty-album-prompt hidden">Our album is waiting for its first photographs. Let’s add a few, then we can begin sharing their stories.</p>
-  <label class="upload-box" for="photoFiles"><span class="upload-icon">＋</span><strong id="uploadTitle">Choose photographs</strong><small id="uploadHint" class="hidden"></small></label>
+  <button class="album-return" id="savePhotos" type="button"><span>Return Home</span></button><div class="eyebrow album-page-title">OUR FAMILY ALBUM</div>
+  <p id="emptyAlbumPrompt" class="empty-album-prompt hidden">Our album is waiting for its first photographs. Let’s add a few, then we can begin sharing their stories.</p>
+  <div class="upload-feedback"><small id="uploadHint" class="hidden" role="status" aria-live="polite"></small></div>
   <input id="photoFiles" type="file" accept="image/*" multiple hidden>
   
-  <button class="primary" id="savePhotos" disabled>Add to our album <b>＋</b></button><button class="text" id="cancelAdd">Return Home</button>
+  
 </section>
+<section id="stories" class="panel hidden"><button class="album-return" id="storiesHomeTop" type="button"><span>Return Home</span></button><div class="eyebrow album-page-title">OUR FAMILY ALBUM</div><section id="albumPreview" class="album-preview hidden" aria-live="polite"><div id="albumPhotoGrid" class="album-photo-grid"></div></section><p id="storiesEmpty" class="stories-empty hidden">The stories we gather will live here, beside the photographs that inspired them.</p><div id="storyList" class="story-list"></div><button class="primary" id="storiesHome">Return Home</button></section>
 <section id="consent" class="panel hidden">
   <div class="eyebrow">Before we begin</div><h1>A little note.</h1>
-  <p>This is an AI voice companion, not a person. If you choose to talk, your voice and the conversation will be recorded and saved on this iPad for your family to keep.</p>
+  <p>This is an AI voice companion, not a person. If you choose to talk, your voice and the conversation will be recorded and saved in your private family archive for your family to keep.</p>
   <p>You can stop at any time. You don’t have to remember anything or answer anything you don’t want to.</p>
   <button class="primary" id="accept">Let’s begin <b>→</b></button><button class="text" id="notnow">Not now</button>
 </section>
@@ -37,11 +40,10 @@
     <div class="album-paper">
       <div class="album-kicker">A photograph from the family album</div>
       <img id="livePhoto" alt="A family photograph to look at together">
-      <div class="album-caption"><span class="quote-mark">“</span><h2 id="liveQuestion">Tell me about this time…</h2></div>
     </div>
   </div>
   <div class="live-story-side">
-    <div class="audio-brand">Grandma’s Stories</div>
+    
     <div class="turntable" id="turntable" aria-label="Audio status: listening">
       <div class="record"><div class="record-disc"><div class="record-grooves"></div><div class="record-label"><span>GRANDMA’S<br>STORIES</span></div></div></div>
       <div class="tonearm"><span></span></div>
@@ -52,8 +54,8 @@
   </div>
 </section>
 <section id="saving" class="panel hidden"><div class="pulse">♥</div><h1>Keeping your story…</h1><p>Just a moment.</p></section>
-<section id="saved" class="panel hidden"><div class="flower">✿</div><h1>Thank you. That was lovely.</h1><p>Your story has been saved with this photograph on this iPad.</p><div id="savedPhoto" class="saved-photo"></div><div class="notice">Stored on this iPad only. It is not yet backed up online.</div><button class="primary" id="anotherStory">Another story <b>→</b></button><button class="text" id="finish">That’s enough for today</button></section>
+<section id="saved" class="panel hidden"><div class="flower">✿</div><h1>Thank you. That was lovely.</h1><p>Your story has been saved with this photograph on this iPad.</p><div id="savedPhoto" class="saved-photo"></div><div class="notice" id="savedCloudStatus" aria-live="polite">Saved on this iPad only.</div><button class="primary" id="finish">Return Home</button></section>
 <section id="error" class="panel hidden"><div class="flower">♡</div><h1>Let’s try again.</h1><p id="errorText">We couldn’t start the conversation right now.</p><button class="primary" id="retry">Try again <b>→</b></button><button class="text" id="errorBack">Back home</button></section>
 <audio id="remoteAudio" autoplay playsinline></audio>
-<footer>Made with love, for the stories that matter. <span>♥</span><small class="image-credit">Room image: <a href="https://roomai.com/ideas/orange-sofa-and-teal-cone-fireplace-lounge-1580" target="_blank" rel="noreferrer">Room AI</a> · Turntable: <a href="https://unsplash.com/photos/black-vinyl-record-player-on-brown-wooden-table-ytOQrHL0V4w" target="_blank" rel="noreferrer">Samuel Regan-Asante / Unsplash</a></small></footer>
-</main><script src="/app.js?v=28" defer></script></body></html>
+<footer>Made with love, for the stories that matter. <span>♥</span></footer>
+</main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.js" defer></script><script src="/app.js?v=41" defer></script></body></html>

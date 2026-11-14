@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" role="img" aria-label="A warm mid-century family living room with teal walls, a rust velvet armchair, walnut sideboard, plants and a glowing lamp">
+<defs>
+ <linearGradient id="wall" x2="0" y2="1"><stop stop-color="#315d5b"/><stop offset="1" stop-color="#173e40"/></linearGradient>
+ <linearGradient id="floor" x2="0" y2="1"><stop stop-color="#8b5738"/><stop offset="1" stop-color="#38251d"/></linearGradient>
+ <linearGradient id="wood" x2="0" y2="1"><stop stop-color="#a66c42"/><stop offset=".45" stop-color="#75452d"/><stop offset="1" stop-color="#4c3024"/></linearGradient>
+ <linearGradient id="rust" x2="1" y2="1"><stop stop-color="#d47b4b"/><stop offset="1" stop-color="#8d4029"/></linearGradient>
+ <radialGradient id="glow"><stop stop-color="#f9dca0" stop-opacity=".7"/><stop offset="1" stop-color="#f9dca0" stop-opacity="0"/></radialGradient>
+ <pattern id="grain" width="36" height="12" patternUnits="userSpaceOnUse"><path d="M0 4h36M0 9h36" stroke="#e4b17a" stroke-opacity=".12" stroke-width="1"/></pattern>
+ <filter id="shadow"><feGaussianBlur stdDeviation="18"/></filter>
+</defs>
+<g class="desktop-room">
+ <rect width="1440" height="900" fill="url(#wall)"/>
+ <path d="M0 0h260v650H0z" fill="#d4b58a" opacity=".18"/><path d="M26 0v650M220 0v650" stroke="#d7b78b" stroke-width="8" opacity=".5"/>
+ <rect y="660" width="1440" height="240" fill="url(#floor)"/><rect y="660" width="1440" height="240" fill="url(#grain)"/>
+ <ellipse cx="725" cy="785" rx="610" ry="95" fill="#211b17" opacity=".4" filter="url(#shadow)"/>
+ <path d="M290 560h890v190H290z" fill="url(#wood)" stroke="#39271f" stroke-width="12"/><path d="M290 560h890v18H290z" fill="#bd8753"/><path d="M320 580v145m280-145v145m290-145v145m250-145v145" stroke="#4c3024" stroke-width="8"/><path d="M300 580h860v160H300z" fill="url(#grain)" opacity=".7"/>
+ <g fill="#e5d4b5" stroke="#70472f" stroke-width="10"><rect x="420" y="100" width="125" height="155"/><rect x="585" y="65" width="165" height="190"/><rect x="790" y="110" width="125" height="145"/><rect x="950" y="80" width="155" height="175"/></g>
+ <g fill="#514338"><path d="M440 225l40-90 45 90z"/><circle cx="668" cy="135" r="48"/><path d="M810 225l45-90 42 90z"/><circle cx="1028" cy="150" r="45"/></g>
+ <g transform="translate(1030 360)"><ellipse cx="0" cy="280" rx="190" ry="28" fill="#231b16" opacity=".35"/><path d="M-10 80v175" stroke="#b68a54" stroke-width="14"/><path d="M-80 85q-20-95 70-130 95 35 65 130z" fill="#e6bd7b"/><ellipse cx="-10" cy="45" rx="170" ry="155" fill="url(#glow)"/></g>
+ <g transform="translate(190 500)"><path d="M0 160q-30-170 15-285" stroke="#5d6b43" stroke-width="12" fill="none"/><g fill="#718653"><ellipse cx="-30" cy="-80" rx="75" ry="30" transform="rotate(25 -30 -80)"/><ellipse cx="70" cy="-140" rx="85" ry="34" transform="rotate(-35 70 -140)"/><ellipse cx="-55" cy="-205" rx="80" ry="32" transform="rotate(35 -55 -205)"/><ellipse cx="35" cy="-250" rx="70" ry="28" transform="rotate(-25 35 -250)"/></g><path d="M-55 160h120l-15 75h-90z" fill="#d1b28a" stroke="#8b6545" stroke-width="8"/></g>
+ <g transform="translate(520 535)"><ellipse cx="90" cy="270" rx="260" ry="40" fill="#241914" opacity=".45" filter="url(#shadow)"/><path d="M-120 145q-25-160 65-205 180-65 285 55l35 150-25 120H-95z" fill="url(#rust)" stroke="#6e3528" stroke-width="12"/><path d="M-90 40q130-110 275 0l35 135H-80z" fill="#c5663e"/><path d="M-110 160h390v160H-90z" fill="url(#rust)"/><path d="M-65 305v90m245-90v90" stroke="#513327" stroke-width="24"/><path d="M-45 80v190m60-205v210m65-220v220m65-210v210m65-185v180" stroke="#e79a67" stroke-width="5" opacity=".35"/><path d="M20 35q45-55 115-10l30 95-120 25z" fill="#e0d1b6"/></g>
+ <g transform="translate(900 530)"><rect x="-60" y="-28" width="300" height="26" rx="8" fill="#c08a59"/><rect x="-50" y="0" width="280" height="62" rx="4" fill="#75472f"/><rect x="-40" y="10" width="260" height="40" fill="#9b6741"/><circle cx="78" cy="30" r="4" fill="#d8b27b"/><rect x="10" y="-105" width="180" height="82" rx="8" fill="#6d432e"/><circle cx="98" cy="-64" r="56" fill="#171a19"/><circle cx="98" cy="-64" r="42" fill="#262b29" stroke="#aaa08a" stroke-width="3"/><circle cx="98" cy="-64" r="14" fill="#c45d36"/><path d="M130-115l25 25-35 65" stroke="#d8d0c0" stroke-width="7" fill="none"/></g>
+ <path d="M0 660h1440" stroke="#c18a59" stroke-width="9" opacity=".55"/>
+</g>
+<g class="mobile-room">
+ <rect width="1440" height="900" fill="url(#wall)"/>
+ <rect y="700" width="1440" height="200" fill="url(#floor)"/>
+ <g transform="translate(180 210)"><path d="M0 440q-30-220 20-350" stroke="#5d6b43" stroke-width="18" fill="none"/><g fill="#82945e"><ellipse cx="-40" cy="-5" rx="150" ry="55" transform="rotate(25 -40 -5)"/><ellipse cx="110" cy="-95" rx="160" ry="60" transform="rotate(-30 110 -95)"/><ellipse cx="-70" cy="-180" rx="130" ry="52" transform="rotate(35 -70 -180)"/></g><path d="M-100 440h210l-25 130H-75z" fill="#d1b28a"/></g>
+ <g transform="translate(770 390)"><rect x="-220" y="20" width="680" height="200" fill="url(#wood)"/><rect x="-200" y="35" width="640" height="18" fill="#bd8753"/><circle cx="120" cy="-25" r="115" fill="#171a19"/><circle cx="120" cy="-25" r="85" fill="#262b29" stroke="#aaa08a" stroke-width="5"/><circle cx="120" cy="-25" r="30" fill="#c45d36"/><path d="M160-130l60 70-70 100" stroke="#d8d0c0" stroke-width="15" fill="none"/></g>
+ <g transform="translate(700 560)"><ellipse cx="80" cy="250" rx="390" ry="48" fill="#241914" opacity=".4" filter="url(#shadow)"/><path d="M-190 160q-30-240 90-290 250-90 420 70l55 180-30 200H-150z" fill="url(#rust)" stroke="#6e3528" stroke-width="16"/><path d="M-145 65q190-150 400 0l45 170h-465z" fill="#c5663e"/><path d="M-160 190h550v200h-530z" fill="url(#rust)"/><path d="M-90 380v75m370-75v75" stroke="#513327" stroke-width="30"/></g>
+ <g transform="translate(1160 270)"><path d="M0 20v260" stroke="#b68a54" stroke-width="18"/><path d="M-100 20q-20-150 100-190 120 40 90 190z" fill="#e6bd7b"/><ellipse cx="0" cy="25" rx="260" ry="220" fill="url(#glow)"/></g>
+ <g fill="#e5d4b5" stroke="#70472f" stroke-width="14"><rect x="460" y="80" width="150" height="180"/><rect x="660" y="60" width="180" height="210"/></g>
+</g>
+<style>
+.mobile-room{display:none}
+@media(max-width:760px){.desktop-room{display:none}.mobile-room{display:block}}
+</style></svg>
