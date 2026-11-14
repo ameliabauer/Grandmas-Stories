@@ -1,6 +1,6 @@
-const CACHE = 'grandmas-stories-redesign-v6';
+const CACHE = 'grandmas-stories-redesign-v7';
 const SHELL = [
-  '/', '/index.html', '/app.css', '/textured-buttons.css', '/ui-polish.css', '/app.js', '/manifest.webmanifest',
+  '/', '/index.html', '/app.css', '/textured-buttons.css', '/ui-polish.css', '/app.js', '/storage.js', '/cloud.js', '/manifest.webmanifest',
   '/walnut-512.webp', '/linen-512.webp', '/leather-512.webp', '/corduroy-512.webp'
 ];
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting())));
@@ -12,7 +12,8 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
   const sameOrigin = url.origin === self.location.origin;
-  const appShell = event.request.mode === 'navigate' || (sameOrigin && ['/', '/index.html', '/app.js', '/app.css', '/textured-buttons.css', '/ui-polish.css', '/manifest.webmanifest'].includes(url.pathname));
+  if (sameOrigin && url.pathname.startsWith('/api/')) return;
+  const appShell = event.request.mode === 'navigate' || (sameOrigin && ['/', '/index.html', '/app.js', '/app.css', '/textured-buttons.css', '/ui-polish.css', '/manifest.webmanifest', '/storage.js', '/cloud.js'].includes(url.pathname));
   if (appShell) {
     event.respondWith(fetch(event.request, { cache: 'no-store' }).then(response => {
       if (response.ok && sameOrigin) caches.open(CACHE).then(cache => cache.put(event.request, response.clone()));
