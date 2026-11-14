@@ -1292,3 +1292,87 @@ button,.primary,.next-photo,.stop,.archive-link {
     max-height: 104px !important;
   }
 }
+
+
+/* FINAL BUTTON ARTWORK MAP — use the supplied button designs, never the
+   legacy corduroy texture, for in-app actions. Each main action has its own
+   artwork so Next Photo and I'm done for today are visibly different. */
+:root {
+  --button-next-photo: url("https://raw.githubusercontent.com/ameliabauer/Grandmas-Stories/main/IMG_0127.png?v=3");
+  --button-done-today: url("https://raw.githubusercontent.com/ameliabauer/Grandmas-Stories/main/IMG_0128.png?v=3");
+  --button-general: url("https://raw.githubusercontent.com/ameliabauer/Grandmas-Stories/main/IMG_0129.png?v=3");
+}
+
+/* Generic primary actions: sign-in, consent, save/return, retry, etc. */
+body:not(.home-mode) .primary {
+  box-sizing: border-box !important;
+  background-color: transparent !important;
+  background-image: var(--button-general) !important;
+  background-size: 100% 100% !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: #fff5e8 !important;
+  text-shadow: 0 2px 4px rgba(35,18,10,.72) !important;
+}
+
+/* The two live-story actions deliberately use different supplied artwork. */
+body.live-mode .live-actions #nextPhoto,
+body:not(.home-mode) .next-photo {
+  background-color: transparent !important;
+  background-image: var(--button-next-photo) !important;
+  background-size: 100% 100% !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: #fff5e8 !important;
+  text-shadow: 0 2px 4px rgba(35,18,10,.72) !important;
+}
+body.live-mode .live-actions #stop,
+body:not(.home-mode) .stop {
+  background-color: transparent !important;
+  background-image: var(--button-done-today) !important;
+  background-size: 100% 100% !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: #fff5e8 !important;
+  text-shadow: 0 2px 4px rgba(35,18,10,.72) !important;
+}
+
+/* Other prominent archive actions use the third, distinct supplied design. */
+body:not(.home-mode) .album-return,
+body.album-mode button.album-add-tile,
+body:not(.home-mode) .add-top {
+  background-color: transparent !important;
+  background-image: var(--button-general) !important;
+  background-size: 100% 100% !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: #fff5e8 !important;
+  text-shadow: 0 2px 4px rgba(35,18,10,.72) !important;
+}
+
+/* The photo upload drop zone is a surface, not a button; do not dress it
+   with the old corduroy image. */
+.upload-box {
+  background-image: linear-gradient(rgba(35,22,15,.72),rgba(35,22,15,.72)), var(--room-photo) !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+
+/* Keep the archive connection control understated and untextured. */
+.home-mode .home-copy #connectArchive {
+  background-image: none !important;
+  background-color: rgba(48,31,21,.92) !important;
+  box-shadow: none !important;
+}
