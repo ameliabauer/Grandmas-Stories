@@ -1221,3 +1221,23 @@ button,.primary,.next-photo,.stop,.archive-link {
 .home-mode .home-copy #startSession:disabled{opacity:1!important;filter:none!important}
 .home-mode .home-copy #startSession,.home-mode .home-copy #openStories{flex:initial!important}
 .home-mode .home-copy #connectArchive{width:min(82%,860px)!important}
+
+
+/* Use Amelia's original high-resolution button artwork committed to the repository. */
+.home-mode .home-copy #startSession{
+  background:transparent url("https://raw.githubusercontent.com/ameliabauer/Grandmas-Stories/main/IMG_0125.png") center/100% 100% no-repeat!important;
+  border:0!important;border-radius:0!important;box-shadow:none!important;
+  padding:0!important;color:#fff5e8!important;text-shadow:0 2px 4px #54230f!important;
+}
+.home-mode .home-copy #openStories{
+  background:transparent url("https://raw.githubusercontent.com/ameliabauer/Grandmas-Stories/main/IMG_0126.png") center/100% 100% no-repeat!important;
+  border:0!important;border-radius:0!important;box-shadow:none!important;
+  padding:0!important;color:#fff5e8!important;text-shadow:0 2px 4px #3b2117!important;
+}
+.home-mode .home-copy #startSession,.home-mode .home-copy #openStories{
+  width:100%!important;min-height:120px!important;height:120px!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+}
+@media(max-width:760px){
+ .home-mode .home-copy #startSession,.home-mode .home-copy #openStories{height:104px!important;min-height:104px!important}
+}
