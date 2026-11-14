@@ -1241,3 +1241,15 @@ button,.primary,.next-photo,.stop,.archive-link {
 @media(max-width:760px){
  .home-mode .home-copy #startSession,.home-mode .home-copy #openStories{height:104px!important;min-height:104px!important}
 }
+
+
+/* Explicitly apply the uploaded leather artwork to Our Family Album. */
+.home-mode #openStories,
+.home-mode button#openStories.archive-link {
+  background: transparent url("https://raw.githubusercontent.com/ameliabauer/Grandmas-Stories/main/IMG_0126.png") center / 100% 100% no-repeat !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: #fff5e8 !important;
+  text-shadow: 0 2px 4px rgba(35,18,10,.8) !important;
+}
