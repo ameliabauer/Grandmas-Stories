@@ -1279,3 +1279,31 @@ button,.primary,.next-photo,.stop,.archive-link {
   opacity: 1 !important;
   filter: none !important;
 }
+
+
+/* Keep the two primary home actions exactly the same size at every breakpoint. */
+.home-mode .home-copy #startSession,
+.home-mode .home-copy #openStories {
+  box-sizing: border-box !important;
+  display: flex !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: 120px !important;
+  min-height: 120px !important;
+  max-height: 120px !important;
+  flex: 0 0 120px !important;
+  margin: 8px 0 !important;
+  padding: 0 !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+@media (max-width: 760px) {
+  .home-mode .home-copy #startSession,
+  .home-mode .home-copy #openStories {
+    height: 104px !important;
+    min-height: 104px !important;
+    max-height: 104px !important;
+    flex-basis: 104px !important;
+  }
+}
