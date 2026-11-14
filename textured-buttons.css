@@ -1,0 +1,156 @@
+/* =========================================================
+   Grandma's Stories - textured button kit
+   Drop this file + the /textures folder into your app.
+   Usage: <a class="tx-btn tx-corduroy" href="#">Start <span class="tx-arrow">-></span></a>
+   ========================================================= */
+
+:root {
+  --tx-cream: #F6EBD9;
+  --tx-espresso: #3A2316;
+  --tx-radius-pill: 999px;
+  --tx-radius-soft: clamp(14px, 1.6vw, 22px);
+}
+
+/* ---------- Base button (shape, depth, responsive sizing) ---------- */
+.tx-btn {
+  --tex: none;            /* texture image, set by variant */
+  --tex-size: 220px;      /* physical size of one tile - keeps ribs/weave the same scale on every screen */
+  --tex-repeat: repeat;
+  --tint: transparent;    /* optional colour wash over the texture */
+  --ink: var(--tx-cream); /* label colour */
+  --ink-shadow: 0 2px 3px rgba(0, 0, 0, .45);
+  --edge: rgba(40, 18, 6, .55);
+
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45em;
+  box-sizing: border-box;
+  min-height: clamp(56px, 4.5vw + 36px, 96px);
+  min-width: 0;
+  padding: .4em clamp(1.25em, 3vw, 2em);
+  border: 0;
+  border-radius: var(--tx-radius-pill);
+  overflow: hidden;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  text-wrap: balance;
+  font-family: "Young Serif", "Cooper Black", Georgia, serif;
+  font-size: clamp(1.15rem, 1.4vw + .8rem, 2rem);
+  line-height: 1.1;
+  color: var(--ink);
+  text-shadow: var(--ink-shadow);
+  background:
+    linear-gradient(var(--tint), var(--tint)),
+    var(--tex) center / var(--tex-size) var(--tex-repeat);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, .22),   /* top highlight */
+    inset 0 -4px 0 rgba(0, 0, 0, .22),        /* bottom inner edge */
+    inset 0 0 0 1.5px var(--edge),            /* seam outline */
+    0 2px 0 rgba(0, 0, 0, .25),
+    0 10px 22px rgba(40, 18, 6, .45);         /* drop shadow */
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* cushion shading - light from above, rolls off at the bottom */
+.tx-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 240, 220, .22), transparent 60%),
+    linear-gradient(to bottom, rgba(255, 255, 255, .06), rgba(0, 0, 0, .28));
+  pointer-events: none;
+}
+
+/* optional stitched seam - add class tx-stitched */
+.tx-stitched::after {
+  content: "";
+  position: absolute;
+  inset: clamp(5px, .6vw, 8px);
+  border: 1.5px dashed rgba(246, 235, 217, .55);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.tx-btn:hover { transform: translateY(-2px); filter: brightness(1.06) saturate(1.05); }
+.tx-btn:active {
+  transform: translateY(1px);
+  filter: brightness(.96);
+  box-shadow:
+    inset 0 3px 6px rgba(0, 0, 0, .3),
+    inset 0 0 0 1.5px var(--edge),
+    0 3px 8px rgba(40, 18, 6, .4);
+}
+.tx-btn:focus-visible { outline: 3px solid #F2C14E; outline-offset: 4px; }
+
+.tx-soft { border-radius: var(--tx-radius-soft); }
+.tx-arrow { font-family: system-ui, sans-serif; font-weight: 600; transition: transform .18s ease; }
+.tx-btn:hover .tx-arrow { transform: translateX(4px); }
+.tx-icon { width: 1.3em; height: 1.3em; flex: none; }
+
+/* ---------- Texture variants ----------
+   image-set serves the 512px tile to standard screens and the 1024px tile to retina. */
+.tx-corduroy {
+  --tex: image-set(url("textures/corduroy-512.webp") 1x, url("textures/corduroy.webp") 2x);
+  --tex-size: 140px;
+  --edge: rgba(90, 30, 8, .7);
+}
+.tx-shag {
+  --tex: image-set(url("textures/shag-512.webp") 1x, url("textures/shag.webp") 2x);
+  --tex-size: 260px;
+  --tint: rgba(60, 25, 8, .28);
+  --ink-shadow: 0 2px 4px rgba(0, 0, 0, .75);
+}
+.tx-walnut {
+  --tex: image-set(url("textures/walnut-512.webp") 1x, url("textures/walnut.webp") 2x);
+  --tex-size: 520px;
+  --tex-repeat: repeat-x;
+  --edge: rgba(20, 8, 2, .75);
+}
+.tx-tweed {
+  --tex: image-set(url("textures/tweed-512.webp") 1x, url("textures/tweed.webp") 2x);
+  --tex-size: 240px;
+  --tint: rgba(30, 30, 10, .12);
+  --ink-shadow: 0 2px 3px rgba(0, 0, 0, .7);
+}
+.tx-floral {
+  --tex: image-set(url("textures/floral-512.webp") 1x, url("textures/floral.webp") 2x);
+  --tex-size: cover;
+  --tex-repeat: no-repeat;
+  --tint: rgba(246, 235, 217, .35);
+  --ink: var(--tx-espresso);
+  --ink-shadow: 0 1px 0 rgba(255, 248, 235, .9), 0 0 12px rgba(255, 248, 235, .9);
+  --edge: rgba(120, 60, 20, .5);
+}
+.tx-leather {
+  --tex: image-set(url("textures/leather-512.webp") 1x, url("textures/leather.webp") 2x);
+  --tex-size: 360px;
+  --edge: rgba(60, 25, 8, .75);
+}
+.tx-knit {
+  --tex: image-set(url("textures/knit-512.webp") 1x, url("textures/knit.webp") 2x);
+  --tex-size: 240px;
+  --ink: var(--tx-espresso);
+  --ink-shadow: 0 1px 0 rgba(255, 255, 255, .6);
+  --edge: rgba(120, 95, 60, .45);
+}
+.tx-linen {
+  --tex: image-set(url("textures/linen-512.webp") 1x, url("textures/linen.webp") 2x);
+  --tex-size: 320px;
+  --ink: var(--tx-espresso);
+  --ink-shadow: 0 1px 0 rgba(255, 255, 255, .55);
+  --edge: rgba(120, 95, 60, .4);
+}
+
+/* ---------- Respect user preferences ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .tx-btn, .tx-arrow { transition: none; }
+  .tx-btn:hover { transform: none; }
+}

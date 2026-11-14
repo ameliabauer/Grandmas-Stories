@@ -1,0 +1,122 @@
+/* Canonical responsive home-room layout. Kept separate from the app's
+   legacy screen styles so the home composition has one source of truth. */
+html, body { width:100%; min-width:320px; }
+body.home-mode { min-height:100svh; overflow-x:hidden; background:#21170f; }
+.home-mode .shell {
+  width:100%; max-width:none; min-height:100svh; height:100svh;
+  margin:0; padding:0; overflow:hidden; position:relative;
+}
+.home-mode header { display:none !important; }
+.home-mode #welcome.home-panel {
+  position:relative; isolation:isolate; display:grid !important; place-items:center;
+  box-sizing:border-box; width:100%; max-width:none; min-width:0;
+  height:100svh; min-height:100svh; margin:0;
+  padding:clamp(28px,5vh,56px) clamp(18px,5vw,72px) clamp(104px,13vh,132px);
+  overflow:hidden; border:0; border-radius:0; box-shadow:none; text-align:center;
+  background:
+    linear-gradient(rgba(12,15,13,.62),rgba(12,15,13,.62)),
+    url("/textures/walnut.webp") repeat;
+  background-size:auto,520px 520px;
+  background-position:center,center top;
+}
+.home-mode #welcome.home-panel::before { display:none !important; content:none !important; }
+.home-mode #welcome.home-panel::after {
+  content:""; display:block; position:absolute; z-index:0;
+  left:0; right:0; bottom:0; width:100%;
+  height:clamp(66px,11vh,100px); margin:0; border:0; border-radius:0;
+  background:
+    linear-gradient(rgba(38,22,13,.16),rgba(38,22,13,.16)),
+    url("/textures/shag.webp") repeat;
+  background-size:auto,260px 260px;
+  background-position:center,center;
+  clip-path:none; opacity:1; pointer-events:none;
+}
+.home-mode .home-copy {
+  position:relative; z-index:2; display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  align-items:center; justify-items:stretch;
+  width:min(100%,980px); max-width:980px; min-width:0;
+  min-height:0; margin:0 auto; padding:0;
+  gap:clamp(12px,2vw,22px);
+}
+.home-mode .home-copy > .eyebrow,
+.home-mode .home-copy > small { display:none !important; }
+.home-mode .home-copy > h1 {
+  grid-column:1/-1; width:100%; max-width:none;
+  margin:0; color:#f7e8d2;
+  font:700 clamp(48px,6.5vw,88px)/.98 "Young Serif",Georgia,serif;
+  letter-spacing:-.035em; text-align:center;
+  text-shadow:0 3px 16px rgba(0,0,0,.68);
+}
+.home-mode .home-copy > #homeMessage {
+  grid-column:1/-1; width:100%; max-width:none;
+  margin:0 0 clamp(4px,1vw,10px); color:#f0e3cf;
+  font:400 clamp(16px,1.8vw,21px)/1.4 "DM Sans",sans-serif;
+  text-align:center; text-shadow:0 2px 8px rgba(0,0,0,.65);
+}
+.home-mode .home-copy > #startSession,
+.home-mode .home-copy > #openStories {
+  display:inline-flex !important; align-items:center; justify-content:center;
+  box-sizing:border-box; width:100%; min-width:0; max-width:none;
+  min-height:clamp(68px,9vw,100px); height:auto; margin:0; padding:.45em 1.1em;
+  font:400 clamp(21px,2.3vw,32px)/1.12 "Young Serif",Georgia,serif;
+  text-align:center; white-space:normal;
+}
+.home-mode .home-copy > #startSession:disabled,
+.home-mode .home-copy > #openStories:disabled {
+  opacity:.58; filter:saturate(.68); cursor:not-allowed;
+}
+.home-mode .home-copy > #connectArchive {
+  grid-column:1/-1; justify-self:center;
+  display:none; width:min(100%,640px); min-width:0; max-width:100%;
+  min-height:clamp(62px,7vw,78px); margin:2px auto 0; padding:.5em 1.25em;
+  font:400 clamp(17px,1.9vw,25px)/1.15 "Young Serif",Georgia,serif;
+}
+.home-mode.archive-disconnected .home-copy > #connectArchive { display:inline-flex !important; }
+.home-mode.archive-connected .home-copy > #connectArchive { display:none !important; }
+.home-mode .home-copy > #photoCount,
+.home-mode .home-copy > #archiveConnectionStatus { display:none !important; }
+.home-mode footer { display:none !important; }
+
+@media (max-width:639px) {
+  .home-mode .shell { height:auto; min-height:100svh; overflow-x:hidden; overflow-y:auto; }
+  .home-mode #welcome.home-panel {
+    height:auto; min-height:100svh; padding:28px 18px 112px;
+  }
+  .home-mode .home-copy {
+    width:min(100%,500px); grid-template-columns:minmax(0,1fr);
+    gap:14px;
+  }
+  .home-mode .home-copy > h1 {
+    grid-column:1; font-size:clamp(42px,11vw,58px); line-height:1.02;
+  }
+  .home-mode .home-copy > #homeMessage { grid-column:1; margin-bottom:4px; }
+  .home-mode .home-copy > #startSession,
+  .home-mode .home-copy > #openStories {
+    grid-column:1; min-height:72px; font-size:clamp(21px,6vw,27px);
+  }
+  .home-mode .home-copy > #connectArchive {
+    grid-column:1; width:100%; min-height:66px; margin-top:2px;
+    font-size:clamp(17px,4.8vw,20px);
+  }
+}
+@media (min-width:640px) {
+  .home-mode .home-copy { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .home-mode .home-copy > #connectArchive { grid-column:1/-1; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .home-mode .home-copy .tx-btn { transition:none; }
+}
+/* Reassert the texture kit over legacy home-button declarations in style.css. */
+.home-mode .home-copy > .tx-btn {
+  position:relative !important; isolation:isolate !important; overflow:hidden !important;
+  border:0 !important; border-radius:var(--tx-radius-pill) !important;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.22),inset 0 -4px 0 rgba(0,0,0,.22),inset 0 0 0 1.5px var(--edge),0 2px 0 rgba(0,0,0,.25),0 10px 22px rgba(40,18,6,.45) !important;
+  background:linear-gradient(var(--tint),var(--tint)),var(--tex) center / var(--tex-size) var(--tex-repeat) !important;
+  color:var(--ink) !important; text-shadow:var(--ink-shadow) !important;
+}
+.home-mode .home-copy > #openStories.tx-soft,
+.home-mode .home-copy > #connectArchive.tx-soft { border-radius:var(--tx-radius-soft) !important; }
+.home-mode .home-copy > #startSession.tx-corduroy { --tex-size:140px; }
+.home-mode .home-copy > #openStories.tx-leather { --tex-size:360px; }
+.home-mode .home-copy > #connectArchive.tx-linen { --tex-size:320px; }

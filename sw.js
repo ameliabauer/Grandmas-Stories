@@ -1,12 +1,12 @@
-const CACHE='grandmas-stories-v33';
-const SHELL=['/','/style.css?v=29','/app.js?v=33','/manifest.webmanifest'];
+const CACHE='grandmas-stories-v34';
+const SHELL=['/','/style.css?v=68','/textured-buttons.css?v=1','/home-screen.css?v=1','/app.js?v=43','/manifest.webmanifest'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('grandmas-stories-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',event=>{
  if(event.request.method!=='GET')return;
  const url=new URL(event.request.url);
  if(url.origin===self.location.origin&&url.pathname.startsWith('/api/'))return;
- const appShell=event.request.mode==='navigate'||url.origin===self.location.origin&&(['/','/index.html','/app.js','/style.css'].includes(url.pathname));
+ const appShell=event.request.mode==='navigate'||url.origin===self.location.origin&&(['/','/index.html','/app.js','/style.css','/textured-buttons.css','/home-screen.css'].includes(url.pathname));
  if(appShell){
   event.respondWith(fetch(event.request,{cache:'no-store'}).then(response=>{
    if(response.ok&&url.origin===self.location.origin){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy));}
