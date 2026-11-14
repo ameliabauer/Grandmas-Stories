@@ -1266,3 +1266,16 @@ button,.primary,.next-photo,.stop,.archive-link {
   border-radius: 0 !important;
   box-shadow: none !important;
 }
+
+
+/* Definitive album artwork rule: match the more-specific home-copy selector above. */
+.home-mode .home-copy #openStories.archive-link {
+  background: transparent url("https://raw.githubusercontent.com/ameliabauer/Grandmas-Stories/main/IMG_0126.png") center / 100% 100% no-repeat !important;
+  background-image: url("https://raw.githubusercontent.com/ameliabauer/Grandmas-Stories/main/IMG_0126.png") !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
