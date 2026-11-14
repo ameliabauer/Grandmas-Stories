@@ -1412,3 +1412,76 @@ body:not(.home-mode) .add-top {
     margin-top: 16px !important;
   }
 }
+
+
+/* HOME LAYOUT REPAIR — explicit placement prevents the heading, copy and
+   actions from being auto-flowed into the wrong grid cells. */
+.home-mode .home-copy {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-auto-flow: row !important;
+  align-content: center !important;
+  align-items: start !important;
+  justify-items: stretch !important;
+  width: min(820px, 72vw) !important;
+  min-height: 0 !important;
+  margin: 0 0 0 4% !important;
+  padding: 0 !important;
+  gap: 16px 24px !important;
+}
+.home-mode .home-copy > .eyebrow,
+.home-mode .home-copy > h1,
+.home-mode .home-copy > p {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+}
+.home-mode .home-copy > .eyebrow { grid-row: 1 !important; }
+.home-mode .home-copy > h1 { grid-row: 2 !important; }
+.home-mode .home-copy > p { grid-row: 3 !important; }
+.home-mode.archive-disconnected .home-copy #connectArchive {
+  grid-column: 1 / -1 !important;
+  grid-row: 4 !important;
+  justify-self: start !important;
+  width: min(100%, 560px) !important;
+  min-height: 76px !important;
+  margin: 8px 0 0 !important;
+  padding: 12px 28px !important;
+  white-space: normal !important;
+}
+.home-mode.archive-connected .home-copy #startSession {
+  grid-column: 1 !important;
+  grid-row: 4 !important;
+}
+.home-mode.archive-connected .home-copy #openStories {
+  grid-column: 2 !important;
+  grid-row: 4 !important;
+}
+.home-mode.archive-connected .home-copy #photoCount {
+  grid-column: 1 / -1 !important;
+  grid-row: 5 !important;
+  margin: 0 !important;
+}
+@media (max-width: 760px) {
+  .home-mode .home-copy {
+    width: min(100%, 520px) !important;
+    margin: 0 auto !important;
+    gap: 13px !important;
+  }
+  .home-mode .home-copy > h1 {
+    font-size: clamp(48px, 13vw, 68px) !important;
+  }
+  .home-mode.archive-disconnected .home-copy #connectArchive {
+    justify-self: stretch !important;
+    width: 100% !important;
+    min-height: 68px !important;
+    margin-top: 7px !important;
+  }
+  .home-mode.archive-connected .home-copy #startSession,
+  .home-mode.archive-connected .home-copy #openStories {
+    height: 96px !important;
+    min-height: 96px !important;
+    max-height: 96px !important;
+    padding: 0 10px !important;
+    font-size: clamp(21px, 6vw, 29px) !important;
+  }
+}
