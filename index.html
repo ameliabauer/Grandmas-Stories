@@ -1,48 +1,208 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f7f2ea"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/style.css?v=5"><title>Grandma’s Stories</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grandma's Stories</title>
+<meta name="theme-color" content="#2A170D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&amp;family=Lora:ital,wght@0,400;0,500;1,400&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="textured-buttons.css">
+<link rel="stylesheet" href="app.css">
 </head>
-<body><main class="shell">
-<header><div class="brand"><span>♥</span> Grandma’s Stories</div><button class="add-top" id="addFromHome" aria-label="Add family photographs" title="Add family photographs">＋</button></header>
-<section id="welcome" class="panel home-panel">
-  <div class="flower">✿</div><h1>Ready for a little story?</h1>
-  <p id="homeMessage">We’ll bring up a photograph and see what memories come to mind.</p>
-  <button class="primary start-home" id="startSession" disabled>Start <b>→</b></button>
-  <small class="muted" id="photoCount">Your family album is waiting.</small>
-  <small class="home-hint">You can talk naturally. No buttons to hold.</small>
-</section>
-<section id="addPanel" class="panel hidden">
-  <div class="eyebrow">Add to the family album</div><h1>Bring out the old photos.</h1>
-  <p>Choose photographs from your device. You can add a little context, but it’s absolutely fine to leave the details blank and let the stories unfold.</p>
-  <label class="upload-box" for="photoFiles"><span>＋</span><strong>Choose photographs</strong><small>JPG, PNG or HEIC images</small></label>
-  <input id="photoFiles" type="file" accept="image/*" multiple hidden>
-  <div id="selectedFiles" class="selected-files">No photographs selected yet.</div>
-  <label class="field-label" for="photoTitle">A note about these photographs (optional)</label><input id="photoTitle" class="field" type="text" maxlength="100" placeholder="e.g. Betty’s school days">
-  <label class="field-label" for="photoNotes">Anything the family already knows? (optional)</label><textarea id="photoNotes" class="field" rows="3" maxlength="500" placeholder="Names, places or a little background…"></textarea>
-  <button class="primary" id="savePhotos" disabled>Add to our album <b>＋</b></button><button class="text" id="cancelAdd">Back home</button>
-  <small class="local-note">Photographs are currently kept on this iPad only. Remote family uploads are coming later.</small>
-</section>
-<section id="consent" class="panel hidden">
-  <div class="eyebrow">Before we begin</div><h1>A little note.</h1>
-  <p>This is an AI voice companion, not a person. If you choose to talk, your voice and the conversation will be recorded and saved on this iPad for your family to keep.</p>
-  <p>You can stop at any time. You don’t have to remember anything or answer anything you don’t want to.</p>
-  <label class="check"><input type="checkbox" id="agree"><span>I understand, and I’d like to continue.</span></label>
-  <button class="primary" id="accept" disabled>Let’s begin <b>→</b></button><button class="text" id="notnow">Not now</button>
-</section>
-<section id="live" class="panel live-panel hidden" data-audio-state="listening">
-  <div class="live-photo-wrap" id="livePhotoWrap"><img id="livePhoto" alt="A family photograph to look at together"></div>
-  <h2 id="liveQuestion">I wonder what you remember about this one?</h2>
-  <div class="turntable" id="turntable" aria-label="Audio status: listening"><div class="record"><div class="record-grooves"></div><div class="record-label"><span>GRANDMA’S<br>STORIES</span></div></div><div class="tonearm"><span></span></div></div>
-  <div class="voice-status" id="voiceStatus" aria-live="polite"><span class="voice-dot"></span><span>Whenever you’re ready, I’m listening.</span></div>
-  <div id="timer">0:00</div><div id="transcript" aria-live="polite"></div>
-  <div class="live-actions"><button class="next-photo" id="nextPhoto">Next Photo <b>→</b></button><button class="stop" id="stop">I’m done for today</button></div>
-</section>
-<section id="saving" class="panel hidden"><div class="pulse">♥</div><h1>Keeping your story…</h1><p>Just a moment.</p></section>
-<section id="saved" class="panel hidden"><div class="flower">✿</div><h1>Thank you. That was lovely.</h1><p>Your story has been saved with this photograph on this iPad.</p><div id="savedPhoto" class="saved-photo"></div><div class="notice">Stored on this iPad only. It is not yet backed up online.</div><button class="primary" id="anotherStory">Another story <b>→</b></button><button class="text" id="finish">That’s enough for today</button></section>
-<section id="error" class="panel hidden"><div class="flower">♡</div><h1>Let’s try again.</h1><p id="errorText">We couldn’t start the conversation right now.</p><button class="primary" id="retry">Try again <b>→</b></button><button class="text" id="errorBack">Back home</button></section>
-<audio id="remoteAudio" autoplay playsinline></audio>
-<footer>Made with love, for the stories that matter. <span>♥</span></footer>
-</main><script src="/app.js?v=5" defer></script></body></html>
+<body>
+
+  <!-- ================= HOME ================= -->
+  <section class="screen screen-home" data-screen="home" aria-labelledby="home-title">
+    <div class="home-inner">
+      <header class="brand">
+        <h1 id="home-title">Grandma's Stories</h1>
+        <p class="tagline">Real stories. Lasting memories.</p>
+      </header>
+      <nav class="home-actions" aria-label="Main">
+        <a class="tx-btn tx-corduroy" href="#/story">Start <span class="tx-arrow" aria-hidden="true">&#8594;</span></a>
+        <a class="tx-btn tx-leather tx-soft tx-stitched" href="#/album">Our family album</a>
+        <a class="tx-btn tx-linen tx-soft wide" href="#/signin">
+          <svg class="tx-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path><circle cx="12" cy="13" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"></circle></svg>
+          Connect to our family archive
+        </a>
+      </nav>
+    </div>
+  </section>
+
+  <!-- ================= SIGN IN ================= -->
+  <section class="screen screen-signin" data-screen="signin" aria-labelledby="signin-title" hidden="">
+    <div class="topbar">
+      <a class="back-link" href="#/home">&#8592; Home</a>
+    </div>
+    <div class="card linen-card">
+      <div class="signin-form" data-state="form">
+        <h2 id="signin-title">Welcome back to the family archive</h2>
+        <p class="muted">We'll email you a secure sign-in link. No password needed.</p>
+        <form class="form" data-form="signin" novalidate="">
+          <label for="email">Email address</label>
+          <input id="email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required="">
+          <p class="field-error" data-error="" hidden="">Please enter a valid email address.</p>
+          <button class="tx-btn tx-corduroy full" type="submit">Send my sign-in link <span class="tx-arrow" aria-hidden="true">&#8594;</span></button>
+        </form>
+      </div>
+      <div class="signin-sent" data-state="sent" hidden="">
+        <h2>Check your inbox</h2>
+        <p class="muted">Your sign-in link is on its way to <strong data-sent-email=""></strong>.</p>
+        <div class="row">
+          <button class="tx-btn tx-leather tx-soft" type="button" data-action="resend">Resend link</button>
+          <a class="text-link" href="#/home">Return home</a>
+        </div>
+      </div>
+    </div>
+    <p class="footnote">Made with love, for the stories that matter.</p>
+  </section>
+
+  <!-- ================= ALBUM ================= -->
+  <section class="screen screen-album" data-screen="album" aria-labelledby="album-title" hidden="">
+    <div class="topbar">
+      <a class="back-link" href="#/home">&#8592; Home</a>
+      <div class="album-tools">
+        <button class="text-link manage-btn" type="button" data-action="manage" aria-pressed="false">Manage photos</button>
+        <button class="tx-btn tx-linen tx-soft small" type="button" data-action="add-photo">
+          <svg class="tx-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"></path></svg>
+          Add a photo
+        </button>
+      </div>
+    </div>
+    <header class="album-head">
+      <h2 id="album-title">Our family album</h2>
+      <p class="muted">Choose a photo and tell the story behind it.</p>
+    </header>
+    <p class="manage-hint" data-manage-hint="" hidden="">Tap the bin icon on any photo you'd like to delete. Tap Done when you're finished.</p>
+    <ul class="prints" data-prints=""></ul>
+    <div class="empty-album" data-empty="" hidden="">
+      <p>The album is empty.</p>
+      <button class="tx-btn tx-corduroy small" type="button" data-action="add-photo">Add the first photo</button>
+    </div>
+  </section>
+
+  <!-- ================= STORY ================= -->
+  <section class="screen screen-story" data-screen="story" aria-labelledby="story-title" hidden="">
+    <div class="topbar">
+      <a class="back-link" href="#/album">&#8592; Album</a>
+      <span class="counter" data-counter=""></span>
+    </div>
+    <div class="story-layout">
+      <div class="album-page" data-album-page="">
+        <div class="photo-slot">
+          <figure class="mount">
+            <img data-photo="" src="" alt="">
+            <figcaption><span data-caption=""></span> <span class="year" data-year=""></span></figcaption>
+          </figure>
+        </div>
+        <div class="story-side">
+          <p class="prompt" id="story-title"><span class="quote" aria-hidden="true">&#8220;</span><span data-prompt=""></span></p>
+          <div class="controls">
+            <div class="ctl">
+              <button class="tx-btn tx-linen round nav-big" type="button" data-action="prev" aria-label="Previous photo">
+                <svg class="tx-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              </button>
+              <span class="ctl-label" aria-hidden="true">Previous</span>
+            </div>
+            <div class="record" data-record="">
+              <button class="tx-btn tx-corduroy round mic" type="button" data-action="listen" aria-pressed="false">
+                <span class="mic-idle">
+                  <svg class="tx-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"></rect><path d="M6 11a6 6 0 0 0 12 0M12 17v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg>
+                  <span>Tap to tell</span>
+                </span>
+                <span class="mic-live">
+                  <span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+                  <span data-timer="">0:00</span>
+                  <span class="mic-stop">Tap to finish</span>
+                </span>
+              </button>
+            </div>
+            <div class="ctl">
+              <button class="tx-btn tx-linen round nav-big" type="button" data-action="next" aria-label="Next photo">
+                <svg class="tx-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              </button>
+              <span class="ctl-label" aria-hidden="true">Next</span>
+            </div>
+          </div>
+          <p class="live-transcript" data-live="" hidden=""></p>
+          <div class="after-row">
+            <div class="saved-note" data-saved="" role="status" aria-live="polite" hidden="">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"></circle><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#FFF9EF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              <span data-saved-text="">Story saved</span>
+            </div>
+            <span class="status" data-status="" role="status" aria-live="polite"></span>
+            <a class="text-link read-link" href="#/album" data-read-link="" hidden="">Read the story in the album</a>
+          </div>
+          <button class="text-link type-toggle" type="button" data-action="toggle-type" aria-expanded="false" aria-controls="story-notes">Prefer to type? Write it instead</button>
+          <div class="story-notes" id="story-notes" data-notes="" hidden="">
+            <label for="story-text">Write the story</label>
+            <textarea id="story-text" rows="4" data-story-text="" placeholder="Type the story here..."></textarea>
+            <div class="row">
+              <button class="tx-btn tx-leather tx-soft small" type="button" data-action="save">Save story</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= VIEW (read a photo's stories) ================= -->
+  <section class="screen screen-view" data-screen="view" aria-labelledby="view-title" hidden="">
+    <div class="topbar">
+      <a class="back-link" href="#/album">&#8592; Album</a>
+      <div class="view-nav">
+        <button class="tx-btn tx-linen round nav-btn" type="button" data-action="view-prev" aria-label="Previous story">
+          <svg class="tx-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        </button>
+        <span class="counter" data-view-counter=""></span>
+        <button class="tx-btn tx-linen round nav-btn" type="button" data-action="view-next" aria-label="Next story">
+          <svg class="tx-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        </button>
+      </div>
+    </div>
+    <div class="book">
+      <div class="book-page photo-page">
+        <figure class="mount">
+          <img data-view-photo="" src="" alt="">
+          <figcaption><span data-view-caption=""></span> <span class="year" data-view-year=""></span></figcaption>
+        </figure>
+      </div>
+      <div class="book-page story-page">
+        <header class="story-head">
+          <h2 id="view-title" data-view-title=""></h2>
+          <p class="story-sub" data-view-sub=""></p>
+        </header>
+        <div class="entries" data-view-entries=""></div>
+        <a class="add-story" href="#/album" data-add-story="">
+          <svg class="tx-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"></path></svg>
+          Add another story
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Confirm removal -->
+  <dialog class="confirm" data-confirm="" aria-labelledby="confirm-title">
+    <div class="confirm-inner">
+      <img class="confirm-thumb" data-confirm-thumb="" src="" alt="">
+      <h2 id="confirm-title">Remove this photo?</h2>
+      <p class="muted" data-confirm-text=""></p>
+      <div class="row confirm-actions">
+        <button class="text-link" type="button" data-choice="cancel">Keep it</button>
+        <button class="tx-btn tx-corduroy tx-soft small" type="button" data-choice="remove" data-confirm-remove="">Remove photo</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Undo toast -->
+  <div class="toast" data-toast="" role="status" aria-live="polite" hidden="">
+    <span data-toast-text="">Photo removed.</span>
+    <button class="toast-undo" type="button" data-action="undo">Undo</button>
+  </div>
+
+  <input type="file" accept="image/*" data-file="" hidden="">
+  <script src="app.js"></script>
+</body>
+</html>
