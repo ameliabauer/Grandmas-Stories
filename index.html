@@ -110,7 +110,7 @@
 
   <dialog class="confirm" data-confirm aria-labelledby="confirm-title"><div class="confirm-inner"><img class="confirm-thumb" data-confirm-thumb src="" alt=""><h2 id="confirm-title">Remove this photo?</h2><p class="muted" data-confirm-text></p><div class="row confirm-actions"><button class="text-link" type="button" data-choice="cancel">Keep it</button><button class="tx-btn tx-corduroy tx-soft small" type="button" data-choice="remove" data-confirm-remove>Remove photo</button></div></div></dialog>
   <div class="toast" data-toast role="status" aria-live="polite" hidden><span data-toast-text>Photo removed.</span><button class="toast-undo" type="button" data-action="undo">Undo</button></div>
-  <input type="file" accept="image/*" data-file hidden>
+  <input type="file" accept="image/*" data-file multiple hidden>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.js"></script>
   <script src="/storage.js"></script>
   <script src="/app.js"></script>
