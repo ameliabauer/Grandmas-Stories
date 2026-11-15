@@ -6,6 +6,7 @@
   const BUCKET="family-archive";
   const say=(text)=>{const el=$("[data-status]");if(el)el.textContent=text;};
   const archiveStatus=(text)=>{const el=$("#archiveConnectionStatus");if(el)el.textContent=text;};
+  const showConnectButton=show=>{const el=$("[data-connect-archive]");if(el)el.hidden=!show;};
   const emitUpdated=()=>window.dispatchEvent(new CustomEvent("gs:cloud-updated"));
   const uuid=()=>crypto.randomUUID();
   const asBlob=async value=>{
@@ -167,12 +168,13 @@
       await syncPhotos();
       await syncStories();
       ready=true;
+      showConnectButton(false);
       archiveStatus("Private family archive connected. Photos and stories are saved online.");
       const sent=$("[data-state='sent']");if(sent){sent.hidden=false;$("[data-state='form']").hidden=true;const msg=sent.querySelector("p");if(msg)msg.textContent="Your private family archive is connected. Photos and stories are syncing across devices.";}
       emitUpdated();
       if(location.hash==="#/signin")location.hash="#/album";
     })().catch(error=>{
-      ready=false;archiveStatus("Archive connection needs attention: "+(error.message||"Please try again."));
+      ready=false;showConnectButton(true);archiveStatus("Archive connection needs attention: "+(error.message||"Please try again."));
       const err=$("[data-error]");if(err){err.hidden=false;err.textContent=error.message||"We could not connect your family archive.";}
       console.error("Family archive connection failed",error);
     }).finally(()=>{connecting=null;});
@@ -204,12 +206,12 @@
       if(!window.supabase||!window.supabase.createClient)throw Error("The secure sign-in library did not load.");
       client=window.supabase.createClient(config.url,config.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
       client.auth.onAuthStateChange((event,session)=>{
-        if(event==="SIGNED_OUT"){user=null;familyId=null;ready=false;archiveStatus("Saved on this device until the family archive is connected.");}
-        if(event==="SIGNED_IN"&&session&&session.user)Promise.resolve().then(()=>connectFamily(session.user));
+        if(event==="SIGNED_OUT"){user=null;familyId=null;ready=false;showConnectButton(true);archiveStatus("Saved on this device until the family archive is connected.");}
+        if(event==="SIGNED_IN"&&session&&session.user){showConnectButton(false);Promise.resolve().then(()=>connectFamily(session.user));}
       });
       const session=await client.auth.getSession();
       if(session.error)throw session.error;
-      if(session.data.session&&session.data.session.user)await connectFamily(session.data.session.user);
+      if(session.data.session&&session.data.session.user){showConnectButton(false);await connectFamily(session.data.session.user);}else{showConnectButton(true);}
       const form=$("[data-form='signin']");
       if(form)form.addEventListener("submit",event=>{
         event.preventDefault();event.stopImmediatePropagation();
@@ -235,6 +237,7 @@
       window.gsCloud={sync:syncAll,isReady:()=>ready};
       if(!ready)archiveStatus("Your photos and stories are saved on this device. Connect your family archive to back them up online.");
     }catch(error){
+      showConnectButton(true);
       console.warn("Family archive setup unavailable",error);
       archiveStatus("Family archive connection is not available right now. Your stories remain saved on this device.");
     }
