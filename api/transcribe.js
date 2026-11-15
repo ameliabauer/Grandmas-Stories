@@ -1,5 +1,3 @@
-module.exports.config = { api: { bodyParser: false } };
-
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
   if (req.method !== "POST") {
@@ -53,3 +51,5 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: "The recording is safely saved, but transcription could not be completed." });
   }
 };
+
+module.exports.config = { api: { bodyParser: false } };
