@@ -381,6 +381,22 @@
         p.textContent = text;
         article.appendChild(p);
       });
+      if (story.audio) {
+        const player = document.createElement("audio");
+        player.className = "story-audio";
+        player.controls = true;
+        player.preload = "metadata";
+        player.setAttribute("aria-label", "Play the original audio recording");
+        if (typeof story.audio === "string") player.src = story.audio;
+        else if (story.audio instanceof Blob) player.src = URL.createObjectURL(story.audio);
+        if (player.src) {
+          article.appendChild(player);
+          const audioMeta = document.createElement("p");
+          audioMeta.className = "entry-meta";
+          audioMeta.textContent = "Original audio recording";
+          article.appendChild(audioMeta);
+        }
+      }
       const meta = document.createElement("p");
       meta.className = "entry-meta";
       meta.textContent = "Written " + formatDate(story.created);
