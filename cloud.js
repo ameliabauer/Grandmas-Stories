@@ -38,6 +38,22 @@
   }
   async function syncPhotos(){
     if(!user||!familyId)return;
+    let deleted=await window.storage.get("deletedCloudAssets");
+    deleted=Array.isArray(deleted)?deleted:[];
+    for(const assetId of deleted){
+      const {data:files,error:fileError}=await client.from("media_files").select("object_key").eq("family_id",familyId).eq("media_asset_id",assetId);
+      if(fileError)throw fileError;
+      const keys=(files||[]).filter(file=>file.object_key).map(file=>file.object_key);
+      if(keys.length){const removed=await client.storage.from(BUCKET).remove(keys);if(removed.error)throw removed.error;}
+      let result=await client.from("media_files").delete().eq("family_id",familyId).eq("media_asset_id",assetId);
+      if(result.error)throw result.error;
+      result=await client.from("story_media").delete().eq("family_id",familyId).eq("media_asset_id",assetId).eq("relationship","cover");
+      if(result.error)throw result.error;
+      result=await client.from("media_assets").delete().eq("family_id",familyId).eq("id",assetId);
+      if(result.error)throw result.error;
+      deleted=deleted.filter(id=>id!==assetId);
+      await window.storage.set("deletedCloudAssets",deleted);
+    }
     let local=await getPhotos(),changed=false;
     for(let i=0;i<local.length;i++){
       if(local[i].custom&&!local[i].cloudAssetId&&local[i].src&&local[i].src.startsWith("data:")){
