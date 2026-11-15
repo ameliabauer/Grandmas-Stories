@@ -156,7 +156,7 @@
       const audioLink=(links||[]).find(l=>l.story_id===row.id&&l.relationship==="audio_narration");
       const audioFile=audioLink&&audioById.get(audioLink.media_asset_id);
       let audio=null;
-      const needsAudio=!known.has(row.id);
+      const needsAudio=!known.has(row.id)||!!(localEntry&&!localEntry.audio);
       const needsTranscript=!(row.original_text||"").trim();
       if(audioFile&&(needsAudio||needsTranscript)){
         const signed=await client.storage.from(BUCKET).createSignedUrl(audioFile.object_key,3600);
@@ -178,6 +178,10 @@
         }
       }
       if(known.has(row.id)){
+        if(localEntry&&audio&&!localEntry.audio){
+          localEntry.audio=await dataUrl(audio);
+          localChanged=true;
+        }
         if(localEntry&&text.trim()&&!(localEntry.text||"").trim()){
           localEntry.text=text;
           localEntry.cloudSyncedText=text;
@@ -188,7 +192,7 @@
       const cover=(links||[]).find(l=>l.story_id===row.id&&l.relationship==="cover");
       const photoId=cover?byCloudId.get(cover.media_asset_id):null;
       if(!photoId)continue;
-      const entry={text,created:row.created_at,cloudStoryId:row.id,cloudSyncedText:text,audio};
+      const entry={text,created:row.created_at,cloudStoryId:row.id,cloudSyncedText:text,audio:audio?await dataUrl(audio):null};
       existing[photoId]=existing[photoId]||[];existing[photoId].push(entry);known.add(row.id);
       localChanged=true;
     }
