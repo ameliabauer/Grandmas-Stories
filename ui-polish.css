@@ -1,0 +1,13 @@
+/* Small corrections and resilience rules for the redesigned screens. */
+.album-head { width: min(100%, 1120px); margin: 0 auto 28px; display: grid; gap: 8px; }
+.screen-album { overflow-x: hidden; }
+.print .badge { white-space: normal; }
+.voice { display: grid; gap: 8px; }
+.voice-label { color: #6B4A33; font-size: .9rem; font-weight: 600; }
+.voice audio { position: static; width: 100%; height: 44px; opacity: 1; }
+.story-page p { max-width: 70ch; }
+@media (max-width: 520px) {
+  .album-tools { gap: 8px; }
+  .album-tools .text-link { font-size: .9rem; }
+  .screen { padding-left: 12px; padding-right: 12px; }
+}
