@@ -641,38 +641,43 @@
     $("[data-file]").click();
   }
 
-  function onFileChange(event) {
-    const file = event.target.files && event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const img = new Image();
-      img.onload = async function () {
-        const canvas = document.createElement("canvas");
-        const size = 900;
-        const side = Math.min(img.width, img.height);
-        canvas.width = size;
-        canvas.height = size;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, size, size);
-        const title = (file.name || "A special day").replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ").slice(0, 60) || "A special day";
-        const year = "";
-        const nextPhoto = {
-          id: "p" + Date.now(),
-          src: canvas.toDataURL("image/jpeg", 0.8),
-          title,
-          year,
-          prompt: "Tell me about this time...",
-          custom: true
-        };
-        state.photos.push(nextPhoto);
-        await persistPhotos();
-        navigate("story/" + nextPhoto.id);
-      };
-      img.src = reader.result;
-    };
-    reader.readAsDataURL(file);
+  async function onFileChange(event) {
+    const files = Array.from(event.target.files || []).filter(file => file.type.startsWith("image/"));
+    if (!files.length) return;
     event.target.value = "";
+
+    const newPhotos = await Promise.all(files.map((file, index) => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error("Could not read " + file.name));
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = () => reject(new Error("Could not load " + file.name));
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const size = 900;
+          const side = Math.min(img.width, img.height);
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, size, size);
+          const title = (file.name || "A special day").replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ").slice(0, 60) || "A special day";
+          resolve({
+            id: "p" + Date.now() + "-" + index,
+            src: canvas.toDataURL("image/jpeg", 0.8),
+            title,
+            year: "",
+            prompt: "Tell me about this time...",
+            custom: true
+          });
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    })));
+
+    state.photos.push(...newPhotos);
+    await persistPhotos();
+    navigate("story/" + newPhotos[0].id);
   }
 
   async function hydrate() {
