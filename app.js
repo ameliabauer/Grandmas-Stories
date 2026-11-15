@@ -21,6 +21,7 @@
     photos: BASE_PHOTOS.slice(),
     stories: {},
     hidden: [],
+    deletedCloudAssets: [],
     editing: false,
     index: 0,
     listening: false,
@@ -58,7 +59,8 @@
   };
 
   function storiesFor(id) { return state.stories[id] || []; }
-  function hasStory(id) { return storiesFor(id).length > 0; }
+  function hasStory(id) { return storiesFor(id).some(story => (story.text || "").trim().length > 0); }
+  function hasPendingStory(id) { return storiesFor(id).some(story => !(story.text || "").trim() && !!story.audio); }
   function toldPhotos() { return state.photos.filter(p => hasStory(p.id)); }
   function firstUntold() { return state.photos.findIndex(p => !hasStory(p.id)); }
   function normaliseStories(raw) {
@@ -95,7 +97,7 @@
       const first = toldPhotos()[0];
       if (first) id = first.id;
     }
-    if (name === "view" && id && !hasStory(id)) name = "story";
+    if (name === "view" && id && !hasStory(id) && !hasPendingStory(id)) name = "story";
     if ((name === "story" || name === "view") && state.photos.length === 0) name = "album";
     if (name !== "album") state.editing = false;
     stopListening();
@@ -131,14 +133,15 @@
     $("[data-empty]").hidden = state.photos.length > 0;
 
     state.photos.forEach((photo) => {
-      const count = storiesFor(photo.id).length;
+      const count = storiesFor(photo.id).filter(story => (story.text || "").trim()).length;
+      const pending = !count && hasPendingStory(photo.id);
       const li = document.createElement("li");
       li.className = "print";
       li.innerHTML = [
-        '<a href="#/' + (count ? "view/" : "story/") + encodeURIComponent(photo.id) + '">',
+        '<a href="#/' + (count || pending ? "view/" : "story/") + encodeURIComponent(photo.id) + '">',
         '<img loading="lazy" alt="" src="' + photo.src + '">',
         '<span class="meta"><span class="title"></span><span class="yr"></span></span>',
-        '<span class="badge' + (count ? "" : " empty") + '">' + (count ? (count === 1 ? "Read the story" : "Read " + count + " stories") : "Waiting for a story") + '</span>',
+        '<span class="badge' + (count ? "" : " empty") + '">' + (count ? (count === 1 ? "Read the story" : "Read " + count + " stories") : (pending ? "Story coming soon" : "Waiting for a story")) + '</span>',
         '</a>'
       ].join("");
       const titleEl = $(".title", li);
@@ -166,6 +169,7 @@
   async function persistPhotos() {
     await store.set("photos", state.photos.filter(p => p.custom));
     await store.set("hidden", state.hidden);
+    await store.set("deletedCloudAssets", state.deletedCloudAssets);
     await store.set("stories", state.stories);
     window.dispatchEvent(new CustomEvent("gs:local-change", { detail: { type: "photos" } }));
   }
@@ -200,6 +204,7 @@
     state.photos.splice(index, 1);
     delete state.stories[id];
     if (!photo.custom && state.hidden.indexOf(id) === -1) state.hidden.push(id);
+    if (photo.cloudAssetId && state.deletedCloudAssets.indexOf(photo.cloudAssetId) === -1) state.deletedCloudAssets.push(photo.cloudAssetId);
     if (state.photos.length === 0) state.editing = false;
     await persistPhotos();
     renderAlbum();
@@ -213,6 +218,7 @@
     state.photos.splice(Math.min(removed.index, state.photos.length), 0, removed.photo);
     if (removed.stories) state.stories[removed.photo.id] = removed.stories;
     state.hidden = state.hidden.filter(v => v !== removed.photo.id);
+    if (removed.photo.cloudAssetId) state.deletedCloudAssets = state.deletedCloudAssets.filter(v => v !== removed.photo.cloudAssetId);
     await persistPhotos();
     hideToast();
     renderAlbum();
@@ -344,6 +350,12 @@
     // Audio recordings are intentionally hidden from the reading interface.
     // Keep written story text visible, but omit audio-only entries.
     const list = storiesFor(photo.id).filter(story => (story.text || "").trim());
+    if (!list.length && hasPendingStory(photo.id)) {
+      const pending = document.createElement("p");
+      pending.className = "entry-meta";
+      pending.textContent = "Story coming soon — we’re getting it ready.";
+      wrap.appendChild(pending);
+    }
     list.forEach((story, index) => {
       const article = document.createElement("article");
       article.className = "entry";
@@ -494,7 +506,7 @@
     if (Recognition) {
       try {
         rec = new Recognition();
-        rec.lang = navigator.language || "en-AU";
+        rec.lang = "en-NZ";
         rec.continuous = true;
         rec.interimResults = true;
         rec.onresult = (event) => {
@@ -673,8 +685,10 @@
       const savedStories = await store.get("stories");
       const savedCustom = await store.get("photos");
       const savedHidden = await store.get("hidden");
+      const savedDeletedCloudAssets = await store.get("deletedCloudAssets");
       const customArray = Array.isArray(savedCustom) ? savedCustom : [];
       state.hidden = Array.isArray(savedHidden) ? savedHidden : [];
+      state.deletedCloudAssets = Array.isArray(savedDeletedCloudAssets) ? savedDeletedCloudAssets : [];
       state.stories = normaliseStories(savedStories || SAMPLE_STORIES);
       state.photos = BASE_PHOTOS.filter(p => state.hidden.indexOf(p.id) === -1).concat(customArray);
       if (!Object.keys(state.stories).length) state.stories = JSON.parse(JSON.stringify(SAMPLE_STORIES));
