@@ -285,6 +285,8 @@
       });
       window.addEventListener("online",syncAll);
       document.addEventListener("visibilitychange",()=>{if(!document.hidden)syncAll();});
+      // Retry pending story transcripts every 30 seconds while the archive is connected.
+      window.setInterval(()=>{if(ready)syncAll();},30000);
       window.gsCloud={sync:syncAll,isReady:()=>ready};
       if(!ready)archiveStatus("Your photos and stories are saved on this device. Connect your family archive to back them up online.");
     }catch(error){
