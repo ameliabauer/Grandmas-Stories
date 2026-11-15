@@ -82,7 +82,7 @@
   }
 
   function navigate(path) {
-    const next = path || "home";
+    const next = (path || "home").replace(/^\\/+/, "");
     location.hash = "#/" + next;
     route();
   }
