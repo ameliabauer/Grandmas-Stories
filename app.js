@@ -655,8 +655,8 @@
         canvas.height = size;
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, size, size);
-        const title = (prompt("What should we call this photo?", "A special day") || "A special day").slice(0, 60);
-        const year = (prompt("What year was it taken? (optional)", "") || "").slice(0, 10);
+        const title = (file.name || "A special day").replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ").slice(0, 60) || "A special day";
+        const year = "";
         const nextPhoto = {
           id: "p" + Date.now(),
           src: canvas.toDataURL("image/jpeg", 0.8),
