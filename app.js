@@ -90,6 +90,8 @@
     route();
   }
 
+  let activeRouteKey = null;
+
   function route() {
     const raw = (location.hash || "").replace(/^#\/?/, "") || "home";
     let [name, id] = raw.split("/");
@@ -101,7 +103,13 @@
     if (name === "view" && id && !hasStory(id) && !hasPendingStory(id)) name = "story";
     if ((name === "story" || name === "view") && state.photos.length === 0) name = "album";
     if (name !== "album") state.editing = false;
-    stopListening();
+    const nextRouteKey = name + ":" + (id || "");
+    // A hashchange can fire after renderStory normalizes the URL. Only stop
+    // recording when the user actually navigates to a different screen/photo.
+    if (activeRouteKey !== nextRouteKey) {
+      stopListening();
+      activeRouteKey = nextRouteKey;
+    }
     $$("[data-screen]").forEach((section) => {
       section.hidden = section.getAttribute("data-screen") !== name;
     });
