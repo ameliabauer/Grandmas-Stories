@@ -22,6 +22,7 @@
     stories: {},
     hidden: [],
     deletedCloudAssets: [],
+    pendingStoryIds: [],
     editing: false,
     index: 0,
     listening: false,
@@ -60,7 +61,7 @@
 
   function storiesFor(id) { return state.stories[id] || []; }
   function hasStory(id) { return storiesFor(id).some(story => (story.text || "").trim().length > 0); }
-  function hasPendingStory(id) { return storiesFor(id).some(story => !(story.text || "").trim() && !!story.audio); }
+  function hasPendingStory(id) { return state.pendingStoryIds.indexOf(id) !== -1 || storiesFor(id).some(story => !(story.text || "").trim() && !!story.audio); }
   function toldPhotos() { return state.photos.filter(p => hasStory(p.id)); }
   function firstUntold() { return state.photos.findIndex(p => !hasStory(p.id)); }
   function normaliseStories(raw) {
@@ -543,6 +544,7 @@
 
   function stopListening() {
     if (!state.listening) return;
+    if (recPhotoId && state.pendingStoryIds.indexOf(recPhotoId) === -1) state.pendingStoryIds.push(recPhotoId);
     setListeningUI(false);
     if (window.gsRealtime && window.gsRealtime.isActive && window.gsRealtime.isActive()) {
       window.gsRealtime.stop().catch(error => setStatus(error.message || "The story could not be saved."));
@@ -582,6 +584,7 @@
     chunks = [];
 
     if (!audio && !text) {
+      state.pendingStoryIds = state.pendingStoryIds.filter(id => id !== photoId);
       setStatus("I didn't catch anything that time. Tap the microphone to try again.");
       return;
     }
@@ -596,12 +599,14 @@
     state.stories[photoId] = list;
 
     const ok = await store.set("stories", state.stories);
+    state.pendingStoryIds = state.pendingStoryIds.filter(id => id !== photoId);
     window.dispatchEvent(new CustomEvent("gs:local-change", { detail: { type: "stories" } }));
     if (!ok && entry.audio) {
       entry.audio = null;
       if (!entry.text) {
         list.pop();
         state.stories[photoId] = list;
+        state.pendingStoryIds = state.pendingStoryIds.filter(id => id !== photoId);
         setStatus("There isn't enough room to save that recording. Try a shorter one, or type it instead.");
         return;
       }
