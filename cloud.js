@@ -167,7 +167,6 @@
       let text=row.original_text||"";
       if(needsTranscript&&audio){
         try{
-          say("Preparing a written transcript…");
           const transcript=await transcribeAudio(audio);
           if(transcript){
             const updated=await client.from("stories").update({original_text:transcript,updated_by:user.id}).eq("family_id",familyId).eq("id",row.id);
