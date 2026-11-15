@@ -341,7 +341,9 @@
 
     const wrap = $("[data-view-entries]");
     wrap.innerHTML = "";
-    const list = storiesFor(photo.id);
+    // Audio recordings are intentionally hidden from the reading interface.
+    // Keep written story text visible, but omit audio-only entries.
+    const list = storiesFor(photo.id).filter(story => (story.text || "").trim());
     list.forEach((story, index) => {
       const article = document.createElement("article");
       article.className = "entry";
@@ -350,20 +352,6 @@
         heading.className = "entry-head";
         heading.textContent = index === 0 ? "The story" : "Another memory";
         article.appendChild(heading);
-      }
-      if (story.audio) {
-        const player = document.createElement("div");
-        player.className = "voice";
-        const label = document.createElement("span");
-        label.className = "voice-label";
-        label.textContent = "Listen to the story";
-        const audio = document.createElement("audio");
-        audio.controls = true;
-        audio.preload = "metadata";
-        audio.src = story.audio instanceof Blob ? URL.createObjectURL(story.audio) : story.audio;
-        player.appendChild(label);
-        player.appendChild(audio);
-        article.appendChild(player);
       }
       (story.text || "").split(/\n{2,}|\r\n\r\n/).forEach((para) => {
         const text = para.trim();
@@ -374,7 +362,7 @@
       });
       const meta = document.createElement("p");
       meta.className = "entry-meta";
-      meta.textContent = (story.audio ? "Told " : "Written ") + formatDate(story.created) + (story.audio && !story.text ? " - voice recording" : "");
+      meta.textContent = "Written " + formatDate(story.created);
       article.appendChild(meta);
       wrap.appendChild(article);
     });
