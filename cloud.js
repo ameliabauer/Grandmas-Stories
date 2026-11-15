@@ -19,6 +19,12 @@
   const dataUrl=blob=>new Promise((resolve,reject)=>{
     const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(reader.error);reader.readAsDataURL(blob);
   });
+  async function transcribeAudio(blob){
+    const response=await fetch("/api/transcribe",{method:"POST",headers:{"Content-Type":blob.type||"audio/webm"},body:blob});
+    const result=await response.json().catch(()=>({}));
+    if(!response.ok)throw Error(result.error||"The recording could not be transcribed.");
+    return (result.text||"").trim();
+  }
   const getPhotos=async()=>{const v=await window.storage.get("photos");return Array.isArray(v)?v:[];};
   const putPhotos=photos=>window.storage.set("photos",photos);
   const getStories=async()=>{const v=await window.storage.get("stories");return v&&typeof v==="object"?v:{};};
@@ -92,7 +98,7 @@
       r=await client.from("story_media").upsert({family_id:familyId,story_id:storyId,media_asset_id:photo.cloudAssetId,relationship:"cover"},{onConflict:"story_id,media_asset_id,relationship",ignoreDuplicates:true});
       if(r.error)throw r.error;
     }
-    let updated=Object.assign({},entry,{cloudStoryId:storyId});
+    let updated=Object.assign({},entry,{cloudStoryId:storyId,cloudSyncedText:entry.text||""});
     if(entry.audio){
       const blob=await asBlob(entry.audio);
       if(blob&&blob.size){
@@ -124,6 +130,10 @@
         // This keeps the UI prototype's sample stories local.
         if(!entries[i].cloudStoryId&&photo&&photo.cloudAssetId){
           entries[i]=await uploadStory(photo,entries[i]);changed=true;
+        }else if(entries[i].cloudStoryId&&photo&&photo.cloudAssetId&&(entries[i].text||"").trim()&&entries[i].cloudSyncedText!==entries[i].text){
+          const updated=await client.from("stories").update({original_text:entries[i].text,updated_by:user.id}).eq("family_id",familyId).eq("id",entries[i].cloudStoryId);
+          if(updated.error)throw updated.error;
+          entries[i].cloudSyncedText=entries[i].text;changed=true;
         }
       }
     }
@@ -140,24 +150,50 @@
     const audioById=new Map((audioResult.data||[]).map(f=>[f.media_asset_id,f]));
     const existing=await getStories(),known=new Set(Object.values(existing).flat().map(e=>e.cloudStoryId).filter(Boolean));
     const currentPhotos=await getPhotos(),byCloudId=new Map(currentPhotos.map(p=>[p.cloudAssetId,p.id]));
+    let localChanged=false;
     for(const row of rows){
-      if(known.has(row.id))continue;
-      const cover=(links||[]).find(l=>l.story_id===row.id&&l.relationship==="cover");
-      const photoId=cover?byCloudId.get(cover.media_asset_id):null;
-      if(!photoId)continue;
-      let audio=null;
+      const localEntry=Object.values(existing).flat().find(entry=>entry.cloudStoryId===row.id);
       const audioLink=(links||[]).find(l=>l.story_id===row.id&&l.relationship==="audio_narration");
       const audioFile=audioLink&&audioById.get(audioLink.media_asset_id);
-      if(audioFile){
+      let audio=null;
+      const needsAudio=!known.has(row.id);
+      const needsTranscript=!(row.original_text||"").trim();
+      if(audioFile&&(needsAudio||needsTranscript)){
         const signed=await client.storage.from(BUCKET).createSignedUrl(audioFile.object_key,3600);
         if(signed.error)throw signed.error;
         const response=await fetch(signed.data.signedUrl);if(!response.ok)throw Error("A saved story recording could not be downloaded.");
         audio=await response.blob();
       }
-      const entry={text:row.original_text||"",created:row.created_at,cloudStoryId:row.id,audio};
+      let text=row.original_text||"";
+      if(needsTranscript&&audio){
+        try{
+          say("Preparing a written transcript…");
+          const transcript=await transcribeAudio(audio);
+          if(transcript){
+            const updated=await client.from("stories").update({original_text:transcript,updated_by:user.id}).eq("family_id",familyId).eq("id",row.id);
+            if(updated.error)throw updated.error;
+            text=transcript;row.original_text=transcript;
+          }
+        }catch(error){
+          console.warn("Story audio transcription is still pending",row.id,error);
+        }
+      }
+      if(known.has(row.id)){
+        if(localEntry&&text.trim()&&!(localEntry.text||"").trim()){
+          localEntry.text=text;
+          localEntry.cloudSyncedText=text;
+          localChanged=true;
+        }
+        continue;
+      }
+      const cover=(links||[]).find(l=>l.story_id===row.id&&l.relationship==="cover");
+      const photoId=cover?byCloudId.get(cover.media_asset_id):null;
+      if(!photoId)continue;
+      const entry={text,created:row.created_at,cloudStoryId:row.id,cloudSyncedText:text,audio};
       existing[photoId]=existing[photoId]||[];existing[photoId].push(entry);known.add(row.id);
+      localChanged=true;
     }
-    await putStories(existing);
+    if(localChanged)await putStories(existing);
   }
   async function syncAll(){
     if(!ready||syncing||!navigator.onLine)return syncing;
