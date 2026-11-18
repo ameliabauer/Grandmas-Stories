@@ -1,4 +1,4 @@
-const CACHE = 'grandmas-stories-redesign-v14';
+const CACHE = 'grandmas-stories-redesign-v15';
 const SHELL = [
   '/', '/index.html', '/app.css', '/textured-buttons.css', '/ui-polish.css', '/app.js', '/storage.js', '/cloud.js', '/manifest.webmanifest',
   '/walnut-512.webp', '/linen-512.webp', '/leather-512.webp', '/corduroy-512.webp'
