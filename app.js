@@ -1,21 +1,10 @@
 (function () {
   "use strict";
 
-  const BASE_PHOTOS = [
-    { id: "beach", src: "photos/beach.webp", title: "At the beach", year: "1958", prompt: "Tell me about this day at the beach..." },
-    { id: "wedding", src: "photos/wedding.webp", title: "Our wedding day", year: "1962", prompt: "What do you remember most about your wedding day?" },
-    { id: "kitchen", src: "photos/kitchen.webp", title: "Baking with the grandkids", year: "1974", prompt: "What were you baking that day?" },
-    { id: "roadtrip", src: "photos/roadtrip.webp", title: "The big road trip", year: "1977", prompt: "Where was the family headed on this trip?" },
-    { id: "christmas", src: "photos/christmas.webp", title: "Christmas morning", year: "1979", prompt: "What made Christmas in this house so special?" },
-    { id: "garden", src: "photos/garden.webp", title: "Summer harvest", year: "1985", prompt: "Tell me about your garden..." }
-  ];
-
-  const SAMPLE_STORIES = {
-    beach: [{
-      created: "2026-11-01T10:00:00.000Z",
-      text: "That was the summer of 1958, the year before I met your grandfather. My sister and I took the early train down to the coast with a basket of egg sandwiches and a thermos of sweet tea, and we didn't come home until the sun was going down.\n\nI'd sewn that swimsuit myself from a remnant of fabric I found at the market - I was so proud of it. Your great-aunt took this picture with her new Brownie camera and made me sit still for what felt like forever. I remember the sand was so hot we had to run to the water, laughing the whole way."
-    }]
-  };
+  // The shared archive was intentionally reset. Start with an empty album;
+  // never show placeholder photo URLs that are not real family uploads.
+  const BASE_PHOTOS = [];
+  const SAMPLE_STORIES = {};
 
   const state = {
     photos: BASE_PHOTOS.slice(),
@@ -711,6 +700,16 @@
 
   async function hydrate() {
     try {
+      // One-time cleanup of test data saved in this browser/device. The cloud
+      // database and Storage bucket have also been cleared separately.
+      const resetVersion = "2026-11-18-empty-test-archive";
+      if (await store.get("archiveResetVersion") !== resetVersion) {
+        await store.set("photos", []);
+        await store.set("stories", {});
+        await store.set("hidden", []);
+        await store.set("deletedCloudAssets", []);
+        await store.set("archiveResetVersion", resetVersion);
+      }
       const savedStories = await store.get("stories");
       const savedCustom = await store.get("photos");
       const savedHidden = await store.get("hidden");
@@ -720,10 +719,10 @@
       state.deletedCloudAssets = Array.isArray(savedDeletedCloudAssets) ? savedDeletedCloudAssets : [];
       state.stories = normaliseStories(savedStories || SAMPLE_STORIES);
       state.photos = BASE_PHOTOS.filter(p => state.hidden.indexOf(p.id) === -1).concat(customArray);
-      if (!Object.keys(state.stories).length) state.stories = JSON.parse(JSON.stringify(SAMPLE_STORIES));
+      if (!Object.keys(state.stories).length) state.stories = {};
     } catch (e) {
-      state.stories = JSON.parse(JSON.stringify(SAMPLE_STORIES));
-      state.photos = BASE_PHOTOS.slice();
+      state.stories = {};
+      state.photos = [];
     }
   }
 
