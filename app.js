@@ -671,17 +671,21 @@
         const img = new Image();
         img.onerror = () => reject(new Error("Could not load " + file.name));
         img.onload = () => {
+          // Preserve the complete photograph and its original aspect ratio.
+          // Downscale proportionally only when needed to keep uploads manageable.
+          const maxDimension = 1800;
+          const scale = Math.min(1, maxDimension / Math.max(img.width, img.height));
           const canvas = document.createElement("canvas");
-          const size = 900;
-          const side = Math.min(img.width, img.height);
-          canvas.width = size;
-          canvas.height = size;
+          canvas.width = Math.round(img.width * scale);
+          canvas.height = Math.round(img.height * scale);
           const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, size, size);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
           const title = (file.name || "A special day").replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ").slice(0, 60) || "A special day";
           resolve({
             id: "p" + Date.now() + "-" + index,
-            src: canvas.toDataURL("image/jpeg", 0.8),
+            src: canvas.toDataURL("image/jpeg", 0.86),
+            width: img.width,
+            height: img.height,
             title,
             year: "",
             prompt: "Tell me about this time...",
