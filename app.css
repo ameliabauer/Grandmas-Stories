@@ -482,13 +482,13 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 }
 
 
-/* The story-entry screen must show the entire original photograph.
-   Keep the mount sized around the image instead of stretching the image
-   into a fixed photo frame. Album thumbnails intentionally remain cropped. */
+/* Story-entry photo sizing is calculated from the actual available slot in app.js.
+   This keeps the full image visible and lets the paper mount follow its proportions. */
 .screen-story .photo-slot {
   min-width: 0;
   min-height: 0;
   overflow: visible;
+  container-type: normal;
 }
 .screen-story .photo-slot > .mount {
   display: flex !important;
@@ -496,29 +496,22 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  width: fit-content !important;
-  height: fit-content !important;
+  width: max-content !important;
+  height: max-content !important;
   min-width: 0;
   min-height: 0;
-  max-width: 100% !important;
-  max-height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
   overflow: visible !important;
 }
 .screen-story .photo-slot > .mount > img[data-photo] {
   display: block;
-  flex: 0 1 auto;
+  flex: none;
   width: auto !important;
   height: auto !important;
   min-width: 0 !important;
   min-height: 0 !important;
-  max-width: 100% !important;
-  max-height: calc(100cqh - 76px) !important;
   aspect-ratio: auto !important;
   object-fit: contain !important;
   object-position: center !important;
-}
-@supports not (height: 1cqh) {
-  .screen-story .photo-slot > .mount > img[data-photo] {
-    max-height: 52svh !important;
-  }
 }
