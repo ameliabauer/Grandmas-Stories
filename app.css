@@ -497,7 +497,7 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
   justify-content: center;
   box-sizing: border-box;
   width: max-content !important;
-  height: max-content !important;
+  height: auto !important;
   min-width: 0;
   min-height: 0;
   max-width: none !important;
@@ -507,11 +507,9 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 .screen-story .photo-slot > .mount > img[data-photo] {
   display: block;
   flex: none;
-  width: auto !important;
-  height: auto !important;
   min-width: 0 !important;
   min-height: 0 !important;
   aspect-ratio: auto !important;
-  object-fit: contain !important;
+  object-fit: fill !important;
   object-position: center !important;
 }
