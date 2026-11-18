@@ -238,12 +238,37 @@
     clearTimeout(state.toastTimer);
   }
 
+  function fitStoryPhoto() {
+    const slot = $(".screen-story .photo-slot");
+    const mount = slot && slot.querySelector(".mount");
+    const img = slot && slot.querySelector("[data-photo]");
+    const caption = mount && mount.querySelector("figcaption");
+    if (!slot || !mount || !img || !img.naturalWidth || !slot.clientWidth || !slot.clientHeight) return;
+
+    const mountStyle = getComputedStyle(mount);
+    const horizontalPadding = parseFloat(mountStyle.paddingLeft) + parseFloat(mountStyle.paddingRight);
+    const verticalPadding = parseFloat(mountStyle.paddingTop) + parseFloat(mountStyle.paddingBottom);
+    const captionHeight = caption ? caption.getBoundingClientRect().height : 0;
+    const availableWidth = Math.max(80, slot.clientWidth - horizontalPadding - 8);
+    const availableHeight = Math.max(80, slot.clientHeight - verticalPadding - captionHeight - 8);
+
+    // Explicit pixel bounds avoid circular percentage sizing in the grid.
+    // The browser scales the image proportionally; no source pixels are cropped.
+    img.style.setProperty("max-width", availableWidth + "px", "important");
+    img.style.setProperty("max-height", availableHeight + "px", "important");
+  }
+
+  window.addEventListener("resize", fitStoryPhoto, { passive: true });
+
   function renderStory() {
     const photo = state.photos[state.index];
     if (!photo) return;
     const img = $("[data-photo]");
-    img.src = photo.src;
     img.alt = photo.title + (photo.year ? ", " + photo.year : "");
+    img.addEventListener("load", fitStoryPhoto, { once: true });
+    img.src = photo.src;
+    requestAnimationFrame(fitStoryPhoto);
+    if (img.complete) requestAnimationFrame(fitStoryPhoto);
     $("[data-caption]").textContent = photo.title;
     $("[data-year]").textContent = photo.year || "";
     $("[data-prompt]").textContent = photo.prompt || "Tell me about this time...";
