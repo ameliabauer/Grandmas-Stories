@@ -243,21 +243,30 @@
     const mount = slot && slot.querySelector(".mount");
     const img = slot && slot.querySelector("[data-photo]");
     const caption = mount && mount.querySelector("figcaption");
-    if (!slot || !mount || !img || !img.naturalWidth || !slot.clientWidth || !slot.clientHeight) return;
+    if (!slot || !mount || !img || !img.naturalWidth || !img.naturalHeight || !slot.clientWidth || !slot.clientHeight) return;
 
-    const mountStyle = getComputedStyle(mount);
-    const horizontalPadding = parseFloat(mountStyle.paddingLeft) + parseFloat(mountStyle.paddingRight);
-    const verticalPadding = parseFloat(mountStyle.paddingTop) + parseFloat(mountStyle.paddingBottom);
+    const style = getComputedStyle(mount);
+    const horizontalPadding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+    const verticalPadding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
     const captionHeight = caption ? caption.getBoundingClientRect().height : 0;
-    const availableWidth = Math.max(80, slot.clientWidth - horizontalPadding - 8);
-    const availableHeight = Math.max(80, slot.clientHeight - verticalPadding - captionHeight - 8);
+    const availableWidth = Math.max(80, slot.clientWidth - horizontalPadding - 12);
+    const availableHeight = Math.max(80, slot.clientHeight - verticalPadding - captionHeight - 12);
+    const scale = Math.min(availableWidth / img.naturalWidth, availableHeight / img.naturalHeight);
+    const width = Math.round(img.naturalWidth * scale);
+    const height = Math.round(img.naturalHeight * scale);
 
-    // Explicit pixel bounds avoid circular percentage sizing in the grid.
-    // The browser scales the image proportionally; no source pixels are cropped.
-    img.style.setProperty("max-width", availableWidth + "px", "important");
-    img.style.setProperty("max-height", availableHeight + "px", "important");
+    // Give the image explicit dimensions calculated from its intrinsic ratio.
+    // This avoids percentage max-size rules forcing portrait photos into square mounts.
+    img.style.setProperty("width", width + "px", "important");
+    img.style.setProperty("height", height + "px", "important");
+    img.style.setProperty("max-width", "none", "important");
+    img.style.setProperty("max-height", "none", "important");
+    img.style.setProperty("object-fit", "fill", "important");
+    mount.style.setProperty("width", "max-content", "important");
+    mount.style.setProperty("height", "auto", "important");
+    mount.style.setProperty("max-width", "none", "important");
+    mount.style.setProperty("max-height", "none", "important");
   }
-
   window.addEventListener("resize", fitStoryPhoto, { passive: true });
 
   function renderStory() {
