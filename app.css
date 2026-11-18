@@ -435,3 +435,48 @@ h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
 @media (prefers-reduced-motion: reduce) {
   .screen, .mic[aria-pressed="true"], .wave i, .record.spinning::before { animation: none !important; }
 }
+
+
+/* ---------- Photo integrity: never crop family photographs ---------- */
+/* Let each mount follow the photograph's own proportions. */
+.print a,
+.mount { min-width: 0; }
+.print img,
+.mount img,
+.confirm-thumb {
+  display: block;
+  width: auto !important;
+  height: auto !important;
+  aspect-ratio: auto !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  flex: none;
+}
+.print img {
+  max-width: 100% !important;
+  max-height: 320px !important;
+}
+.mount {
+  box-sizing: border-box;
+  width: max-content !important;
+  height: auto !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+}
+.mount img {
+  max-width: 100% !important;
+  max-height: 58svh !important;
+}
+.photo-slot .mount,
+.photo-page .mount {
+  max-width: 100% !important;
+  max-height: 100% !important;
+}
+.confirm-thumb {
+  width: auto !important;
+  height: auto !important;
+  max-width: 180px !important;
+  max-height: 180px !important;
+  object-fit: contain !important;
+  border: 8px solid #FFF9EF;
+}
