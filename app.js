@@ -125,7 +125,7 @@
             const prior = byCloudId.get(entry.cloudStoryId);
             if (prior) {
               if (!(prior.text || "").trim() && (entry.text || "").trim()) prior.text = entry.text;
-              if (!prior.authorName) prior.authorName = entry.authorName;
+              if (entry.authorName) prior.authorName = entry.authorName;
             } else {
               existing.push(entry);
             }
