@@ -35,3 +35,8 @@
 .family-access-saved input { width:100%; min-height:52px; padding:0 12px; border-radius:10px; border:1.5px solid rgba(90,50,20,.45); background:#FFF9EF; color:#3A2316; font:inherit; font-size:.9rem; }
 .family-settings-link { font-size:.95rem; white-space:nowrap; }
 .family-status.is-error { color:#9C2F12; }
+
+.family-share-card{display:grid;gap:14px;padding:20px;border:1px solid rgba(90,50,20,.2);border-radius:18px;background:linear-gradient(145deg,rgba(255,249,239,.98),rgba(238,224,204,.78));box-shadow:0 8px 22px rgba(58,35,22,.08),inset 0 1px 0 rgba(255,255,255,.8)}
+.family-share-heading{display:flex;align-items:flex-start;gap:12px}.family-share-icon{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border-radius:50%;background:#B5541C;color:#FFF9EF;font-size:1.25rem}
+.family-share-heading h3,.family-edit-heading{margin:0 0 4px;color:#3A2316;font-family:'Young Serif',Georgia,serif;font-size:1.2rem}.family-share-heading p,.family-share-note{margin:0;color:#5D4938;font-size:.9rem;line-height:1.45}
+.family-code-wrap{display:grid;gap:7px;padding:13px;border-radius:12px;background:rgba(58,35,22,.07)}.family-code-label{color:#5D4938;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.family-code-wrap code{display:block;overflow-wrap:anywhere;color:#3A2316;font:600 .95rem/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;user-select:all}.family-edit-heading{margin-top:6px}
