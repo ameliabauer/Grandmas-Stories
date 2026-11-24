@@ -29,7 +29,7 @@
       }
       return null;
     }catch(e){
-      try{const raw=localStorage.getItem("gs:"+key);return raw===null?null:JSON.parse(raw);}catch(_){return null;}
+      try{const raw=localStorage.getItem("gs:"+scopedKey(key));return raw===null?null:JSON.parse(raw);}catch(_){return null;}
     }
   }
   async function set(key,value){
