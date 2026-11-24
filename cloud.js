@@ -299,7 +299,7 @@
       if(settingsLink)settingsLink.hidden=familyRole!=="owner";
       if(!familyId){
         showConnectButton(false);
-        if(inviteSlug){familyPanel("join");}else{showFamilySetup(inviteToken||((location.hash.match(/^#\/join\/([^/]+)/)||[])[1]||null));}
+        if(invitationToken||inviteSlug){familyPanel("join");}else{showFamilySetup(inviteToken||((location.hash.match(/^#\/join\/([^/]+)/)||[])[1]||null));}
         archiveStatus("Choose a family to create or join on this device.");
         return false;
       }
