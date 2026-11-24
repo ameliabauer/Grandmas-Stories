@@ -299,6 +299,12 @@
     if(readonly)readonly.hidden=owner;
     const saved=$("[data-family-access-saved]");
     if(saved)saved.hidden=true;
+    const codeWrap=$("[data-family-code-wrap]");
+    const copyCode=$("[data-copy-family-code]");
+    if(codeWrap)codeWrap.hidden=true;
+    if(copyCode)copyCode.hidden=true;
+    const generateCode=$("[data-family-action='generate-family-code']");
+    if(generateCode)generateCode.hidden=!owner;
     const title=$("[data-family-access] h2");
     if(title&&data&&data.family_name)title.textContent=data.family_name+" sharing settings";
     const link=$("[data-family-settings-link]");
@@ -317,16 +323,15 @@
     const button=form.querySelector("button[type='submit']");
     if(button)button.disabled=true;
     try{
-      const token=makeInviteToken();
-      const {data,error}=await client.rpc("set_family_access",{
-        p_password:password,p_recovery_question:question,p_recovery_answer:answer,p_invite_token:token
-      });
+      const {data,error}=await client.rpc("set_family_access",{p_password:password,p_recovery_question:question,p_recovery_answer:answer,p_invite_token:makeInviteToken()});
       if(error)throw error;
       if(!data||!data.ok)throw Error("Family access settings could not be saved.");
-      const input=$("#family-access-invite-link");
-      if(input)input.value=location.origin+location.pathname+"#/join/"+token;
       const saved=$("[data-family-access-saved]");
       if(saved)saved.hidden=false;
+      const codeWrap=$("[data-family-code-wrap]");
+      const copyCode=$("[data-copy-family-code]");
+      if(codeWrap)codeWrap.hidden=true;
+      if(copyCode)copyCode.hidden=true;
       form.reset();
       const custom=$("[data-access-custom-question]");
       if(custom)custom.hidden=true;
@@ -441,13 +446,30 @@
         const value=$("#join-invite-link").value.trim();
         const raw=value.indexOf("#/join/")>=0?value.split("#/join/")[1]:(value.indexOf("/join/")>=0?value.split("/join/")[1]:value);
         const token=raw.split(/[/?#]/)[0];
-        if(!/^[a-f0-9]{48,256}$/i.test(token)){familyStatus("Paste a valid family invitation link.",true);return;}
+        if(!/^[a-f0-9]{48,256}$/i.test(token)){familyStatus("Enter a valid family invite code or invitation link.",true);return;}
         try{await loadInvite(token);}catch(error){familyStatus(error.message||"That invitation link could not be opened.",true);}
       }
-      if(type==="copy-access-invite"){
-        const input=$("#family-access-invite-link");
-        try{await navigator.clipboard.writeText(input.value);familyStatus("Invitation link copied. Share it together with the family password.");}
-        catch(_){input.select();document.execCommand("copy");familyStatus("Invitation link copied. Share it together with the family password.");}
+      if(type==="generate-family-code"){
+        if(authBusy||!ready||familyRole!=="owner")return;
+        action.disabled=true;
+        try{
+          const token=makeInviteToken();
+          const result=await client.rpc("rotate_family_invite_code",{p_invite_token:token});
+          if(result.error)throw result.error;
+          if(!result.data||!result.data.ok)throw Error("A family invite code could not be created.");
+          const code=$("[data-family-invite-code]"),wrap=$("[data-family-code-wrap]"),copy=$("[data-copy-family-code]");
+          if(code)code.textContent=token;
+          if(wrap)wrap.hidden=false;
+          if(copy)copy.hidden=false;
+          action.textContent="Create a new code";
+          familyStatus("Your new family invite code is ready. Creating another code will replace this one.");
+        }catch(error){familyStatus(error.message||"A family invite code could not be created.",true);}
+        finally{action.disabled=false;}
+      }
+      if(type==="copy-family-code"){
+        const value=$("[data-family-invite-code]")?.textContent||"";
+        try{await navigator.clipboard.writeText(value);familyStatus("Family invite code copied. Share it with the family joining password.");}
+        catch(_){const field=document.createElement("textarea");field.value=value;document.body.appendChild(field);field.select();document.execCommand("copy");field.remove();familyStatus("Family invite code copied. Share it with the family joining password.");}
       }
       if(type==="copy-invite"){
         const input=$("#family-invite-link");
