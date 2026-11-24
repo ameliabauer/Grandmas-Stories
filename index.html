@@ -82,6 +82,9 @@
         </div>
         <div data-join-credentials hidden>
           <p class="muted">You’re joining <strong data-invite-family-name>this family</strong>. This personal invitation can be used once and expires after 7 days.</p>
+          <label for="join-member-name">Your name</label>
+          <input id="join-member-name" name="displayName" type="text" maxlength="80" autocomplete="name" placeholder="e.g. Eric" required>
+          <p class="family-help">Your name will appear beside the stories you add to family photos.</p>
           <p class="field-error" data-family-error hidden></p>
           <button class="tx-btn tx-corduroy full" type="submit">Join family <span class="tx-arrow" aria-hidden="true">&#8594;</span></button>
           

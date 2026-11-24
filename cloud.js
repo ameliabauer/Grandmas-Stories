@@ -2,7 +2,7 @@
   "use strict";
   const $=s=>document.querySelector(s);
   let client=null,user=null,familyId=null,familyRole=null,ready=false,connecting=null,syncing=null,authBusy=false,inviteToken=null,inviteInfo=null,inviteSlug=null,invitationToken=null,familySlug=null;
-  let realtime=null;
+  let realtime=null,memberDisplayName="Family member";
   const BUCKET="family-archive";
   const say=(text)=>{const el=$("[data-status]");if(el)el.textContent=text;};
   const archiveStatus=(text)=>{const el=$("#archiveConnectionStatus");if(el)el.textContent=text;};
@@ -138,7 +138,7 @@
       }
     }
     if(changed)await putStories(stories);
-    const {data:rows,error}=await client.from("stories").select("id,title,original_text,created_at").eq("family_id",familyId).order("created_at",{ascending:false});
+    const {data:rows,error}=await client.from("stories").select("id,title,original_text,created_at,created_by").eq("family_id",familyId).order("created_at",{ascending:false});
     if(error)throw error;
     if(!rows||!rows.length)return;
     const ids=rows.map(r=>r.id);
@@ -148,6 +148,9 @@
     const audioResult=audioIds.length?await client.from("media_files").select("media_asset_id,object_key,mime_type").eq("family_id",familyId).eq("variant","original").in("media_asset_id",audioIds):{data:[],error:null};
     if(audioResult.error)throw audioResult.error;
     const audioById=new Map((audioResult.data||[]).map(f=>[f.media_asset_id,f]));
+    const {data:memberRows,error:memberError}=await client.from("family_members").select("user_id,display_name").eq("family_id",familyId).eq("status","active");
+    if(memberError)throw memberError;
+    const memberNames=new Map((memberRows||[]).map(m=>[m.user_id,m.display_name||"Family member"]));
     const existing=await getStories(),known=new Set(Object.values(existing).flat().map(e=>e.cloudStoryId).filter(Boolean));
     const currentPhotos=await getPhotos(),byCloudId=new Map(currentPhotos.map(p=>[p.cloudAssetId,p.id]));
     let localChanged=false;
@@ -178,6 +181,7 @@
         }
       }
       if(known.has(row.id)){
+        if(localEntry&&!localEntry.authorName&&row.created_by){localEntry.authorName=memberNames.get(row.created_by)||"Family member";localChanged=true;}
         if(localEntry&&audio&&!localEntry.audio){
           localEntry.audio=await dataUrl(audio);
           localChanged=true;
@@ -192,7 +196,7 @@
       const cover=(links||[]).find(l=>l.story_id===row.id&&l.relationship==="cover");
       const photoId=cover?byCloudId.get(cover.media_asset_id):null;
       if(!photoId)continue;
-      const entry={text,created:row.created_at,cloudStoryId:row.id,cloudSyncedText:text,audio:audio?await dataUrl(audio):null};
+      const entry={text,created:row.created_at,authorName:memberNames.get(row.created_by)||"Family member",cloudStoryId:row.id,cloudSyncedText:text,audio:audio?await dataUrl(audio):null};
       existing[photoId]=existing[photoId]||[];existing[photoId].push(entry);known.add(row.id);
       localChanged=true;
     }
@@ -291,10 +295,11 @@
     connecting=(async()=>{
       user=nextUser;ready=false;
       archiveStatus("Checking this device's family connection…");
-      const membership=await client.from("family_members").select("family_id,role").eq("user_id",user.id).eq("status","active").limit(1).maybeSingle();
+      const membership=await client.from("family_members").select("family_id,role,display_name").eq("user_id",user.id).eq("status","active").limit(1).maybeSingle();
       if(membership.error)throw membership.error;
       familyId=membership.data&&membership.data.family_id;
       familyRole=membership.data&&membership.data.role;
+      memberDisplayName=membership.data&&membership.data.display_name||"Family member";
       const settingsLink=$("[data-family-settings-link]");
       if(settingsLink)settingsLink.hidden=familyRole!=="owner";
       if(!familyId){
@@ -433,7 +438,9 @@
     const button=form.querySelector("button[type='submit']");
     if(button)button.disabled=true;
     try{
-      const {data,error}=await client.rpc("redeem_family_invitation",{p_token:invitationToken});
+      const displayName=($("#join-member-name")?.value||"").trim();
+      if(!displayName){familyStatus("Please enter your name so your stories can be attributed to you.",true);return;}
+      const {data,error}=await client.rpc("redeem_family_invitation",{p_token:invitationToken,p_display_name:displayName});
       if(error)throw error;
       if(!data||!data.ok)throw Error(data&&data.error||"We could not join this family.");
       await connectFamily(user,{redirect:true});
@@ -553,7 +560,7 @@
       window.addEventListener("hashchange",()=>{if(location.hash==="#/family"&&ready)loadFamilySettings().catch(error=>familyStatus(error.message||"Family settings could not be loaded.",true));});
       document.addEventListener("visibilitychange",()=>{if(!document.hidden)syncAll();});
       window.setInterval(()=>{if(ready)syncAll();},30000);
-      window.gsCloud={sync:syncAll,isReady:()=>ready,getFamilyId:()=>familyId};
+      window.gsCloud={sync:syncAll,isReady:()=>ready,getFamilyId:()=>familyId,getDisplayName:()=>memberDisplayName};
       if(!ready)archiveStatus("Create a family or open an invitation link to join one.");
     }catch(error){
       showConnectButton(false);
