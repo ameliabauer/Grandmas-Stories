@@ -202,6 +202,22 @@
     }
     if(localChanged)await putStories(existing);
   }
+  async function getStoriesForPhoto(photoId){
+    if(!ready||!user||!familyId)return [];
+    const photos=await getPhotos();
+    const photo=photos.find(item=>item.id===photoId);
+    if(!photo||!photo.cloudAssetId)return [];
+    const {data:links,error:linkError}=await client.from("story_media").select("story_id").eq("family_id",familyId).eq("media_asset_id",photo.cloudAssetId).eq("relationship","cover");
+    if(linkError)throw linkError;
+    const ids=[...new Set((links||[]).map(link=>link.story_id))];
+    if(!ids.length)return [];
+    const {data:rows,error}=await client.from("stories").select("id,original_text,created_at,created_by").eq("family_id",familyId).in("id",ids).order("created_at",{ascending:true});
+    if(error)throw error;
+    const {data:members,error:memberError}=await client.from("family_members").select("user_id,display_name").eq("family_id",familyId).eq("status","active");
+    if(memberError)throw memberError;
+    const names=new Map((members||[]).map(member=>[member.user_id,member.display_name||"Family member"]));
+    return (rows||[]).map(row=>({cloudStoryId:row.id,text:row.original_text||"",created:row.created_at,authorName:names.get(row.created_by)||"Family member",cloudSyncedText:row.original_text||""}));
+  }
   async function syncAll(){
     if(!ready||syncing||!navigator.onLine)return syncing;
     syncing=(async()=>{await syncPhotos();await syncStories();archiveStatus("Private family archive connected. Photos and stories are saved online.");emitUpdated();})().catch(error=>{
@@ -560,7 +576,7 @@
       window.addEventListener("hashchange",()=>{if(location.hash==="#/family"&&ready)loadFamilySettings().catch(error=>familyStatus(error.message||"Family settings could not be loaded.",true));});
       document.addEventListener("visibilitychange",()=>{if(!document.hidden)syncAll();});
       window.setInterval(()=>{if(ready)syncAll();},30000);
-      window.gsCloud={sync:syncAll,isReady:()=>ready,getFamilyId:()=>familyId,getDisplayName:()=>memberDisplayName};
+      window.gsCloud={sync:syncAll,isReady:()=>ready,getFamilyId:()=>familyId,getDisplayName:()=>memberDisplayName,getStoriesForPhoto};
       if(!ready)archiveStatus("Create a family or open an invitation link to join one.");
     }catch(error){
       showConnectButton(false);
