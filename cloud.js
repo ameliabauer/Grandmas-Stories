@@ -2,7 +2,7 @@
   "use strict";
   const $=s=>document.querySelector(s);
   let client=null,user=null,familyId=null,familyRole=null,ready=false,connecting=null,syncing=null,authBusy=false,inviteToken=null,inviteInfo=null;
-  let realtime=null;
+  let realtime=null,familyInviteCode=null;
   const BUCKET="family-archive";
   const say=(text)=>{const el=$("[data-status]");if(el)el.textContent=text;};
   const archiveStatus=(text)=>{const el=$("#archiveConnectionStatus");if(el)el.textContent=text;};
@@ -301,10 +301,12 @@
     if(saved)saved.hidden=true;
     const codeWrap=$("[data-family-code-wrap]");
     const copyCode=$("[data-copy-family-code]");
-    if(codeWrap)codeWrap.hidden=true;
-    if(copyCode)copyCode.hidden=true;
+    const code=$("[data-family-invite-code]");
+    if(code)code.textContent=familyInviteCode||"";
+    if(codeWrap)codeWrap.hidden=!familyInviteCode;
+    if(copyCode)copyCode.hidden=!familyInviteCode;
     const generateCode=$("[data-family-action='generate-family-code']");
-    if(generateCode)generateCode.hidden=!owner;
+    if(generateCode){generateCode.hidden=!owner;generateCode.textContent=familyInviteCode?"Create a new code":"Create a share code";}
     const title=$("[data-family-access] h2");
     if(title&&data&&data.family_name)title.textContent=data.family_name+" sharing settings";
     const link=$("[data-family-settings-link]");
@@ -326,6 +328,7 @@
       const {data,error}=await client.rpc("set_family_access",{p_password:password,p_recovery_question:question,p_recovery_answer:answer,p_invite_token:makeInviteToken()});
       if(error)throw error;
       if(!data||!data.ok)throw Error("Family access settings could not be saved.");
+      familyInviteCode=null;
       const saved=$("[data-family-access-saved]");
       if(saved)saved.hidden=false;
       const codeWrap=$("[data-family-code-wrap]");
@@ -457,6 +460,7 @@
           const result=await client.rpc("rotate_family_invite_code",{p_invite_token:token});
           if(result.error)throw result.error;
           if(!result.data||!result.data.ok)throw Error("A family invite code could not be created.");
+          familyInviteCode=token;
           const code=$("[data-family-invite-code]"),wrap=$("[data-family-code-wrap]"),copy=$("[data-copy-family-code]");
           if(code)code.textContent=token;
           if(wrap)wrap.hidden=false;
