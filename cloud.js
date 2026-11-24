@@ -1,7 +1,7 @@
 (function(){
   "use strict";
   const $=s=>document.querySelector(s);
-  let client=null,user=null,familyId=null,familyRole=null,ready=false,connecting=null,syncing=null,authBusy=false,inviteToken=null,inviteInfo=null,inviteSlug=null,familySlug=null;
+  let client=null,user=null,familyId=null,familyRole=null,ready=false,connecting=null,syncing=null,authBusy=false,inviteToken=null,inviteInfo=null,inviteSlug=null,invitationToken=null,familySlug=null;
   let realtime=null;
   const BUCKET="family-archive";
   const say=(text)=>{const el=$("[data-status]");if(el)el.textContent=text;};
@@ -221,8 +221,8 @@
     if(created)created.hidden=mode!=="created";
     if(access)access.hidden=mode!=="access";
     const noLink=$("[data-join-no-link]"),credentials=$("[data-join-credentials]");
-    if(noLink)noLink.hidden=mode!=="join"||!!(inviteToken||inviteSlug);
-    if(credentials)credentials.hidden=mode!=="join"||!(inviteToken||inviteSlug);
+    if(noLink)noLink.hidden=mode!=="join"||!!invitationToken;
+    if(credentials)credentials.hidden=mode!=="join"||!invitationToken;
     familyStatus("");
   }
   function showFamilySetup(token){
@@ -247,6 +247,28 @@
     if(name)name.textContent=data.family_name||"this family";
     if(question)question.textContent=data.recovery_question||"";
     familyStatus("");
+  }
+  async function loadFamilyInvitation(token){
+    invitationToken=token;inviteToken=null;inviteSlug=null;inviteInfo=null;
+    familyPanel("join");
+    const name=$("[data-invite-family-name]");
+    if(name)name.textContent="this family";
+    const {data,error}=await client.rpc("get_family_invite_info_by_token",{p_token:token});
+    if(error)throw error;
+    if(!data)throw Error("This invitation link has already been used or has expired. Ask the family owner for a new one.");
+    inviteInfo=data;
+    if(name)name.textContent=data.family_name||"this family";
+    familyStatus("");
+  }
+  async function createFamilyInvitation(){
+    const token=makeInviteToken();
+    const {data,error}=await client.rpc("create_family_invitation",{p_token:token});
+    if(error)throw error;
+    if(!data||!data.ok)throw Error("A new family invitation could not be created.");
+    const family=await client.from("families").select("slug").eq("id",familyId).single();
+    if(family.error)throw family.error;
+    familySlug=family.data.slug;
+    return location.origin+"/joinafamily/"+familySlug+"?invite="+token;
   }
   async function loadFamilySlug(slug){
     inviteSlug=slug;inviteToken=null;inviteInfo=null;
@@ -320,8 +342,8 @@
       const family=await client.from("families").select("slug").eq("id",familyId).single();
       if(family.error)throw family.error;
       familySlug=family.data.slug;
-      const url=location.origin+"/joinafamily/"+familySlug;
-      if(share)share.value="Join our family archive!\n\nOpen this link to join: "+url+"\n\nYou will also need our family joining password, which I will send separately.";
+      const url=await createFamilyInvitation();
+      if(share)share.value="You’re invited to our family archive!\n\nOpen this personal invitation link to join: "+url+"\n\nThe link can be used once and expires in 7 days.";
       if(copyShare)copyShare.hidden=false;
     }else{if(share)share.value="";if(copyShare)copyShare.hidden=true;}
     const title=$("[data-family-access] h2");
@@ -333,11 +355,11 @@
     if(event)event.preventDefault();
     if(authBusy||!client||!user)return;
     const form=$("[data-family-access-form]");
-    const password=form.elements.familyPassword.value;
+    const password=makeInviteToken()+makeInviteToken();
     const selected=form.elements.recoveryQuestion.value;
     const question=selected==="custom"?form.elements.customQuestion.value.trim():selected;
     const answer=form.elements.recoveryAnswer.value.trim();
-    if(password.length<8||!question||!answer){familyStatus("Please complete each field. The family password must be at least 8 characters.",true);return;}
+    if(!question||!answer){familyStatus("Please complete the recovery question and answer.",true);return;}
     authBusy=true;
     const button=form.querySelector("button[type='submit']");
     if(button)button.disabled=true;
@@ -354,7 +376,7 @@
       form.reset();
       const custom=$("[data-access-custom-question]");
       if(custom)custom.hidden=true;
-      familyStatus("Family access settings saved. The previous invitation link is no longer valid.");
+      familyStatus("Family recovery settings saved. Existing invitations remain valid until used or expired.");
     }catch(error){
       familyStatus(error.message||"We could not save family access settings.",true);
     }finally{
@@ -370,12 +392,12 @@
     }
     const form=$("[data-family-create]");
     const name=form.elements.familyName.value.trim();
-    const password=form.elements.familyPassword.value;
+    const password=makeInviteToken()+makeInviteToken();
     const selected=form.elements.recoveryQuestion.value;
     const question=selected==="custom"?form.elements.customQuestion.value.trim():selected;
     const answer=form.elements.recoveryAnswer.value.trim();
-    if(!name||password.length<8||!question||!answer){
-      familyStatus("Please complete each field. The family password must be at least 8 characters.",true);return;
+    if(!name||!question||!answer){
+      familyStatus("Please complete the family name and recovery question and answer.",true);return;
     }
     authBusy=true;
     const token=makeInviteToken();
@@ -392,11 +414,11 @@
       const family=await client.from("families").select("slug").eq("id",familyId).single();
       if(family.error)throw family.error;
       familySlug=family.data.slug;
-      const link=location.origin+"/joinafamily/"+familySlug;
+      const link=await createFamilyInvitation();
       const input=$("#family-invite-link");
       if(input)input.value=link;
       familyPanel("created");
-      familyStatus("Your family is ready. Keep the joining password private and share it only with relatives.");
+      familyStatus("Your family is ready. Share the invitation link with relatives. It can be used once and expires in 7 days.");
     }catch(error){
       familyStatus(error.message||"We could not create your family. Please try again.",true);
     }finally{
@@ -405,15 +427,13 @@
   }
   async function joinFamily(event){
     if(event)event.preventDefault();
-    if(authBusy||!client||!user||(!inviteToken&&!inviteSlug)){familyStatus("Open the invitation link shared by your family to continue.",true);return;}
+    if(authBusy||!client||!user||!invitationToken){familyStatus("Open a current personal invitation link from your family to continue.",true);return;}
     const form=$("[data-family-join]");
-    const password=form.elements.joinPassword.value;
-    if(!password){familyStatus("Enter the family joining password.",true);return;}
     authBusy=true;
     const button=form.querySelector("button[type='submit']");
     if(button)button.disabled=true;
     try{
-      const {data,error}=inviteSlug?await client.rpc("join_family_by_slug_with_password",{p_slug:inviteSlug,p_password:password}):await client.rpc("join_family_with_password",{p_invite_token:inviteToken,p_password:password});
+      const {data,error}=await client.rpc("redeem_family_invitation",{p_token:invitationToken});
       if(error)throw error;
       if(!data||!data.ok)throw Error(data&&data.error||"We could not join this family.");
       await connectFamily(user,{redirect:true});
@@ -424,7 +444,7 @@
     }
   }
   async function recoverFamily(){
-    if(authBusy||!client||!user||(!inviteToken&&!inviteSlug))return;
+    if(authBusy||!client||!user||invitationToken||(!inviteToken&&!inviteSlug))return;
     const answer=$("#join-recovery-answer").value.trim();
     if(!answer){familyStatus("Enter the answer to the family's recovery question.",true);return;}
     authBusy=true;
@@ -466,24 +486,22 @@
       if(type==="recover")recoverFamily();
       if(type==="load-invite"){
         const value=$("#join-invite-link").value.trim();
-        const familyMatch=value.match(/(?:^|\/)joinafamily\/([^/?#]+)\/?(?:[?#].*)?$/i);
-        const tokenMatch=value.match(/(?:#\/join\/|\/join\/)([a-f0-9]{48,256})(?:[/?#]|$)/i);
-        const token=tokenMatch?tokenMatch[1]:(/^[a-f0-9]{48,256}$/i.test(value)?value:null);
         try{
-          if(familyMatch){await loadFamilySlug(decodeURIComponent(familyMatch[1]));}
-          else if(token){await loadInvite(token);}
-          else{familyStatus("Paste the family invitation link you received.",true);}
+          const parsed=new URL(value,location.origin);
+          const token=parsed.searchParams.get("invite");
+          if(token&&/^[a-f0-9]{64}$/i.test(token)){await loadFamilyInvitation(token);}
+          else{familyStatus("That invitation link is missing its personal invite token. Ask the family owner to create a new invitation.",true);}
         }catch(error){familyStatus(error.message||"That invitation link could not be opened.",true);}
       }
       if(type==="copy-family-share"){
         const value=$("[data-family-share-message]")?.value||"";
-        try{await navigator.clipboard.writeText(value);familyStatus("Family invitation message copied. Send the joining password separately.");}
-        catch(_){const field=$("[data-family-share-message]");field.focus();field.select();document.execCommand("copy");familyStatus("Family invitation message copied. Send the joining password separately.");}
+        try{await navigator.clipboard.writeText(value);familyStatus("Family invitation message copied. Send it to your relative.");}
+        catch(_){const field=$("[data-family-share-message]");field.focus();field.select();document.execCommand("copy");familyStatus("Family invitation message copied. Send it to your relative.");}
       }
       if(type==="copy-invite"){
         const input=$("#family-invite-link");
-        try{await navigator.clipboard.writeText(input.value);familyStatus("Invitation link copied. Share it together with the family password.");}
-        catch(_){input.select();document.execCommand("copy");familyStatus("Invitation link copied. Share it together with the family password.");}
+        try{await navigator.clipboard.writeText(input.value);familyStatus("Invitation link copied. Send it to your relative.");}
+        catch(_){input.select();document.execCommand("copy");familyStatus("Invitation link copied. Send it to your relative.");}
       }
       if(type==="open-album")location.hash="#/album";
     });
@@ -521,9 +539,11 @@
       const familyPath=location.pathname.match(/^\/joinafamily\/([^/]+)\/?$/i);
       const routeMatch=location.hash.match(/^#\/join\/([^/]+)/);
       inviteToken=routeMatch?decodeURIComponent(routeMatch[1]):null;
-      if(familyPath){location.hash="#/family";await loadFamilySlug(decodeURIComponent(familyPath[1]));}
+      const invitationFromUrl=familyPath?new URLSearchParams(location.search).get("invite"):null;
+      if(familyPath&&invitationFromUrl){location.hash="#/family";await loadFamilyInvitation(invitationFromUrl);}
+      else if(familyPath){location.hash="#/family";inviteSlug=decodeURIComponent(familyPath[1]);familyPanel("join");familyStatus("This is a family address, not an invitation. Ask the owner to send you a personal invitation link.",true);}
       else if(inviteToken)await loadInvite(inviteToken);
-      await connectFamily(user,{redirect:!!(inviteToken||inviteSlug)});
+      await connectFamily(user,{redirect:!!(inviteToken||inviteSlug||invitationToken)});
       window.addEventListener("gs:local-change",()=>{
         if(!ready)return;
         clearTimeout(window.__gsSyncTimer);
