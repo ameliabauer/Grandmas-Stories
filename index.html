@@ -47,8 +47,7 @@
         <p class="muted">Set up your shared family space. You won't need an email address or a personal password.</p>
         <label for="family-name">Family name</label>
         <input id="family-name" name="familyName" type="text" maxlength="160" placeholder="The Betty Family" required>
-        <label for="family-password">Family joining password</label>
-        <input id="family-password" name="familyPassword" type="password" minlength="8" maxlength="128" autocomplete="new-password" placeholder="At least 8 characters" required>
+        <p class="family-help">Invite relatives with a private, one-time link after creating your archive. No shared password is needed.</p>
         <label for="family-recovery-question">Family recovery question</label>
         <select id="family-recovery-question" name="recoveryQuestion" required>
           <option value="What was Grandma's first job?">What was Grandma's first job?</option>
@@ -76,18 +75,16 @@
       <form class="form" data-family-join hidden novalidate>
         <h2>Join a family</h2>
         <div data-join-no-link>
-          <p class="muted">Open the personal family invitation link you received. You’ll also need the family joining password.</p>
+          <p class="muted">Open the personal family invitation link you received. No password is needed.</p>
           <label for="join-invite-link">Family invitation link</label>
           <input id="join-invite-link" type="url" autocomplete="url" placeholder="Paste the family link">
           <button class="tx-btn tx-leather tx-soft full" type="button" data-family-action="load-invite">Continue</button>
         </div>
         <div data-join-credentials hidden>
-          <p class="muted">You're joining <strong data-invite-family-name>this family</strong>. Enter the joining password shared with you.</p>
-          <label for="join-family-password">Family joining password</label>
-          <input id="join-family-password" name="joinPassword" type="password" autocomplete="current-password" placeholder="Enter family password" required>
+          <p class="muted">You’re joining <strong data-invite-family-name>this family</strong>. This personal invitation can be used once and expires after 7 days.</p>
           <p class="field-error" data-family-error hidden></p>
           <button class="tx-btn tx-corduroy full" type="submit">Join family <span class="tx-arrow" aria-hidden="true">&#8594;</span></button>
-          <button class="text-link family-recover-toggle" type="button" data-family-action="recover-toggle">Forgot the family password?</button>
+          
           <div class="family-recovery" data-family-recovery hidden>
             <p class="family-help">Answer the family's recovery question to restore access.</p>
             <label data-recovery-question-label for="join-recovery-answer">Recovery question</label>
@@ -101,7 +98,7 @@
 
       <div class="family-created" data-family-created hidden>
         <h2>Your family archive is ready!</h2>
-        <p class="muted">Share this invitation link with relatives. They'll also need your family joining password.</p>
+        <p class="muted">Share this private invitation link with one relative. It can be used once and expires after 7 days.</p>
         <label for="family-invite-link">Family invitation link</label>
         <input id="family-invite-link" type="text" readonly>
         <button class="tx-btn tx-leather tx-soft full" type="button" data-family-action="copy-invite">Copy invitation link</button>
@@ -110,17 +107,15 @@
       <div class="family-access" data-family-access hidden>
         <h2>Family sharing settings</h2>
         <section class="family-share-card" aria-labelledby="family-share-title">
-          <div class="family-share-heading"><span class="family-share-icon" aria-hidden="true">✉</span><div><h3 id="family-share-title">Invite your family</h3><p>Copy this ready-to-send invitation and share it with relatives. The link opens directly into your family’s join page.</p></div></div>
+          <div class="family-share-heading"><span class="family-share-icon" aria-hidden="true">✉</span><div><h3 id="family-share-title">Invite your family</h3><p>Copy this ready-to-send invitation and share it with a relative. Each link works once and expires after 7 days.</p></div></div>
           <label class="family-code-label" for="family-share-message">Invitation message</label>
           <textarea id="family-share-message" data-family-share-message rows="5" readonly></textarea>
           <button class="tx-btn tx-corduroy full" type="button" data-family-action="copy-family-share" data-copy-family-share hidden>Copy invitation message</button>
-          <p class="family-share-note">For security, send your family joining password separately.</p>
+          <p class="family-share-note">Each invitation is private, single-use, and expires after 7 days. Create a new one for each relative.</p>
         </section>
-        <h3 class="family-edit-heading">Edit existing family access</h3>
-        <p class="muted">Update your family joining password or change the recovery question and answer already on file. This does not create an additional question.</p>
+        <h3 class="family-edit-heading">Family recovery</h3>
+        <p class="muted">Update the recovery question and answer used if the family owner needs to recover access.</p>
         <form class="form" data-family-access-form novalidate>
-          <label for="access-family-password">Family joining password</label>
-          <input id="access-family-password" name="familyPassword" type="password" minlength="8" maxlength="128" autocomplete="new-password" placeholder="At least 8 characters" required>
           <label for="access-recovery-question">Edit family recovery question</label>
           <select id="access-recovery-question" name="recoveryQuestion" required>
             <option value="What was Grandma's first job?">What was Grandma's first job?</option>
