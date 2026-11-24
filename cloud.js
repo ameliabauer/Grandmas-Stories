@@ -1,7 +1,7 @@
 (function(){
   "use strict";
   const $=s=>document.querySelector(s);
-  let client=null,user=null,familyId=null,familyRole=null,ready=false,connecting=null,syncing=null,authBusy=false,inviteToken=null,inviteInfo=null;
+  let client=null,user=null,familyId=null,familyRole=null,ready=false,connecting=null,syncing=null,authBusy=false,inviteToken=null,inviteInfo=null,inviteSlug=null,familySlug=null;
   let realtime=null;
   const BUCKET="family-archive";
   const say=(text)=>{const el=$("[data-status]");if(el)el.textContent=text;};
@@ -221,8 +221,8 @@
     if(created)created.hidden=mode!=="created";
     if(access)access.hidden=mode!=="access";
     const noLink=$("[data-join-no-link]"),credentials=$("[data-join-credentials]");
-    if(noLink)noLink.hidden=mode!=="join"||!!inviteToken;
-    if(credentials)credentials.hidden=mode!=="join"||!inviteToken;
+    if(noLink)noLink.hidden=mode!=="join"||!!(inviteToken||inviteSlug);
+    if(credentials)credentials.hidden=mode!=="join"||!(inviteToken||inviteSlug);
     familyStatus("");
   }
   function showFamilySetup(token){
@@ -248,6 +248,20 @@
     if(question)question.textContent=data.recovery_question||"";
     familyStatus("");
   }
+  async function loadFamilySlug(slug){
+    inviteSlug=slug;inviteToken=null;inviteInfo=null;
+    familyPanel("join");
+    const name=$("[data-invite-family-name]"),question=$("[data-join-recovery-question]");
+    if(name)name.textContent="this family";
+    if(question)question.textContent="";
+    const {data,error}=await client.rpc("get_family_invite_info_by_slug",{p_slug:slug});
+    if(error)throw error;
+    if(!data)throw Error("This family link is invalid.");
+    inviteInfo=data;
+    if(name)name.textContent=data.family_name||"this family";
+    if(question)question.textContent=data.recovery_question||"";
+    familyStatus("");
+  }
   async function connectFamily(nextUser,options){
     if(!nextUser||!client)return;
     if(connecting)return connecting;
@@ -263,7 +277,7 @@
       if(settingsLink)settingsLink.hidden=familyRole!=="owner";
       if(!familyId){
         showConnectButton(false);
-        showFamilySetup(inviteToken||((location.hash.match(/^#\/join\/([^/]+)/)||[])[1]||null));
+        if(inviteSlug){familyPanel("join");}else{showFamilySetup(inviteToken||((location.hash.match(/^#\/join\/([^/]+)/)||[])[1]||null));}
         archiveStatus("Choose a family to create or join on this device.");
         return false;
       }
@@ -299,12 +313,17 @@
     if(readonly)readonly.hidden=owner;
     const saved=$("[data-family-access-saved]");
     if(saved)saved.hidden=true;
-    const codeWrap=$("[data-family-code-wrap]");
-    const copyCode=$("[data-copy-family-code]");
-    if(codeWrap)codeWrap.hidden=true;
-    if(copyCode)copyCode.hidden=true;
-    const generateCode=$("[data-family-action='generate-family-code']");
-    if(generateCode)generateCode.hidden=!owner;
+    const share=$("[data-family-share-message]");
+    const copyShare=$("[data-family-action='copy-family-share']");
+    familySlug=null;
+    if(owner){
+      const family=await client.from("families").select("slug").eq("id",familyId).single();
+      if(family.error)throw family.error;
+      familySlug=family.data.slug;
+      const url=location.origin+"/joinafamily/"+familySlug;
+      if(share)share.value="Join our family archive!\n\nOpen this link to join: "+url+"\n\nYou will also need our family joining password, which I will send separately.";
+      if(copyShare)copyShare.hidden=false;
+    }else{if(share)share.value="";if(copyShare)copyShare.hidden=true;}
     const title=$("[data-family-access] h2");
     if(title&&data&&data.family_name)title.textContent=data.family_name+" sharing settings";
     const link=$("[data-family-settings-link]");
@@ -370,7 +389,10 @@
       familyId=data;
       if(window.storage&&window.storage.setNamespace)window.storage.setNamespace(familyId);
       await connectFamily(user,{stay:true});
-      const link=location.origin+location.pathname+"#/join/"+token;
+      const family=await client.from("families").select("slug").eq("id",familyId).single();
+      if(family.error)throw family.error;
+      familySlug=family.data.slug;
+      const link=location.origin+"/joinafamily/"+familySlug;
       const input=$("#family-invite-link");
       if(input)input.value=link;
       familyPanel("created");
@@ -383,7 +405,7 @@
   }
   async function joinFamily(event){
     if(event)event.preventDefault();
-    if(authBusy||!client||!user||!inviteToken){familyStatus("Open the invitation link shared by your family to continue.",true);return;}
+    if(authBusy||!client||!user||(!inviteToken&&!inviteSlug)){familyStatus("Open the invitation link shared by your family to continue.",true);return;}
     const form=$("[data-family-join]");
     const password=form.elements.joinPassword.value;
     if(!password){familyStatus("Enter the family joining password.",true);return;}
@@ -391,7 +413,7 @@
     const button=form.querySelector("button[type='submit']");
     if(button)button.disabled=true;
     try{
-      const {data,error}=await client.rpc("join_family_with_password",{p_invite_token:inviteToken,p_password:password});
+      const {data,error}=inviteSlug?await client.rpc("join_family_by_slug_with_password",{p_slug:inviteSlug,p_password:password}):await client.rpc("join_family_with_password",{p_invite_token:inviteToken,p_password:password});
       if(error)throw error;
       if(!data||!data.ok)throw Error(data&&data.error||"We could not join this family.");
       await connectFamily(user,{redirect:true});
@@ -402,14 +424,14 @@
     }
   }
   async function recoverFamily(){
-    if(authBusy||!client||!user||!inviteToken)return;
+    if(authBusy||!client||!user||(!inviteToken&&!inviteSlug))return;
     const answer=$("#join-recovery-answer").value.trim();
     if(!answer){familyStatus("Enter the answer to the family's recovery question.",true);return;}
     authBusy=true;
     const button=$("[data-family-action='recover']");
     if(button)button.disabled=true;
     try{
-      const {data,error}=await client.rpc("recover_family_with_question",{p_invite_token:inviteToken,p_answer:answer});
+      const {data,error}=inviteSlug?await client.rpc("recover_family_by_slug_with_question",{p_slug:inviteSlug,p_answer:answer}):await client.rpc("recover_family_with_question",{p_invite_token:inviteToken,p_answer:answer});
       if(error)throw error;
       if(!data||!data.ok)throw Error(data&&data.error||"We could not recover this family.");
       await connectFamily(user,{redirect:true});
@@ -433,7 +455,7 @@
       const mode=event.target.closest("[data-family-mode]");
       if(mode){familyPanel(mode.getAttribute("data-family-mode"));return;}
       const back=event.target.closest("[data-family-back]");
-      if(back){if(inviteToken){location.hash="#/home";}else familyPanel("choice");return;}
+      if(back){if(inviteToken||inviteSlug){location.hash="#/home";}else familyPanel("choice");return;}
       const action=event.target.closest("[data-family-action]");
       if(!action)return;
       const type=action.getAttribute("data-family-action");
@@ -449,27 +471,10 @@
         if(!/^[a-f0-9]{48,256}$/i.test(token)){familyStatus("Enter a valid family invite code or invitation link.",true);return;}
         try{await loadInvite(token);}catch(error){familyStatus(error.message||"That invitation link could not be opened.",true);}
       }
-      if(type==="generate-family-code"){
-        if(authBusy||!ready||familyRole!=="owner")return;
-        action.disabled=true;
-        try{
-          const token=makeInviteToken();
-          const result=await client.rpc("rotate_family_invite_code",{p_invite_token:token});
-          if(result.error)throw result.error;
-          if(!result.data||!result.data.ok)throw Error("A family invite code could not be created.");
-          const code=$("[data-family-invite-code]"),wrap=$("[data-family-code-wrap]"),copy=$("[data-copy-family-code]");
-          if(code)code.textContent=token;
-          if(wrap)wrap.hidden=false;
-          if(copy)copy.hidden=false;
-          action.textContent="Create a new code";
-          familyStatus("Your new family invite code is ready. Creating another code will replace this one.");
-        }catch(error){familyStatus(error.message||"A family invite code could not be created.",true);}
-        finally{action.disabled=false;}
-      }
-      if(type==="copy-family-code"){
-        const value=$("[data-family-invite-code]")?.textContent||"";
-        try{await navigator.clipboard.writeText(value);familyStatus("Family invite code copied. Share it with the family joining password.");}
-        catch(_){const field=document.createElement("textarea");field.value=value;document.body.appendChild(field);field.select();document.execCommand("copy");field.remove();familyStatus("Family invite code copied. Share it with the family joining password.");}
+      if(type==="copy-family-share"){
+        const value=$("[data-family-share-message]")?.value||"";
+        try{await navigator.clipboard.writeText(value);familyStatus("Family invitation message copied. Send the joining password separately.");}
+        catch(_){const field=$("[data-family-share-message]");field.focus();field.select();document.execCommand("copy");familyStatus("Family invitation message copied. Send the joining password separately.");}
       }
       if(type==="copy-invite"){
         const input=$("#family-invite-link");
@@ -509,12 +514,12 @@
       }else{
         user=sessionResult.data.session.user;
       }
+      const familyPath=location.pathname.match(/^\/joinafamily\/([^/]+)\/?$/i);
       const routeMatch=location.hash.match(/^#\/join\/([^/]+)/);
       inviteToken=routeMatch?decodeURIComponent(routeMatch[1]):null;
-      if(inviteToken){
-        await loadInvite(inviteToken);
-      }
-      await connectFamily(user,{redirect:!!inviteToken});
+      if(familyPath){location.hash="#/family";await loadFamilySlug(decodeURIComponent(familyPath[1]));}
+      else if(inviteToken)await loadInvite(inviteToken);
+      await connectFamily(user,{redirect:!!(inviteToken||inviteSlug)});
       window.addEventListener("gs:local-change",()=>{
         if(!ready)return;
         clearTimeout(window.__gsSyncTimer);
