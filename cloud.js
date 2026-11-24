@@ -466,10 +466,14 @@
       if(type==="recover")recoverFamily();
       if(type==="load-invite"){
         const value=$("#join-invite-link").value.trim();
-        const raw=value.indexOf("#/join/")>=0?value.split("#/join/")[1]:(value.indexOf("/join/")>=0?value.split("/join/")[1]:value);
-        const token=raw.split(/[/?#]/)[0];
-        if(!/^[a-f0-9]{48,256}$/i.test(token)){familyStatus("Enter a valid family invite code or invitation link.",true);return;}
-        try{await loadInvite(token);}catch(error){familyStatus(error.message||"That invitation link could not be opened.",true);}
+        const familyMatch=value.match(/(?:^|\/)joinafamily\/([^/?#]+)\/?(?:[?#].*)?$/i);
+        const tokenMatch=value.match(/(?:#\/join\/|\/join\/)([a-f0-9]{48,256})(?:[/?#]|$)/i);
+        const token=tokenMatch?tokenMatch[1]:(/^[a-f0-9]{48,256}$/i.test(value)?value:null);
+        try{
+          if(familyMatch){await loadFamilySlug(decodeURIComponent(familyMatch[1]));}
+          else if(token){await loadInvite(token);}
+          else{familyStatus("Paste the family invitation link you received.",true);}
+        }catch(error){familyStatus(error.message||"That invitation link could not be opened.",true);}
       }
       if(type==="copy-family-share"){
         const value=$("[data-family-share-message]")?.value||"";
