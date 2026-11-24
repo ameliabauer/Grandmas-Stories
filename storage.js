@@ -1,7 +1,7 @@
 (function(){
   "use strict";
   const DB="grandmas-stories-ui", STORE="kv";
-  let dbPromise;
+  let dbPromise;\n  let namespace = "";\n  const scopedKey = key => namespace + key;\n  function setNamespace(familyId) { namespace = familyId ? "family:" + familyId + ":" : ""; }
   function open(){
     if(dbPromise)return dbPromise;
     dbPromise=new Promise((resolve,reject)=>{
@@ -16,12 +16,12 @@
     try{
       const db=await open();
       const value=await new Promise((resolve,reject)=>{
-        const req=db.transaction(STORE,"readonly").objectStore(STORE).get(key);
+        const req=db.transaction(STORE,"readonly").objectStore(STORE).get(scopedKey(key));
         req.onsuccess=()=>resolve(req.result?req.result.value:undefined);
         req.onerror=()=>reject(req.error);
       });
       if(value!==undefined)return value;
-      const raw=localStorage.getItem("gs:"+key);
+      const raw=localStorage.getItem("gs:"+scopedKey(key));
       if(raw!==null){
         const migrated=JSON.parse(raw);
         await set(key,migrated);
@@ -37,13 +37,13 @@
       const db=await open();
       await new Promise((resolve,reject)=>{
         const tx=db.transaction(STORE,"readwrite");
-        tx.objectStore(STORE).put({key,value});
+        tx.objectStore(STORE).put({key:scopedKey(key),value});
         tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);
       });
       return true;
     }catch(e){
-      try{localStorage.setItem("gs:"+key,JSON.stringify(value));return true;}catch(_){return false;}
+      try{localStorage.setItem("gs:"+scopedKey(key),JSON.stringify(value));return true;}catch(_){return false;}
     }
   }
-  window.storage={get,set};
+  window.storage={get,set,setNamespace};
 })();
