@@ -277,7 +277,7 @@
       if(settingsLink)settingsLink.hidden=familyRole!=="owner";
       if(!familyId){
         showConnectButton(false);
-        showFamilySetup(inviteToken||inviteSlug||((location.hash.match(/^#\/join\/([^/]+)/)||[])[1]||null));
+        if(inviteSlug){familyPanel("join");}else{showFamilySetup(inviteToken||((location.hash.match(/^#\/join\/([^/]+)/)||[])[1]||null));}
         archiveStatus("Choose a family to create or join on this device.");
         return false;
       }
@@ -517,7 +517,7 @@
       const familyPath=location.pathname.match(/^\/joinafamily\/([^/]+)\/?$/i);
       const routeMatch=location.hash.match(/^#\/join\/([^/]+)/);
       inviteToken=routeMatch?decodeURIComponent(routeMatch[1]):null;
-      if(familyPath)await loadFamilySlug(decodeURIComponent(familyPath[1]));
+      if(familyPath){location.hash="#/family";await loadFamilySlug(decodeURIComponent(familyPath[1]));}
       else if(inviteToken)await loadInvite(inviteToken);
       await connectFamily(user,{redirect:!!(inviteToken||inviteSlug)});
       window.addEventListener("gs:local-change",()=>{
