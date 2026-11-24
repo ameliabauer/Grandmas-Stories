@@ -78,20 +78,28 @@
 
       <form class="form" data-family-join hidden novalidate>
         <h2>Join a family</h2>
-        <p class="muted">You're joining <strong data-invite-family-name>this family</strong>. Enter the joining password shared with you.</p>
-        <label for="join-family-password">Family joining password</label>
-        <input id="join-family-password" name="joinPassword" type="password" autocomplete="current-password" placeholder="Enter family password" required>
-        <p class="field-error" data-family-error hidden></p>
-        <button class="tx-btn tx-corduroy full" type="submit">Join family <span class="tx-arrow" aria-hidden="true">&#8594;</span></button>
-        <button class="text-link family-back" type="button" data-family-back>Back</button>
-        <button class="text-link family-recover-toggle" type="button" data-family-action="recover-toggle">Forgot the family password?</button>
-        <div class="family-recovery" data-family-recovery hidden>
-          <p class="family-help">Answer the family's recovery question to restore access.</p>
-          <label data-recovery-question-label for="join-recovery-answer">Recovery question</label>
-          <p class="recovery-question" data-join-recovery-question></p>
-          <input id="join-recovery-answer" name="recoveryAnswer" type="text" autocomplete="off" placeholder="Your answer">
-          <button class="tx-btn tx-leather tx-soft full" type="button" data-family-action="recover">Recover family access</button>
+        <div data-join-no-link>
+          <p class="muted">Open the invitation link shared by your family, or paste it below. You'll also need the family joining password.</p>
+          <label for="join-invite-link">Family invitation link</label>
+          <input id="join-invite-link" type="url" placeholder="Paste your invitation link">
+          <button class="tx-btn tx-leather tx-soft full" type="button" data-family-action="load-invite">Continue</button>
         </div>
+        <div data-join-credentials hidden>
+          <p class="muted">You're joining <strong data-invite-family-name>this family</strong>. Enter the joining password shared with you.</p>
+          <label for="join-family-password">Family joining password</label>
+          <input id="join-family-password" name="joinPassword" type="password" autocomplete="current-password" placeholder="Enter family password" required>
+          <p class="field-error" data-family-error hidden></p>
+          <button class="tx-btn tx-corduroy full" type="submit">Join family <span class="tx-arrow" aria-hidden="true">&#8594;</span></button>
+          <button class="text-link family-recover-toggle" type="button" data-family-action="recover-toggle">Forgot the family password?</button>
+          <div class="family-recovery" data-family-recovery hidden>
+            <p class="family-help">Answer the family's recovery question to restore access.</p>
+            <label data-recovery-question-label for="join-recovery-answer">Recovery question</label>
+            <p class="recovery-question" data-join-recovery-question></p>
+            <input id="join-recovery-answer" name="recoveryAnswer" type="text" autocomplete="off" placeholder="Your answer">
+            <button class="tx-btn tx-leather tx-soft full" type="button" data-family-action="recover">Recover family access</button>
+          </div>
+        </div>
+        <button class="text-link family-back" type="button" data-family-back>Back</button>
       </form>
 
       <div class="family-created" data-family-created hidden>
