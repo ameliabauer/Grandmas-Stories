@@ -15,10 +15,22 @@ A photo-led family storytelling experience. The heart of the product is recreati
 - Local audio recording and transcript stored with the photograph reference in IndexedDB.
 - Large touch controls, explicit stop, and eight-minute session cap.
 
-## Important limitations
-This milestone stores photographs, recordings, and transcripts on the same iPad only. There is no secure family login, remote upload, cross-device sync, cloud archive, backup, or family sharing yet. Do not treat it as a permanent preservation archive until those features and recovery/export/delete flows are complete and tested.
+## Family access and device sessions
+- Supabase anonymous authentication creates a persistent session for each browser/device; no email or personal password is required.
+- A device explicitly creates a family or joins through a shareable invitation link plus the family-wide joining password.
+- The family owner sets a recovery question from suggested options or writes a custom question.
+- Recovery can restore family ownership on a replacement device using the invitation link and the recovery answer.
+- Family access credentials and recovery answers are stored as password hashes in the private database schema; invitation links contain high-entropy random tokens stored only as hashes.
+- Local photo/story cache keys are namespaced by family ID so one family’s device cache is not reused for another family.
+- Supabase refresh tokens are persisted by the browser client, so ordinary site deployments should not sign families out.
 
-The photo album is intentionally local for this first photo-led interaction prototype. The next milestone is a secure family web portal so relatives can upload and curate photographs remotely, with those photographs delivered privately to Grandma's iPad.
+## Important setup and limitations
+- Enable **Authentication → Providers → Anonymous Sign-Ins** in the Supabase dashboard before using the new onboarding flow.
+- Existing signed-in family owners can open **Family settings** to set the first family password, recovery question, and invitation link.
+- A device is associated with one family at a time. Use a separate browser profile/device to access a different family.
+- Clearing browser data or losing a device removes its anonymous session. The family invitation link and recovery answer are then required to restore family access.
+- Add CAPTCHA/Turnstile and monitor anonymous sign-in abuse before opening the product to broad public signup.
+- Keep regular database and Storage backups; account recovery is not a substitute for backups.
 
 ## Environment
 Set OPENAI_API_KEY in the Vercel project. Optional: REALTIME_MODEL, REALTIME_VOICE.
