@@ -143,10 +143,8 @@
         '<span class="badge' + (count ? "" : " empty") + '">' + (count ? (count === 1 ? "Read the story" : "Read " + count + " stories") : (pending ? "Story coming soon" : "Waiting for a story")) + '</span>',
         '</a>'
       ].join("");
-      const titleEl = $(".title", li);
-      titleEl.textContent = photo.title;
       $(".yr", li).textContent = photo.year || "";
-      $("img", li).alt = photo.title + (photo.year ? ", " + photo.year : "");
+      $("img", li).alt = "Family photo";
 
       if (editing) {
         const removeButton = document.createElement("button");
@@ -274,12 +272,12 @@
     const photo = state.photos[state.index];
     if (!photo) return;
     const img = $("[data-photo]");
-    img.alt = photo.title + (photo.year ? ", " + photo.year : "");
+    img.alt = "Family photo";
     img.addEventListener("load", fitStoryPhoto, { once: true });
     img.src = photo.src;
     requestAnimationFrame(fitStoryPhoto);
     if (img.complete) requestAnimationFrame(fitStoryPhoto);
-    $("[data-caption]").textContent = photo.title;
+    $("[data-caption]").textContent = "";
     $("[data-year]").textContent = photo.year || "";
     $("[data-prompt]").textContent = photo.prompt || "Tell me about this time...";
     $("[data-counter]").textContent = "Photo " + (state.index + 1) + " of " + state.photos.length;
@@ -367,10 +365,10 @@
     const pos = told.findIndex(p => p.id === photo.id);
 
     $("[data-view-photo]").src = photo.src;
-    $("[data-view-photo]").alt = photo.title + (photo.year ? ", " + photo.year : "");
-    $("[data-view-caption]").textContent = photo.title;
+    $("[data-view-photo]").alt = "Family photo";
+    $("[data-view-caption]").textContent = "";
     $("[data-view-year]").textContent = photo.year || "";
-    $("[data-view-title]").textContent = photo.title;
+    $("[data-view-title]").textContent = "";
     $("[data-view-sub]").textContent = photo.year ? "Remembered from " + photo.year : "";
     $("[data-view-counter]").textContent = told.length > 1 ? "Story " + (pos + 1) + " of " + told.length : "";
     $$("[data-action='view-prev'], [data-action='view-next']").forEach((btn) => {
