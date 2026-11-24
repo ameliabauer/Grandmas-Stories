@@ -75,8 +75,9 @@
 
   function navigate(path) {
     const next = (path || "home").replace(/^\/+/, "");
-    location.hash = "#/" + next;
-    route();
+    const target = "#/" + next;
+    if (location.hash !== target) location.hash = target;
+    else route();
   }
 
   let activeRouteKey = null;
@@ -91,13 +92,13 @@
       const first = toldPhotos()[0];
       if (first) id = first.id;
     }
-    if (name === "view" && id && !hasStory(id) && !hasPendingStory(id)) name = "story";
     if ((name === "story" || name === "view") && state.photos.length === 0) name = "album";
     if (name !== "album") state.editing = false;
     const nextRouteKey = name + ":" + (id || "");
     // A hashchange can fire after renderStory normalizes the URL. Only stop
     // recording when the user actually navigates to a different screen/photo.
-    if (activeRouteKey !== nextRouteKey) {
+    const routeChanged = activeRouteKey !== nextRouteKey;
+    if (routeChanged) {
       stopListening();
       activeRouteKey = nextRouteKey;
     }
@@ -110,7 +111,12 @@
       state.index = idx >= 0 ? idx : 0;
       renderStory();
     }
-    if (name === "view") renderView(id);
+    if (name === "view") {
+      renderView(id);
+      if (routeChanged && window.gsCloud && window.gsCloud.sync) {
+        Promise.resolve(window.gsCloud.sync());
+      }
+    }
     window.scrollTo(0, 0);
     const heading = $("[data-screen='" + name + "'] h1, [data-screen='" + name + "'] h2");
     if (heading && name !== "home") {
@@ -381,10 +387,12 @@
     // Audio recordings are intentionally hidden from the reading interface.
     // Keep written story text visible, but omit audio-only entries.
     const list = storiesFor(photo.id).filter(story => (story.text || "").trim());
-    if (!list.length && hasPendingStory(photo.id)) {
+    if (!list.length) {
       const pending = document.createElement("p");
       pending.className = "entry-meta";
-      pending.textContent = "Story coming soon — we’re getting it ready.";
+      pending.textContent = hasPendingStory(photo.id)
+        ? "Story coming soon — we’re getting it ready."
+        : "No written story is showing here yet. If someone just shared one, return to the album and reopen this photo in a moment. You can also add a memory below.";
       wrap.appendChild(pending);
     }
     list.forEach((story, index) => {
