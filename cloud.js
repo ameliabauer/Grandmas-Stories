@@ -219,6 +219,9 @@
     if(create)create.hidden=mode!=="create";
     if(join)join.hidden=mode!=="join";
     if(created)created.hidden=mode!=="created";
+    const noLink=$("[data-join-no-link]"),credentials=$("[data-join-credentials]");
+    if(noLink)noLink.hidden=mode!=="join"||!!inviteToken;
+    if(credentials)credentials.hidden=mode!=="join"||!inviteToken;
     familyStatus("");
   }
   function showFamilySetup(token){
@@ -371,6 +374,13 @@
         if(panel)panel.hidden=!panel.hidden;
       }
       if(type==="recover")recoverFamily();
+      if(type==="load-invite"){
+        const value=$("#join-invite-link").value.trim();
+        const match=value.match(/#\\/join\\/([a-f0-9]{48,})/i)||value.match(/\\/join\\/([a-f0-9]{48,})/i);
+        const token=match?match[1]:value;
+        if(!/^[a-f0-9]{48,256}$/i.test(token)){familyStatus("Paste a valid family invitation link.",true);return;}
+        try{await loadInvite(token);}catch(error){familyStatus(error.message||"That invitation link could not be opened.",true);}
+      }
       if(type==="copy-invite"){
         const input=$("#family-invite-link");
         try{await navigator.clipboard.writeText(input.value);familyStatus("Invitation link copied. Share it together with the family password.");}
