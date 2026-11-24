@@ -75,9 +75,9 @@
       <form class="form" data-family-join hidden novalidate>
         <h2>Join a family</h2>
         <div data-join-no-link>
-          <p class="muted">Enter the family invite code or open the invitation link shared with you. You’ll also need the family joining password.</p>
-          <label for="join-invite-link">Family invite code or link</label>
-          <input id="join-invite-link" type="text" autocomplete="off" placeholder="Paste the code or invitation link">
+          <p class="muted">Open the personal family invitation link you received. You’ll also need the family joining password.</p>
+          <label for="join-invite-link">Family invitation link</label>
+          <input id="join-invite-link" type="url" autocomplete="url" placeholder="Paste the family link">
           <button class="tx-btn tx-leather tx-soft full" type="button" data-family-action="load-invite">Continue</button>
         </div>
         <div data-join-credentials hidden>
@@ -109,11 +109,11 @@
       <div class="family-access" data-family-access hidden>
         <h2>Family sharing settings</h2>
         <section class="family-share-card" aria-labelledby="family-share-title">
-          <div class="family-share-heading"><span class="family-share-icon" aria-hidden="true">✉</span><div><h3 id="family-share-title">Invite your family</h3><p>Share this code with relatives. They’ll use it with your family joining password.</p></div></div>
-          <div class="family-code-wrap" data-family-code-wrap hidden><span class="family-code-label">Your family invite code</span><code data-family-invite-code></code></div>
-          <button class="tx-btn tx-corduroy full" type="button" data-family-action="generate-family-code">Create a share code</button>
-          <button class="tx-btn tx-leather tx-soft full" type="button" data-family-action="copy-family-code" data-copy-family-code hidden>Copy invite code</button>
-          <p class="family-share-note">Only share the code and joining password with people you want in the family archive.</p>
+          <div class="family-share-heading"><span class="family-share-icon" aria-hidden="true">✉</span><div><h3 id="family-share-title">Invite your family</h3><p>Copy this ready-to-send invitation and share it with relatives. The link opens directly into your family’s join page.</p></div></div>
+          <label class="family-code-label" for="family-share-message">Invitation message</label>
+          <textarea id="family-share-message" data-family-share-message rows="5" readonly></textarea>
+          <button class="tx-btn tx-corduroy full" type="button" data-family-action="copy-family-share" data-copy-family-share hidden>Copy invitation message</button>
+          <p class="family-share-note">For security, send your family joining password separately.</p>
         </section>
         <h3 class="family-edit-heading">Edit existing family access</h3>
         <p class="muted">Update your family joining password or change the recovery question and answer already on file. This does not create an additional question.</p>
