@@ -221,8 +221,8 @@
     if(created)created.hidden=mode!=="created";
     if(access)access.hidden=mode!=="access";
     const noLink=$("[data-join-no-link]"),credentials=$("[data-join-credentials]");
-    if(noLink)noLink.hidden=mode!=="join"||!!inviteToken;
-    if(credentials)credentials.hidden=mode!=="join"||!inviteToken;
+    if(noLink)noLink.hidden=mode!=="join"||!!(inviteToken||inviteSlug);
+    if(credentials)credentials.hidden=mode!=="join"||!(inviteToken||inviteSlug);
     familyStatus("");
   }
   function showFamilySetup(token){
