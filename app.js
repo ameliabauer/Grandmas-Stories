@@ -815,5 +815,30 @@
   window.addEventListener("gs:cloud-updated", async function () {
     await hydrate();
     route();
+    // The initial reading route can run before the family archive has finished
+    // loading its photos. Retry the story lookup after cloud hydration completes.
+    const match = (location.hash || "").match(/^#\/view\/([^/]+)/);
+    if (match && window.gsCloud && window.gsCloud.getStoriesForPhoto) {
+      const photoId = decodeURIComponent(match[1]);
+      try {
+        const cloudEntries = await window.gsCloud.getStoriesForPhoto(photoId);
+        if (location.hash !== "#/view/" + match[1] || !Array.isArray(cloudEntries)) return;
+        const existing = storiesFor(photoId);
+        const byCloudId = new Map(existing.filter(entry => entry.cloudStoryId).map(entry => [entry.cloudStoryId, entry]));
+        cloudEntries.forEach(entry => {
+          const prior = byCloudId.get(entry.cloudStoryId);
+          if (prior) {
+            if (!(prior.text || "").trim() && (entry.text || "").trim()) prior.text = entry.text;
+            if (!prior.authorName) prior.authorName = entry.authorName;
+          } else {
+            existing.push(entry);
+          }
+        });
+        state.stories[photoId] = existing;
+        renderView(photoId);
+      } catch (error) {
+        console.warn("Could not refresh this story after archive hydration", error);
+      }
+    }
   });
 })();
