@@ -109,6 +109,15 @@
       </div>
       <div class="family-access" data-family-access hidden>
         <h2>Family sharing settings</h2>
+        <section class="family-share-card" aria-labelledby="your-name-title">
+          <div class="family-share-heading"><span class="family-share-icon" aria-hidden="true">✎</span><div><h3 id="your-name-title">Your name on this device</h3><p>Choose how your name appears when you share a story. This only changes the name for this device.</p></div></div>
+          <form class="form" data-member-name-form novalidate>
+            <label for="member-display-name">Your name</label>
+            <input id="member-display-name" name="displayName" type="text" maxlength="80" autocomplete="name" required>
+            <button class="tx-btn tx-corduroy full" type="submit">Save my name</button>
+          </form>
+          <p class="family-help" data-member-name-saved hidden>Your name has been saved.</p>
+        </section>
         <section class="family-share-card" aria-labelledby="family-share-title">
           <div class="family-share-heading"><span class="family-share-icon" aria-hidden="true">✉</span><div><h3 id="family-share-title">Invite your family</h3><p>Copy this ready-to-send invitation and share it with a relative. Each link works once and expires after 7 days.</p></div></div>
           <label class="family-code-label" for="family-share-message">Invitation message</label>
@@ -142,7 +151,7 @@
           <button class="tx-btn tx-corduroy full" type="submit">Save family access settings</button>
         </form>
         <div class="family-access-saved" data-family-access-saved hidden><p class="family-help">Your family access settings were updated.</p></div>
-        <p class="family-help" data-family-access-readonly hidden>Only the family owner can change sharing and recovery settings.</p>
+        <p class="family-help" data-family-access-readonly hidden>Only the family owner can change sharing and recovery settings. You can still update your own name above.</p>
         <button class="text-link family-back" type="button" data-family-action="open-album">Back to family album</button>
       </div>
       <p class="family-status" data-family-status role="status" aria-live="polite" hidden></p>
