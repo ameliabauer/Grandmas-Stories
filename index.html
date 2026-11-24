@@ -110,6 +110,42 @@
         <button class="tx-btn tx-leather tx-soft full" type="button" data-family-action="copy-invite">Copy invitation link</button>
         <button class="tx-btn tx-corduroy full" type="button" data-family-action="open-album">Open family album <span class="tx-arrow" aria-hidden="true">&#8594;</span></button>
       </div>
+      <div class="family-access" data-family-access hidden>
+        <h2>Family sharing settings</h2>
+        <p class="muted">Set or update your family's joining password and recovery question. Saving creates a fresh invitation link and invalidates the previous one.</p>
+        <form class="form" data-family-access-form novalidate>
+          <label for="access-family-password">Family joining password</label>
+          <input id="access-family-password" name="familyPassword" type="password" minlength="8" maxlength="128" autocomplete="new-password" placeholder="At least 8 characters" required>
+          <label for="access-recovery-question">Family recovery question</label>
+          <select id="access-recovery-question" name="recoveryQuestion" required>
+            <option value="What was Grandma's first job?">What was Grandma's first job?</option>
+            <option value="Where did Grandma grow up?">Where did Grandma grow up?</option>
+            <option value="What was Grandma's favourite childhood meal?">What was Grandma's favourite childhood meal?</option>
+            <option value="Where did Grandma and Grandpa first meet?">Where did Grandma and Grandpa first meet?</option>
+            <option value="What was the name of Grandma's first pet?">What was the name of Grandma's first pet?</option>
+            <option value="What was Grandma's childhood nickname?">What was Grandma's childhood nickname?</option>
+            <option value="What was the family's favourite holiday destination?">What was the family's favourite holiday destination?</option>
+            <option value="What dish was Grandma famous for making?">What dish was Grandma famous for making?</option>
+            <option value="custom">Write my own question…</option>
+          </select>
+          <div class="custom-question" data-access-custom-question hidden>
+            <label for="access-custom-question">Your custom question</label>
+            <input id="access-custom-question" name="customQuestion" type="text" maxlength="240" placeholder="Write a question your family would know">
+          </div>
+          <label for="access-recovery-answer">Answer</label>
+          <input id="access-recovery-answer" name="recoveryAnswer" type="text" maxlength="160" autocomplete="off" placeholder="Enter the answer" required>
+          <p class="family-help">Recovery answers are stored as secure hashes. Choose an answer your trusted relatives can remember.</p>
+          <p class="field-error" data-family-error hidden></p>
+          <button class="tx-btn tx-corduroy full" type="submit">Save family access settings</button>
+        </form>
+        <div class="family-access-saved" data-family-access-saved hidden>
+          <label for="family-access-invite-link">New family invitation link</label>
+          <input id="family-access-invite-link" type="text" readonly>
+          <button class="tx-btn tx-leather tx-soft full" type="button" data-family-action="copy-access-invite">Copy invitation link</button>
+        </div>
+        <p class="family-help" data-family-access-readonly hidden>Only the family owner can change sharing and recovery settings.</p>
+        <button class="text-link family-back" type="button" data-family-action="open-album">Back to family album</button>
+      </div>
       <p class="family-status" data-family-status role="status" aria-live="polite" hidden></p>
     </div>
     <p class="footnote">Made with love, for the stories that matter.</p>
@@ -119,6 +155,7 @@
     <div class="topbar">
       <a class="back-link" href="#/home">&#8592; Home</a>
       <div class="album-tools">
+        <a class="text-link family-settings-link" href="#/family" data-family-settings-link>Family settings</a>
         <button class="text-link manage-btn" type="button" data-action="manage" aria-pressed="false">Manage photos</button>
         <button class="tx-btn tx-linen tx-soft small" type="button" data-action="add-photo"><svg class="tx-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"></path></svg>Add a photo</button>
       </div>
