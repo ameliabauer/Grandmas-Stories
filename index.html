@@ -33,24 +33,76 @@
     </div>
   </section>
 
-  <section class="screen screen-signin" data-screen="signin" aria-labelledby="signin-title" hidden>
+  <section class="screen screen-family" data-screen="family" aria-labelledby="family-title" hidden>
     <div class="topbar"><a class="back-link" href="#/home">&#8592; Home</a></div>
-    <div class="card linen-card">
-      <div class="signin-form" data-state="form">
-        <h2 id="signin-title">Welcome back to the family archive</h2>
-        <p class="muted">We'll email you a secure sign-in link. No password needed.</p>
-        <form class="form" data-form="signin" novalidate>
-          <label for="email">Email address</label>
-          <input id="email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required>
-          <p class="field-error" data-error hidden>Please enter a valid email address.</p>
-          <button class="tx-btn tx-corduroy full" type="submit">Send my sign-in link <span class="tx-arrow" aria-hidden="true">&#8594;</span></button>
-        </form>
+    <div class="card linen-card family-card">
+      <div data-family-choice>
+        <h2 id="family-title">Welcome to Grandma's Stories</h2>
+        <p class="muted">Create a family archive or join one you've been invited to.</p>
+        <div class="family-choice-actions">
+          <button class="tx-btn tx-corduroy full" type="button" data-family-mode="create">Create a family</button>
+          <button class="tx-btn tx-leather tx-soft full" type="button" data-family-mode="join">Join a family</button>
+        </div>
       </div>
-      <div class="signin-sent" data-state="sent" hidden>
-        <h2>Check your inbox</h2>
-        <p class="muted">Your sign-in link is on its way to <strong data-sent-email></strong>.</p>
-        <div class="row"><button class="tx-btn tx-leather tx-soft" type="button" data-action="resend">Resend link</button><a class="text-link" href="#/home">Return home</a></div>
+
+      <form class="form" data-family-create hidden novalidate>
+        <h2>Create your family</h2>
+        <p class="muted">Set up your shared family space. You won't need an email address or a personal password.</p>
+        <label for="family-name">Family name</label>
+        <input id="family-name" name="familyName" type="text" maxlength="160" placeholder="The Betty Family" required>
+        <label for="family-password">Family joining password</label>
+        <input id="family-password" name="familyPassword" type="password" minlength="8" maxlength="128" autocomplete="new-password" placeholder="At least 8 characters" required>
+        <label for="family-recovery-question">Family recovery question</label>
+        <select id="family-recovery-question" name="recoveryQuestion" required>
+          <option value="What was Grandma's first job?">What was Grandma's first job?</option>
+          <option value="Where did Grandma grow up?">Where did Grandma grow up?</option>
+          <option value="What was Grandma's favourite childhood meal?">What was Grandma's favourite childhood meal?</option>
+          <option value="Where did Grandma and Grandpa first meet?">Where did Grandma and Grandpa first meet?</option>
+          <option value="What was the name of Grandma's first pet?">What was the name of Grandma's first pet?</option>
+          <option value="What was Grandma's childhood nickname?">What was Grandma's childhood nickname?</option>
+          <option value="What was the family's favourite holiday destination?">What was the family's favourite holiday destination?</option>
+          <option value="What dish was Grandma famous for making?">What dish was Grandma famous for making?</option>
+          <option value="custom">Write my own question…</option>
+        </select>
+        <div class="custom-question" data-custom-question hidden>
+          <label for="family-custom-question">Your custom question</label>
+          <input id="family-custom-question" name="customQuestion" type="text" maxlength="240" placeholder="Write a question your family would know">
+        </div>
+        <label for="family-recovery-answer">Answer</label>
+        <input id="family-recovery-answer" name="recoveryAnswer" type="text" maxlength="160" autocomplete="off" placeholder="Enter the answer" required>
+        <p class="family-help">Choose an answer trusted family members can remember. Answers are stored as secure hashes.</p>
+        <p class="field-error" data-family-error hidden></p>
+        <button class="tx-btn tx-corduroy full" type="submit">Create family archive <span class="tx-arrow" aria-hidden="true">&#8594;</span></button>
+        <button class="text-link family-back" type="button" data-family-back>Back</button>
+      </form>
+
+      <form class="form" data-family-join hidden novalidate>
+        <h2>Join a family</h2>
+        <p class="muted">You're joining <strong data-invite-family-name>this family</strong>. Enter the joining password shared with you.</p>
+        <label for="join-family-password">Family joining password</label>
+        <input id="join-family-password" name="joinPassword" type="password" autocomplete="current-password" placeholder="Enter family password" required>
+        <p class="field-error" data-family-error hidden></p>
+        <button class="tx-btn tx-corduroy full" type="submit">Join family <span class="tx-arrow" aria-hidden="true">&#8594;</span></button>
+        <button class="text-link family-back" type="button" data-family-back>Back</button>
+        <button class="text-link family-recover-toggle" type="button" data-family-action="recover-toggle">Forgot the family password?</button>
+        <div class="family-recovery" data-family-recovery hidden>
+          <p class="family-help">Answer the family's recovery question to restore access.</p>
+          <label data-recovery-question-label for="join-recovery-answer">Recovery question</label>
+          <p class="recovery-question" data-join-recovery-question></p>
+          <input id="join-recovery-answer" name="recoveryAnswer" type="text" autocomplete="off" placeholder="Your answer">
+          <button class="tx-btn tx-leather tx-soft full" type="button" data-family-action="recover">Recover family access</button>
+        </div>
+      </form>
+
+      <div class="family-created" data-family-created hidden>
+        <h2>Your family archive is ready!</h2>
+        <p class="muted">Share this invitation link with relatives. They'll also need your family joining password.</p>
+        <label for="family-invite-link">Family invitation link</label>
+        <input id="family-invite-link" type="text" readonly>
+        <button class="tx-btn tx-leather tx-soft full" type="button" data-family-action="copy-invite">Copy invitation link</button>
+        <button class="tx-btn tx-corduroy full" type="button" data-family-action="open-album">Open family album <span class="tx-arrow" aria-hidden="true">&#8594;</span></button>
       </div>
+      <p class="family-status" data-family-status role="status" aria-live="polite" hidden></p>
     </div>
     <p class="footnote">Made with love, for the stories that matter.</p>
   </section>
