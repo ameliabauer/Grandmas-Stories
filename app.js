@@ -84,6 +84,7 @@
   function route() {
     const raw = (location.hash || "").replace(/^#\/?/, "") || "home";
     let [name, id] = raw.split("/");
+    if (name === "join") name = "family";
     if (["home", "signin", "family", "album", "story", "view"].indexOf(name) === -1) name = "home";
     if (name === "signin") name = "family";
     if (name === "view" && !id) {
