@@ -376,8 +376,8 @@
       if(type==="recover")recoverFamily();
       if(type==="load-invite"){
         const value=$("#join-invite-link").value.trim();
-        const match=value.match(/#\\/join\\/([a-f0-9]{48,})/i)||value.match(/\\/join\\/([a-f0-9]{48,})/i);
-        const token=match?match[1]:value;
+        const raw=value.indexOf("#/join/")>=0?value.split("#/join/")[1]:(value.indexOf("/join/")>=0?value.split("/join/")[1]:value);
+        const token=raw.split(/[/?#]/)[0];
         if(!/^[a-f0-9]{48,256}$/i.test(token)){familyStatus("Paste a valid family invitation link.",true);return;}
         try{await loadInvite(token);}catch(error){familyStatus(error.message||"That invitation link could not be opened.",true);}
       }
