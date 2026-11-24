@@ -52,16 +52,43 @@
     inset 0 0 0 1.5px var(--edge),
     0 2px 0 rgba(0, 0, 0, .25),
     0 10px 22px rgba(40, 18, 6, .45);
-  /* No animated hover transforms/filters/shadows: keep textured surfaces stable. */
-  transition: none;
-.tx-btn:hover { outline: 2px solid rgba(246, 235, 217, .72); outline-offset: 3px; }
+  /* Keep the lift animation on the button element; avoid filters that repaint textured layers. */
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+  transition: transform 180ms cubic-bezier(.2, .75, .25, 1),
+              box-shadow 180ms ease;
+}
+.tx-btn:hover {
+  transform: translate3d(0, -3px, 0);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, .22),
+    inset 0 -4px 0 rgba(0, 0, 0, .22),
+    inset 0 0 0 1.5px var(--edge),
+    0 4px 0 rgba(0, 0, 0, .25),
+    0 15px 28px rgba(40, 18, 6, .48);
+}
+.tx-btn:active {
+  transform: translate3d(0, 1px, 0);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, .18),
+    inset 0 -2px 0 rgba(0, 0, 0, .2),
+    inset 0 0 0 1.5px var(--edge),
+    0 1px 0 rgba(0, 0, 0, .25),
+    0 5px 12px rgba(40, 18, 6, .4);
+}
 .tx-btn:focus-visible { outline: 3px solid #F2C14E; outline-offset: 4px; }
-
 .tx-soft { border-radius: var(--tx-radius-soft); }
-.tx-arrow { font-family: system-ui, sans-serif; font-weight: 600; transition: none; }
+.tx-arrow {
+  font-family: system-ui, sans-serif;
+  font-weight: 600;
+  display: inline-block;
+  transition: transform 180ms cubic-bezier(.2, .75, .25, 1);
+}
+.tx-btn:hover .tx-arrow { transform: translate3d(4px, 0, 0); }
 .tx-icon { width: 1.3em; height: 1.3em; flex: none; }
 
 /* ---------- Texture variants ----------
+ ----------
    image-set serves the 512px tile to standard screens and the 1024px tile to retina. */
 .tx-corduroy {
   --tex: image-set(url("corduroy-512.webp") 1x, url("corduroy.webp") 2x);
