@@ -396,7 +396,6 @@
       memberDisplayName=name;
       const saved=$("[data-member-name-saved]");
       if(saved)saved.hidden=false;
-      familyStatus("Your name has been updated for this device.");
       await syncStories();
       emitUpdated();
     }catch(error){familyStatus(error.message||"Your name could not be updated.",true);}
