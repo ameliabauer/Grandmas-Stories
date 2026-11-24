@@ -11,3 +11,47 @@
   .album-tools .text-link { font-size: .9rem; }
   .screen { padding-left: 12px; padding-right: 12px; }
 }
+
+
+/* Mobile album controls: keep the back link and action row inside the viewport. */
+@media (max-width: 520px) {
+  .screen-album .topbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .screen-album .topbar > .back-link {
+    justify-self: start;
+    line-height: 1.2;
+    padding-block: 8px;
+  }
+  .screen-album .album-tools {
+    display: grid;
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 6px;
+  }
+  .screen-album .album-tools .text-link {
+    min-width: 0;
+    width: 100%;
+    padding: 8px 2px;
+    font-size: clamp(.78rem, 3vw, .9rem);
+    line-height: 1.2;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .screen-album .album-tools .manage-btn { width: 100%; }
+  .screen-album .album-tools .tx-btn.small {
+    min-height: 44px;
+    padding: .3em .7em;
+    font-size: .85rem;
+    gap: .25em;
+    white-space: nowrap;
+    border-radius: 12px;
+  }
+  .screen-album .album-tools .tx-icon { width: 1.1em; height: 1.1em; }
+}
