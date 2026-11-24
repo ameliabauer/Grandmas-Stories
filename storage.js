@@ -1,7 +1,10 @@
 (function(){
   "use strict";
   const DB="grandmas-stories-ui", STORE="kv";
-  let dbPromise;\n  let namespace = "";\n  const scopedKey = key => namespace + key;\n  function setNamespace(familyId) { namespace = familyId ? "family:" + familyId + ":" : ""; }
+  let dbPromise;
+  let namespace = "";
+  const scopedKey = key => namespace + key;
+  function setNamespace(familyId) { namespace = familyId ? "family:" + familyId + ":" : ""; }
   function open(){
     if(dbPromise)return dbPromise;
     dbPromise=new Promise((resolve,reject)=>{
