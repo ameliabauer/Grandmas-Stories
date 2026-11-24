@@ -1,0 +1,28 @@
+/* Family setup and device authentication */
+.screen-family { display:flex; flex-direction:column; }
+.family-card { width:min(100%,560px); }
+.family-card .form { display:grid; gap:10px; }
+.family-card .form h2 { margin-bottom:2px; }
+.family-card .form .muted { margin-bottom:8px; }
+.family-card .form label { font-weight:600; font-size:.95rem; }
+.family-card .form input,
+.family-card .form select {
+  width:100%; min-height:54px; padding:0 14px; border-radius:10px;
+  border:1.5px solid rgba(90,50,20,.45); background:#FFF9EF; color:#3A2316;
+  font:inherit; font-size:1rem;
+}
+.family-card .form input:focus,
+.family-card .form select:focus { outline:none; border-color:#B5541C; box-shadow:0 0 0 3px rgba(181,84,28,.25); }
+.family-choice-actions { display:grid; gap:14px; margin-top:24px; }
+.family-choice-actions .tx-btn { min-height:64px; }
+.family-back { justify-self:center; color:#3A2316 !important; border-bottom-color:rgba(58,35,22,.35) !important; }
+.family-help { color:#5D4938; font-size:.88rem; line-height:1.45; }
+.family-card .field-error { color:#9C2F12; font-size:.9rem; }
+.family-recover-toggle { color:#3A2316 !important; border-bottom-color:rgba(58,35,22,.35) !important; justify-self:center; }
+.family-recovery { display:grid; gap:10px; padding:16px; border-radius:12px; background:rgba(90,50,20,.08); }
+.recovery-question { color:#3A2316; font-family:"Young Serif",Georgia,serif; font-size:1.12rem; line-height:1.35; }
+.family-created { display:grid; gap:14px; }
+.family-created h2 { margin-bottom:0; }
+.family-created label { color:#3A2316; font-weight:600; font-size:.95rem; }
+.family-created input { width:100%; min-height:52px; padding:0 12px; border-radius:10px; border:1.5px solid rgba(90,50,20,.45); background:#FFF9EF; color:#3A2316; font:inherit; font-size:.9rem; }
+.family-status { color:#3A2316; margin-top:12px; line-height:1.45; }
