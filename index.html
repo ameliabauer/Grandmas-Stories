@@ -107,53 +107,6 @@
         <button class="tx-btn tx-leather tx-soft full" type="button" data-family-action="copy-invite">Copy invitation link</button>
         <button class="tx-btn tx-corduroy full" type="button" data-family-action="open-album">Open family album <span class="tx-arrow" aria-hidden="true">&#8594;</span></button>
       </div>
-      <div class="family-access" data-family-access hidden>
-        <h2>Family sharing settings</h2>
-        <section class="family-share-card" aria-labelledby="your-name-title">
-          <div class="family-share-heading"><span class="family-share-icon" aria-hidden="true">✎</span><div><h3 id="your-name-title">Your name on this device</h3><p>Choose how your name appears when you share a story. This only changes the name for this device.</p></div></div>
-          <form class="form" data-member-name-form novalidate>
-            <label for="member-display-name">Your name</label>
-            <input id="member-display-name" name="displayName" type="text" maxlength="80" autocomplete="name" required>
-            <button class="tx-btn tx-corduroy full" type="submit">Save my name</button>
-          </form>
-          <p class="family-help" data-member-name-saved hidden>Your name has been saved.</p>
-        </section>
-        <section class="family-share-card" aria-labelledby="family-share-title">
-          <div class="family-share-heading"><span class="family-share-icon" aria-hidden="true">✉</span><div><h3 id="family-share-title">Invite your family</h3><p>Copy this ready-to-send invitation and share it with a relative. Each link works once and expires after 7 days.</p></div></div>
-          <label class="family-code-label" for="family-share-message">Invitation message</label>
-          <textarea id="family-share-message" data-family-share-message rows="5" readonly></textarea>
-          <button class="tx-btn tx-corduroy full" type="button" data-family-action="copy-family-share" data-copy-family-share hidden>Copy invitation message</button>
-          <p class="family-share-note">Each invitation is private, single-use, and expires after 7 days. Create a new one for each relative.</p>
-        </section>
-        <h3 class="family-edit-heading">Family recovery</h3>
-        <p class="muted">Update the recovery question and answer used if the family owner needs to recover access.</p>
-        <form class="form" data-family-access-form novalidate>
-          <label for="access-recovery-question">Edit family recovery question</label>
-          <select id="access-recovery-question" name="recoveryQuestion" required>
-            <option value="What was Grandma's first job?">What was Grandma's first job?</option>
-            <option value="Where did Grandma grow up?">Where did Grandma grow up?</option>
-            <option value="What was Grandma's favourite childhood meal?">What was Grandma's favourite childhood meal?</option>
-            <option value="Where did Grandma and Grandpa first meet?">Where did Grandma and Grandpa first meet?</option>
-            <option value="What was the name of Grandma's first pet?">What was the name of Grandma's first pet?</option>
-            <option value="What was Grandma's childhood nickname?">What was Grandma's childhood nickname?</option>
-            <option value="What was the family's favourite holiday destination?">What was the family's favourite holiday destination?</option>
-            <option value="What dish was Grandma famous for making?">What dish was Grandma famous for making?</option>
-            <option value="custom">Write my own question…</option>
-          </select>
-          <div class="custom-question" data-access-custom-question hidden>
-            <label for="access-custom-question">Your custom question</label>
-            <input id="access-custom-question" name="customQuestion" type="text" maxlength="240" placeholder="Write a question your family would know">
-          </div>
-          <label for="access-recovery-answer">Answer</label>
-          <input id="access-recovery-answer" name="recoveryAnswer" type="text" maxlength="160" autocomplete="off" placeholder="Enter the answer" required>
-          <p class="family-help">This replaces the existing recovery question and answer. Your answer is stored securely as a hash.</p>
-          <p class="field-error" data-family-error hidden></p>
-          <button class="tx-btn tx-corduroy full" type="submit">Save family access settings</button>
-        </form>
-        <div class="family-access-saved" data-family-access-saved hidden><p class="family-help">Your family access settings were updated.</p></div>
-        <p class="family-help" data-family-access-readonly hidden>Only the family owner can change sharing and recovery settings. You can still update your own name above.</p>
-        <button class="text-link family-back" type="button" data-family-action="open-album">Back to family album</button>
-      </div>
       <p class="family-status" data-family-status role="status" aria-live="polite" hidden></p>
     </div>
     <p class="footnote">Made with love, for the stories that matter.</p>
@@ -163,7 +116,7 @@
     <div class="topbar">
       <a class="back-link" href="#/home">&#8592; Home</a>
       <div class="album-tools">
-        <a class="text-link family-settings-link" href="#/family" data-family-settings-link>Family settings</a>
+        <button class="text-link family-settings-link" type="button" data-family-action="open-settings" data-family-settings-link>Family settings</button>
         <button class="text-link manage-btn" type="button" data-action="manage" aria-pressed="false">Manage photos</button>
         <button class="tx-btn tx-linen tx-soft small" type="button" data-action="add-photo"><svg class="tx-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"></path></svg>Add a photo</button>
       </div>
@@ -212,6 +165,58 @@
       <div class="book-page story-page"><div class="entries" data-view-entries></div><a class="add-story" href="#/album" data-add-story><svg class="tx-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"></path></svg>Add another story</a></div>
     </div>
   </section>
+
+  <dialog class="family-settings-dialog" data-family-settings-dialog aria-labelledby="family-settings-title">
+    <div class="family-settings-dialog-inner">
+      <button class="family-settings-close" type="button" data-family-settings-close aria-label="Close family settings">×</button>
+      <div class="family-access" data-family-access hidden>
+              <h2 id="family-settings-title">Family sharing settings</h2>
+              <section class="family-share-card" aria-labelledby="your-name-title">
+                <div class="family-share-heading"><span class="family-share-icon" aria-hidden="true">✎</span><div><h3 id="your-name-title">Your name on this device</h3><p>Choose how your name appears when you share a story. This only changes the name for this device.</p></div></div>
+                <form class="form" data-member-name-form novalidate>
+                  <label for="member-display-name">Your name</label>
+                  <input id="member-display-name" name="displayName" type="text" maxlength="80" autocomplete="name" required>
+                  <button class="tx-btn tx-corduroy full" type="submit">Save my name</button>
+                </form>
+                <p class="family-help" data-member-name-saved hidden>Your name has been saved.</p>
+              </section>
+              <section class="family-share-card" aria-labelledby="family-share-title">
+                <div class="family-share-heading"><span class="family-share-icon" aria-hidden="true">✉</span><div><h3 id="family-share-title">Invite your family</h3><p>Copy this ready-to-send invitation and share it with a relative. Each link works once and expires after 7 days.</p></div></div>
+                <label class="family-code-label" for="family-share-message">Invitation message</label>
+                <textarea id="family-share-message" data-family-share-message rows="5" readonly></textarea>
+                <button class="tx-btn tx-corduroy full" type="button" data-family-action="copy-family-share" data-copy-family-share hidden>Copy invitation message</button>
+                <p class="family-share-note">Each invitation is private, single-use, and expires after 7 days. Create a new one for each relative.</p>
+              </section>
+              <h3 class="family-edit-heading">Family recovery</h3>
+              <p class="muted">Update the recovery question and answer used if the family owner needs to recover access.</p>
+              <form class="form" data-family-access-form novalidate>
+                <label for="access-recovery-question">Edit family recovery question</label>
+                <select id="access-recovery-question" name="recoveryQuestion" required>
+                  <option value="What was Grandma's first job?">What was Grandma's first job?</option>
+                  <option value="Where did Grandma grow up?">Where did Grandma grow up?</option>
+                  <option value="What was Grandma's favourite childhood meal?">What was Grandma's favourite childhood meal?</option>
+                  <option value="Where did Grandma and Grandpa first meet?">Where did Grandma and Grandpa first meet?</option>
+                  <option value="What was the name of Grandma's first pet?">What was the name of Grandma's first pet?</option>
+                  <option value="What was Grandma's childhood nickname?">What was Grandma's childhood nickname?</option>
+                  <option value="What was the family's favourite holiday destination?">What was the family's favourite holiday destination?</option>
+                  <option value="What dish was Grandma famous for making?">What dish was Grandma famous for making?</option>
+                  <option value="custom">Write my own question…</option>
+                </select>
+                <div class="custom-question" data-access-custom-question hidden>
+                  <label for="access-custom-question">Your custom question</label>
+                  <input id="access-custom-question" name="customQuestion" type="text" maxlength="240" placeholder="Write a question your family would know">
+                </div>
+                <label for="access-recovery-answer">Answer</label>
+                <input id="access-recovery-answer" name="recoveryAnswer" type="text" maxlength="160" autocomplete="off" placeholder="Enter the answer" required>
+                <p class="family-help">This replaces the existing recovery question and answer. Your answer is stored securely as a hash.</p>
+                <p class="field-error" data-family-error hidden></p>
+                <button class="tx-btn tx-corduroy full" type="submit">Save family access settings</button>
+              </form>
+              <div class="family-access-saved" data-family-access-saved hidden><p class="family-help">Your family access settings were updated.</p></div>
+              <p class="family-help" data-family-access-readonly hidden>Only the family owner can change sharing and recovery settings. You can still update your own name above.</p>
+            </div>
+    </div>
+  </dialog>
 
   <dialog class="confirm" data-confirm aria-labelledby="confirm-title"><div class="confirm-inner"><img class="confirm-thumb" data-confirm-thumb src="" alt=""><h2 id="confirm-title">Remove this photo?</h2><p class="muted" data-confirm-text></p><div class="row confirm-actions"><button class="text-link" type="button" data-choice="cancel">Keep it</button><button class="tx-btn tx-corduroy tx-soft small" type="button" data-choice="remove" data-confirm-remove>Remove photo</button></div></div></dialog>
   <div class="toast" data-toast role="status" aria-live="polite" hidden><span data-toast-text>Photo removed.</span><button class="toast-undo" type="button" data-action="undo">Undo</button></div>
