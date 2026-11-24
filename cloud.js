@@ -205,11 +205,11 @@
   async function getStoriesForPhoto(photoId){
     if(!ready||!user||!familyId)return [];
     const photos=await getPhotos();
-    const photo=photos.find(item=>item.id===photoId);
+    const photo=photos.find(item=>item.id===photoId||item.cloudAssetId===photoId||(item.cloudAssetId&&"cloud-"+item.cloudAssetId===photoId));
     // Cloud-backed album cards use the stable route id "cloud-<asset UUID>".
     // Resolve the asset directly from that route as a fallback: local photo
     // metadata can be absent/stale even while the archive link is valid.
-    const assetId=(photo&&photo.cloudAssetId)||(typeof photoId==="string"&&photoId.startsWith("cloud-")?photoId.slice(6):null);
+    const assetId=(photo&&photo.cloudAssetId)||(typeof photoId==="string"&&photoId.startsWith("cloud-")?photoId.slice(6):photoId);
     if(!assetId)return [];
     const {data:links,error:linkError}=await client.from("story_media").select("story_id").eq("family_id",familyId).eq("media_asset_id",assetId).eq("relationship","cover");
     if(linkError)throw linkError;
