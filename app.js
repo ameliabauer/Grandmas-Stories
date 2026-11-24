@@ -85,6 +85,7 @@
   function route() {
     const raw = (location.hash || "").replace(/^#\/?/, "") || "home";
     let [name, id] = raw.split("/");
+    if (id) { try { id = decodeURIComponent(id); } catch (e) {} }
     if (name === "join") name = "family";
     if (["home", "signin", "family", "album", "story", "view"].indexOf(name) === -1) name = "home";
     if (name === "signin") name = "family";
@@ -381,8 +382,9 @@
   }
 
   function renderView(id) {
-    const photo = state.photos.find(p => p.id === id);
+    const photo = state.photos.find(p => p.id === id || p.cloudAssetId === id || (p.cloudAssetId && "cloud-" + p.cloudAssetId === id));
     if (!photo) return;
+    id = photo.id;
     state.viewId = photo.id;
     const told = toldPhotos();
     const pos = told.findIndex(p => p.id === photo.id);
