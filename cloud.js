@@ -339,7 +339,11 @@
   }
   async function createFamily(event){
     if(event)event.preventDefault();
-    if(authBusy||!client||!user)return;
+    if(authBusy)return;
+    if(!client||!user){
+      familyStatus("Family setup is still connecting. Please wait a moment and try again. If this continues, refresh the page.",true);
+      return;
+    }
     const form=$("[data-family-create]");
     const name=form.elements.familyName.value.trim();
     const password=form.elements.familyPassword.value;
@@ -454,6 +458,8 @@
     });
   }
   async function init(){
+    // Wire family forms immediately so setup errors are visible rather than leaving the primary action inert.
+    wireFamilyForms();
     try{
       if(window.gsAppHydrated)await window.gsAppHydrated;
       const configResponse=await fetch("/api/config",{cache:"no-store"});
@@ -461,7 +467,6 @@
       if(!configResponse.ok||!config.url||!config.publishableKey)throw Error(config.error||"Family archive is not configured yet.");
       if(!window.supabase||!window.supabase.createClient)throw Error("The secure archive service did not load.");
       client=window.supabase.createClient(config.url,config.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
-      wireFamilyForms();
       client.auth.onAuthStateChange((event,session)=>{
         if(event==="SIGNED_OUT"){
           user=null;familyId=null;familyRole=null;ready=false;
@@ -502,6 +507,8 @@
     }catch(error){
       showConnectButton(false);
       console.warn("Family device authentication unavailable",error);
+      showFamilySetup(null);
+      if(location.hash!=="#/family")location.hash="#/family";
       familyStatus(error.message||"Family setup is not available right now. Please refresh and try again.",true);
       archiveStatus("Family archive connection is not available right now.");
     }
