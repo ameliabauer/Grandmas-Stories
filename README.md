@@ -1,12 +1,12 @@
 <img width="1672" height="941" alt="image" src="https://github.com/user-attachments/assets/bd2f75ff-9df1-407b-b5b9-4991a383250f" />
 
 
-# Grandma's Stories
+# Yesterday by Betty Mae
 
 A photo-led family storytelling experience. The heart of the product is recreating the feeling of sitting together in a living room, opening an old box of photographs, and letting the pictures bring memories to the surface.
 
 ## Current milestone: photo-led iPad prototype
-- Grandma-first responsive web app / PWA shell.
+- A family storytelling web app inspired by Betty Mae, designed to help preserve the stories behind family photos.
 - A family photo album with image upload, one-photo-at-a-time viewing, and optional family context.
 - The selected photograph is shown throughout the conversation and sent as visual context to the Realtime session.
 - Conversational guidance asks the AI to describe only what is visibly present, avoid guessing identities or facts, and let Grandma lead the memory.
