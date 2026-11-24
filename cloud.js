@@ -429,7 +429,7 @@
       await syncStories();
       emitUpdated();
     }catch(error){familyStatus(error.message||"Your name could not be updated.",true);}
-    finally{authBusy=false;if(button)button.disabled=false;}
+    finally{authBusy=false;updateFamilySettingsButtons();}
   }
   async function saveFamilyAccess(event){
     if(event)event.preventDefault();
@@ -462,7 +462,7 @@
     }catch(error){
       familyStatus(error.message||"We could not save family access settings.",true);
     }finally{
-      authBusy=false;if(button)button.disabled=false;
+      authBusy=false;updateFamilySettingsButtons();
     }
   }
   async function createFamily(event){
