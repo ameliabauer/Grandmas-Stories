@@ -258,6 +258,9 @@
       const membership=await client.from("family_members").select("family_id,role").eq("user_id",user.id).eq("status","active").limit(1).maybeSingle();
       if(membership.error)throw membership.error;
       familyId=membership.data&&membership.data.family_id;
+      familyRole=membership.data&&membership.data.role;
+      const settingsLink=$("[data-family-settings-link]");
+      if(settingsLink)settingsLink.hidden=familyRole!=="owner";
       if(!familyId){
         showConnectButton(false);
         showFamilySetup(inviteToken||((location.hash.match(/^#\/join\/([^/]+)/)||[])[1]||null));
