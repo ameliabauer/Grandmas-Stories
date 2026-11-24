@@ -113,8 +113,25 @@
     }
     if (name === "view") {
       renderView(id);
-      if (routeChanged && window.gsCloud && window.gsCloud.sync) {
-        Promise.resolve(window.gsCloud.sync());
+      if (routeChanged && window.gsCloud && window.gsCloud.getStoriesForPhoto) {
+        const requestedId = id;
+        window.gsCloud.getStoriesForPhoto(id).then(async (cloudEntries) => {
+          if (location.hash !== "#/view/" + requestedId || !Array.isArray(cloudEntries)) return;
+          await hydrate();
+          const existing = storiesFor(requestedId);
+          const byCloudId = new Map(existing.filter(entry => entry.cloudStoryId).map(entry => [entry.cloudStoryId, entry]));
+          cloudEntries.forEach(entry => {
+            const prior = byCloudId.get(entry.cloudStoryId);
+            if (prior) {
+              if (!(prior.text || "").trim() && (entry.text || "").trim()) prior.text = entry.text;
+              if (!prior.authorName) prior.authorName = entry.authorName;
+            } else {
+              existing.push(entry);
+            }
+          });
+          state.stories[requestedId] = existing;
+          renderView(requestedId);
+        }).catch(error => console.warn("Could not refresh this story for reading", error));
       }
     }
     window.scrollTo(0, 0);
