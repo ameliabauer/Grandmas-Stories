@@ -423,7 +423,7 @@
       }
       const meta = document.createElement("p");
       meta.className = "entry-meta";
-      meta.textContent = "Written " + formatDate(story.created);
+      meta.textContent = (story.authorName ? "Shared by " + story.authorName + " · " : "") + "Written " + formatDate(story.created);
       article.appendChild(meta);
       wrap.appendChild(article);
     });
@@ -643,6 +643,7 @@
   async function addEntry(photoId, entry) {
     const list = storiesFor(photoId).slice();
     entry.created = new Date().toISOString();
+    if (!entry.authorName && window.gsCloud && window.gsCloud.getDisplayName) entry.authorName = window.gsCloud.getDisplayName();
     list.push(entry);
     state.stories[photoId] = list;
 
