@@ -84,7 +84,9 @@
   function route() {
     const raw = (location.hash || "").replace(/^#\/?/, "") || "home";
     let [name, id] = raw.split("/");
-    if (["home", "signin", "album", "story", "view"].indexOf(name) === -1) name = "home";
+    if (name === "join") name = "family";
+    if (["home", "signin", "family", "album", "story", "view"].indexOf(name) === -1) name = "home";
+    if (name === "signin") name = "family";
     if (name === "view" && !id) {
       const first = toldPhotos()[0];
       if (first) id = first.id;
@@ -109,7 +111,6 @@
       renderStory();
     }
     if (name === "view") renderView(id);
-    if (name === "signin") resetSignin();
     window.scrollTo(0, 0);
     const heading = $("[data-screen='" + name + "'] h1, [data-screen='" + name + "'] h2");
     if (heading && name !== "home") {
@@ -667,28 +668,6 @@
     if (photo && state.photos[state.index] === photo) updateReadLink(photo);
   }
 
-  function resetSignin() {
-    $("[data-state='form']").hidden = false;
-    $("[data-state='sent']").hidden = true;
-    $("[data-error]").hidden = true;
-  }
-
-  function onSignin(event) {
-    event.preventDefault();
-    const input = $("#email");
-    const email = input.value.trim();
-    const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    $("[data-error]").hidden = valid;
-    input.setAttribute("aria-invalid", valid ? "false" : "true");
-    if (!valid) {
-      input.focus();
-      return;
-    }
-    $("[data-sent-email]").textContent = email;
-    $("[data-state='form']").hidden = true;
-    $("[data-state='sent']").hidden = false;
-  }
-
   function pickPhoto() {
     $("[data-file]").click();
   }
@@ -738,16 +717,6 @@
 
   async function hydrate() {
     try {
-      // One-time cleanup of test data saved in this browser/device. The cloud
-      // database and Storage bucket have also been cleared separately.
-      const resetVersion = "2026-11-18-empty-test-archive";
-      if (await store.get("archiveResetVersion") !== resetVersion) {
-        await store.set("photos", []);
-        await store.set("stories", {});
-        await store.set("hidden", []);
-        await store.set("deletedCloudAssets", []);
-        await store.set("archiveResetVersion", resetVersion);
-      }
       const savedStories = await store.get("stories");
       const savedCustom = await store.get("photos");
       const savedHidden = await store.get("hidden");
@@ -798,10 +767,6 @@
     }
     if (action === "remove") askRemove(actionButton.getAttribute("data-id"));
     if (action === "undo") undoRemove();
-    if (action === "resend") {
-      actionButton.textContent = "Link sent again";
-      setTimeout(() => { actionButton.textContent = "Resend link"; }, 1800);
-    }
   });
 
   document.addEventListener("keydown", function (event) {
@@ -812,7 +777,6 @@
     if (event.key === "ArrowRight" && !$("[data-screen='view']").hidden) goView(1);
   });
 
-  $("[data-form='signin']").addEventListener("submit", onSignin);
   $("[data-file]").addEventListener("change", onFileChange);
   $("[data-story-text]").addEventListener("blur", function () {
     saveStory(true);
