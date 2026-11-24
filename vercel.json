@@ -1,1 +1,16 @@
-{"functions":{"api/session.js":{"maxDuration":60,"regions":["syd1"]}}}
+{
+  "functions": {
+    "api/session.js": {
+      "maxDuration": 60,
+      "regions": [
+        "syd1"
+      ]
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/joinafamily/:slug",
+      "destination": "/"
+    }
+  ]
+}
