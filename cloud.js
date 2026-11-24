@@ -214,11 +214,12 @@
     el.classList.toggle("is-error",!!isError);
   }
   function familyPanel(mode){
-    const choice=$("[data-family-choice]"),create=$("[data-family-create]"),join=$("[data-family-join]"),created=$("[data-family-created]");
+    const choice=$("[data-family-choice]"),create=$("[data-family-create]"),join=$("[data-family-join]"),created=$("[data-family-created]"),access=$("[data-family-access]");
     if(choice)choice.hidden=mode!=="choice";
     if(create)create.hidden=mode!=="create";
     if(join)join.hidden=mode!=="join";
     if(created)created.hidden=mode!=="created";
+    if(access)access.hidden=mode!=="access";
     const noLink=$("[data-join-no-link]"),credentials=$("[data-join-credentials]");
     if(noLink)noLink.hidden=mode!=="join"||!!inviteToken;
     if(credentials)credentials.hidden=mode!=="join"||!inviteToken;
@@ -270,6 +271,7 @@
       showConnectButton(false);
       archiveStatus("Private family archive connected. Photos and stories are saved online.");
       emitUpdated();
+      if(location.hash==="#/family")await loadFamilySettings();
       if(options.redirect||location.hash.startsWith("#/join/")||location.hash==="#/signin")location.hash="#/album";
       return true;
     })().catch(error=>{
@@ -281,6 +283,56 @@
       throw error;
     }).finally(()=>{connecting=null;});
     return connecting;
+  }
+  async function loadFamilySettings(){
+    if(!client||!user||!ready)return;
+    const {data,error}=await client.rpc("get_my_family_access_status");
+    if(error)throw error;
+    familyPanel("access");
+    const form=$("[data-family-access-form]");
+    const readonly=$("[data-family-access-readonly]");
+    const owner=data&&data.role==="owner";
+    if(form)form.hidden=!owner;
+    if(readonly)readonly.hidden=owner;
+    const saved=$("[data-family-access-saved]");
+    if(saved)saved.hidden=true;
+    const title=$("[data-family-access] h2");
+    if(title&&data&&data.family_name)title.textContent=data.family_name+" sharing settings";
+    const link=$("[data-family-settings-link]");
+    if(link)link.hidden=!owner;
+  }
+  async function saveFamilyAccess(event){
+    if(event)event.preventDefault();
+    if(authBusy||!client||!user)return;
+    const form=$("[data-family-access-form]");
+    const password=form.elements.familyPassword.value;
+    const selected=form.elements.recoveryQuestion.value;
+    const question=selected==="custom"?form.elements.customQuestion.value.trim():selected;
+    const answer=form.elements.recoveryAnswer.value.trim();
+    if(password.length<8||!question||!answer){familyStatus("Please complete each field. The family password must be at least 8 characters.",true);return;}
+    authBusy=true;
+    const button=form.querySelector("button[type='submit']");
+    if(button)button.disabled=true;
+    try{
+      const token=makeInviteToken();
+      const {data,error}=await client.rpc("set_family_access",{
+        p_password:password,p_recovery_question:question,p_recovery_answer:answer,p_invite_token:token
+      });
+      if(error)throw error;
+      if(!data||!data.ok)throw Error("Family access settings could not be saved.");
+      const input=$("#family-access-invite-link");
+      if(input)input.value=location.origin+location.pathname+"#/join/"+token;
+      const saved=$("[data-family-access-saved]");
+      if(saved)saved.hidden=false;
+      form.reset();
+      const custom=$("[data-access-custom-question]");
+      if(custom)custom.hidden=true;
+      familyStatus("Family access settings saved. The previous invitation link is no longer valid.");
+    }catch(error){
+      familyStatus(error.message||"We could not save family access settings.",true);
+    }finally{
+      authBusy=false;if(button)button.disabled=false;
+    }
   }
   async function createFamily(event){
     if(event)event.preventDefault();
@@ -359,8 +411,12 @@
     const create=$("[data-family-create]"),join=$("[data-family-join]");
     if(create)create.addEventListener("submit",createFamily);
     if(join)join.addEventListener("submit",joinFamily);
+    const access=$("[data-family-access-form]");
+    if(access)access.addEventListener("submit",saveFamilyAccess);
     const question=$("#family-recovery-question"),custom=$("[data-custom-question]");
     if(question&&custom)question.addEventListener("change",()=>{custom.hidden=question.value!=="custom";});
+    const accessQuestion=$("#access-recovery-question"),accessCustom=$("[data-access-custom-question]");
+    if(accessQuestion&&accessCustom)accessQuestion.addEventListener("change",()=>{accessCustom.hidden=accessQuestion.value!=="custom";});
     document.addEventListener("click",async event=>{
       const mode=event.target.closest("[data-family-mode]");
       if(mode){familyPanel(mode.getAttribute("data-family-mode"));return;}
@@ -380,6 +436,11 @@
         const token=raw.split(/[/?#]/)[0];
         if(!/^[a-f0-9]{48,256}$/i.test(token)){familyStatus("Paste a valid family invitation link.",true);return;}
         try{await loadInvite(token);}catch(error){familyStatus(error.message||"That invitation link could not be opened.",true);}
+      }
+      if(type==="copy-access-invite"){
+        const input=$("#family-access-invite-link");
+        try{await navigator.clipboard.writeText(input.value);familyStatus("Invitation link copied. Share it together with the family password.");}
+        catch(_){input.select();document.execCommand("copy");familyStatus("Invitation link copied. Share it together with the family password.");}
       }
       if(type==="copy-invite"){
         const input=$("#family-invite-link");
@@ -430,6 +491,7 @@
         window.__gsSyncTimer=setTimeout(()=>syncAll(),500);
       });
       window.addEventListener("online",syncAll);
+      window.addEventListener("hashchange",()=>{if(location.hash==="#/family"&&ready)loadFamilySettings().catch(error=>familyStatus(error.message||"Family settings could not be loaded.",true));});
       document.addEventListener("visibilitychange",()=>{if(!document.hidden)syncAll();});
       window.setInterval(()=>{if(ready)syncAll();},30000);
       window.gsCloud={sync:syncAll,isReady:()=>ready,getFamilyId:()=>familyId};
