@@ -391,10 +391,16 @@
 
     $("[data-view-photo]").src = photo.src;
     $("[data-view-photo]").alt = "Family photo";
-    $("[data-view-caption]").textContent = "";
-    $("[data-view-year]").textContent = photo.year || "";
-    $("[data-view-title]").textContent = "";
-    $("[data-view-sub]").textContent = photo.year ? "Remembered from " + photo.year : "";
+    // These legacy metadata nodes are not part of the current reading-page
+    // markup. Guard them so an absent optional node cannot abort story rendering.
+    const viewCaption = $("[data-view-caption]");
+    const viewYear = $("[data-view-year]");
+    const viewTitle = $("[data-view-title]");
+    const viewSub = $("[data-view-sub]");
+    if (viewCaption) viewCaption.textContent = "";
+    if (viewYear) viewYear.textContent = photo.year || "";
+    if (viewTitle) viewTitle.textContent = "";
+    if (viewSub) viewSub.textContent = photo.year ? "Remembered from " + photo.year : "";
     $("[data-view-counter]").textContent = told.length > 1 ? "Story " + (pos + 1) + " of " + told.length : "";
     $$("[data-action='view-prev'], [data-action='view-next']").forEach((btn) => {
       btn.hidden = told.length < 2;
