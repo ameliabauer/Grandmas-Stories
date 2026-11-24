@@ -391,7 +391,6 @@
     const saved=$("[data-family-access-saved]");
     if(saved)saved.hidden=true;
     const share=$("[data-family-share-message]");
-    const copyShare=$("[data-family-action='copy-family-share']");
     const shareInvite=$("[data-family-action='share-family-invite']");
     familySlug=null;
     if(owner){
@@ -614,16 +613,6 @@
           try{await navigator.clipboard.writeText(value);familyStatus("Invitation copied. Paste it into Messages, WhatsApp, or Messenger.");}
           catch(_){const field=type==="share-invite"?$("#family-invite-link"):$("[data-family-share-message]");if(field){field.focus();field.select();document.execCommand("copy");familyStatus("Invitation copied. Paste it into your messaging app.");}}
         }
-      }
-      if(type==="copy-family-share"){
-        const value=$("[data-family-share-message]")?.value||"";
-        try{await navigator.clipboard.writeText(value);familyStatus("Family invitation message copied. Send it to your relative.");}
-        catch(_){const field=$("[data-family-share-message]");field.focus();field.select();document.execCommand("copy");familyStatus("Family invitation message copied. Send it to your relative.");}
-      }
-      if(type==="copy-invite"){
-        const input=$("#family-invite-link");
-        try{await navigator.clipboard.writeText(input.value);familyStatus("Invitation link copied. Send it to your relative.");}
-        catch(_){input.select();document.execCommand("copy");familyStatus("Invitation link copied. Send it to your relative.");}
       }
       if(type==="open-album")location.hash="#/album";
     });
