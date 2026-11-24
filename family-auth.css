@@ -26,3 +26,12 @@
 .family-created label { color:#3A2316; font-weight:600; font-size:.95rem; }
 .family-created input { width:100%; min-height:52px; padding:0 12px; border-radius:10px; border:1.5px solid rgba(90,50,20,.45); background:#FFF9EF; color:#3A2316; font:inherit; font-size:.9rem; }
 .family-status { color:#3A2316; margin-top:12px; line-height:1.45; }
+
+.family-access { display:grid; gap:14px; }
+.family-access h2 { margin-bottom:0; }
+.family-access form { display:grid; gap:10px; }
+.family-access-saved { display:grid; gap:10px; padding:14px; border-radius:12px; background:rgba(90,50,20,.08); }
+.family-access-saved label { color:#3A2316; font-weight:600; font-size:.95rem; }
+.family-access-saved input { width:100%; min-height:52px; padding:0 12px; border-radius:10px; border:1.5px solid rgba(90,50,20,.45); background:#FFF9EF; color:#3A2316; font:inherit; font-size:.9rem; }
+.family-settings-link { font-size:.95rem; white-space:nowrap; }
+.family-status.is-error { color:#9C2F12; }
