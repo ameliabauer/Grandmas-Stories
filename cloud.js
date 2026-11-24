@@ -335,7 +335,6 @@
       showConnectButton(false);
       archiveStatus("Private family archive connected. Photos and stories are saved online.");
       emitUpdated();
-      if(location.hash==="#/family")await loadFamilySettings();
       if(options.redirect||location.hash.startsWith("#/join/")||location.hash==="#/signin")location.hash="#/album";
       return true;
     })().catch(error=>{
@@ -347,6 +346,21 @@
       throw error;
     }).finally(()=>{connecting=null;});
     return connecting;
+  }
+  let originalRecoveryQuestion = "";
+  function updateFamilySettingsButtons(){
+    const nameForm=$("[data-member-name-form]");
+    const nameButton=nameForm&&nameForm.querySelector("button[type='submit']");
+    const nameInput=nameForm&&nameForm.elements.displayName;
+    if(nameButton&&nameInput)nameButton.disabled=(nameInput.value||"").trim()===(memberDisplayName||"").trim();
+    const accessForm=$("[data-family-access-form]");
+    const accessButton=accessForm&&accessForm.querySelector("button[type='submit']");
+    if(accessButton&&accessForm){
+      const selected=accessForm.elements.recoveryQuestion.value;
+      const question=selected==="custom"?(accessForm.elements.customQuestion.value||"").trim():selected;
+      const answer=(accessForm.elements.recoveryAnswer.value||"").trim();
+      accessButton.disabled=!answer || !question || (question===originalRecoveryQuestion && !answer);
+    }
   }
   async function loadFamilySettings(){
     if(!client||!user||!ready)return;
@@ -360,6 +374,18 @@
     const form=$("[data-family-access-form]");
     const readonly=$("[data-family-access-readonly]");
     const owner=data&&data.role==="owner";
+    if(form){
+      const question=form.elements.recoveryQuestion;
+      const customInput=form.elements.customQuestion;
+      const customWrap=$("[data-access-custom-question]");
+      const currentQuestion=(data&&data.recovery_question)||question.value;
+      const optionExists=Array.from(question.options).some(option=>option.value===currentQuestion);
+      question.value=optionExists?currentQuestion:"custom";
+      if(customInput)customInput.value=optionExists?"":currentQuestion;
+      if(customWrap)customWrap.hidden=optionExists;
+      originalRecoveryQuestion=currentQuestion;
+      form.elements.recoveryAnswer.value="";
+    }
     if(form)form.hidden=!owner;
     if(readonly)readonly.hidden=owner;
     const saved=$("[data-family-access-saved]");
@@ -379,6 +405,9 @@
     if(title&&data&&data.family_name)title.textContent=data.family_name+" sharing settings";
     const link=$("[data-family-settings-link]");
     if(link)link.hidden=false;
+    updateFamilySettingsButtons();
+    const dialog=$("[data-family-settings-dialog]");
+    if(dialog&&!dialog.open)dialog.showModal();
   }
   async function saveMemberDisplayName(event){
     if(event)event.preventDefault();
@@ -394,6 +423,7 @@
       if(error)throw error;
       if(!data||!data.ok)throw Error(data&&data.error||"Your name could not be updated.");
       memberDisplayName=name;
+      updateFamilySettingsButtons();
       const saved=$("[data-member-name-saved]");
       if(saved)saved.hidden=false;
       await syncStories();
@@ -423,9 +453,11 @@
       const copyCode=$("[data-copy-family-code]");
       if(codeWrap)codeWrap.hidden=true;
       if(copyCode)copyCode.hidden=true;
-      form.reset();
+      originalRecoveryQuestion=question;
+      form.elements.recoveryAnswer.value="";
+      updateFamilySettingsButtons();
       const custom=$("[data-access-custom-question]");
-      if(custom)custom.hidden=true;
+      if(custom)custom.hidden=form.elements.recoveryQuestion.value!=="custom";
       familyStatus("Family recovery settings saved. Existing invitations remain valid until used or expired.");
     }catch(error){
       familyStatus(error.message||"We could not save family access settings.",true);
@@ -520,7 +552,22 @@
     const access=$("[data-family-access-form]");
     if(access)access.addEventListener("submit",saveFamilyAccess);
     const memberName=$("[data-member-name-form]");
-    if(memberName)memberName.addEventListener("submit",saveMemberDisplayName);
+    if(memberName){
+      memberName.addEventListener("submit",saveMemberDisplayName);
+      memberName.addEventListener("input",updateFamilySettingsButtons);
+    }
+    if(access){
+      access.addEventListener("input",updateFamilySettingsButtons);
+      access.addEventListener("change",updateFamilySettingsButtons);
+    }
+    const settingsDialog=$("[data-family-settings-dialog]");
+    if(settingsDialog){
+      settingsDialog.addEventListener("click",event=>{
+        if(event.target===settingsDialog)settingsDialog.close();
+      });
+      const close=settingsDialog.querySelector("[data-family-settings-close]");
+      if(close)close.addEventListener("click",()=>settingsDialog.close());
+    }
     const question=$("#family-recovery-question"),custom=$("[data-custom-question]");
     if(question&&custom)question.addEventListener("change",()=>{custom.hidden=question.value!=="custom";});
     const accessQuestion=$("#access-recovery-question"),accessCustom=$("[data-access-custom-question]");
@@ -533,6 +580,12 @@
       const action=event.target.closest("[data-family-action]");
       if(!action)return;
       const type=action.getAttribute("data-family-action");
+      if(type==="open-settings"){
+        event.preventDefault();
+        try{await loadFamilySettings();}
+        catch(error){familyStatus(error.message||"Family settings could not be opened.",true);}
+        return;
+      }
       if(type==="recover-toggle"){
         const panel=$("[data-family-recovery]");
         if(panel)panel.hidden=!panel.hidden;
