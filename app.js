@@ -97,7 +97,8 @@
     const nextRouteKey = name + ":" + (id || "");
     // A hashchange can fire after renderStory normalizes the URL. Only stop
     // recording when the user actually navigates to a different screen/photo.
-    if (activeRouteKey !== nextRouteKey) {
+    const routeChanged = activeRouteKey !== nextRouteKey;
+    if (routeChanged) {
       stopListening();
       activeRouteKey = nextRouteKey;
     }
@@ -112,11 +113,8 @@
     }
     if (name === "view") {
       renderView(id);
-      if (activeRouteKey === nextRouteKey && window.gsCloud && window.gsCloud.sync && !window.__gsViewRefreshKey) {
-        window.__gsViewRefreshKey = nextRouteKey;
-        Promise.resolve(window.gsCloud.sync()).finally(() => {
-          if (window.__gsViewRefreshKey === nextRouteKey) window.__gsViewRefreshKey = null;
-        });
+      if (routeChanged && window.gsCloud && window.gsCloud.sync) {
+        Promise.resolve(window.gsCloud.sync());
       }
     }
     window.scrollTo(0, 0);
