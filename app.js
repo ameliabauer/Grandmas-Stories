@@ -446,10 +446,6 @@
         else if (story.audio instanceof Blob) player.src = URL.createObjectURL(story.audio);
         if (player.src) {
           article.appendChild(player);
-          const audioMeta = document.createElement("p");
-          audioMeta.className = "entry-meta";
-          audioMeta.textContent = "Original audio recording";
-          article.appendChild(audioMeta);
         }
       }
       const meta = document.createElement("p");
