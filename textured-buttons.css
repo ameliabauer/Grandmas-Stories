@@ -11,18 +11,17 @@
   --tx-radius-soft: clamp(14px, 1.6vw, 22px);
 }
 
-/* ---------- Base button (shape, depth, responsive sizing) ---------- */
+/* ---------- Base button: stable textured rendering ---------- */
 .tx-btn {
-  --tex: none;            /* texture image, set by variant */
-  --tex-size: 220px;      /* physical size of one tile - keeps ribs/weave the same scale on every screen */
+  --tex: none;
+  --tex-size: 220px;
   --tex-repeat: repeat;
-  --tint: transparent;    /* optional colour wash over the texture */
-  --ink: var(--tx-cream); /* label colour */
+  --tint: transparent;
+  --ink: var(--tx-cream);
   --ink-shadow: 0 2px 3px rgba(0, 0, 0, .45);
   --edge: rgba(40, 18, 6, .55);
 
   position: relative;
-  isolation: isolate;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -52,39 +51,33 @@
     inset 0 0 0 1.5px var(--edge),
     0 2px 0 rgba(0, 0, 0, .25),
     0 10px 22px rgba(40, 18, 6, .45);
-  /* Keep the lift animation on the button element; avoid filters that repaint textured layers. */
-  backface-visibility: hidden;
-  transform: translate3d(0, 0, 0);
-  transition: transform 180ms cubic-bezier(.2, .75, .25, 1),
-              box-shadow 180ms ease;
+  /* Do not transform or promote textured controls to GPU layers:
+     Safari can drop/repaint layered background images during hover. */
+  transition: color 160ms ease, outline-color 160ms ease, border-color 160ms ease;
+  -webkit-tap-highlight-color: rgba(242, 193, 78, .18);
 }
 .tx-btn:hover {
-  transform: translate3d(0, -3px, 0);
-  box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, .22),
-    inset 0 -4px 0 rgba(0, 0, 0, .22),
-    inset 0 0 0 1.5px var(--edge),
-    0 4px 0 rgba(0, 0, 0, .25),
-    0 15px 28px rgba(40, 18, 6, .48);
+  color: #fff;
+  outline: 2px solid rgba(246, 235, 217, .62);
+  outline-offset: 3px;
 }
 .tx-btn:active {
-  transform: translate3d(0, 1px, 0);
-  box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, .18),
-    inset 0 -2px 0 rgba(0, 0, 0, .2),
-    inset 0 0 0 1.5px var(--edge),
-    0 1px 0 rgba(0, 0, 0, .25),
-    0 5px 12px rgba(40, 18, 6, .4);
+  color: #fff0d8;
+  outline: 2px solid rgba(242, 193, 78, .9);
+  outline-offset: 1px;
 }
 .tx-btn:focus-visible { outline: 3px solid #F2C14E; outline-offset: 4px; }
+.tx-btn:disabled,
+.tx-btn[aria-disabled="true"] {
+  cursor: not-allowed;
+  filter: none;
+}
 .tx-soft { border-radius: var(--tx-radius-soft); }
 .tx-arrow {
   font-family: system-ui, sans-serif;
   font-weight: 600;
   display: inline-block;
-  transition: transform 180ms cubic-bezier(.2, .75, .25, 1);
 }
-.tx-btn:hover .tx-arrow { transform: translate3d(4px, 0, 0); }
 .tx-icon { width: 1.3em; height: 1.3em; flex: none; }
 
 /* ---------- Texture variants ----------
