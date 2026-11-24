@@ -1,7 +1,7 @@
 (function(){
   "use strict";
   const $=s=>document.querySelector(s);
-  let client=null,user=null,familyId=null,ready=false,connecting=null,syncing=null,authBusy=false,inviteToken=null,inviteInfo=null;
+  let client=null,user=null,familyId=null,familyRole=null,ready=false,connecting=null,syncing=null,authBusy=false,inviteToken=null,inviteInfo=null;
   let realtime=null;
   const BUCKET="family-archive";
   const say=(text)=>{const el=$("[data-status]");if(el)el.textContent=text;};
@@ -461,7 +461,7 @@
       wireFamilyForms();
       client.auth.onAuthStateChange((event,session)=>{
         if(event==="SIGNED_OUT"){
-          user=null;familyId=null;ready=false;
+          user=null;familyId=null;familyRole=null;ready=false;
           if(window.storage&&window.storage.setNamespace)window.storage.setNamespace(null);
           showConnectButton(false);showFamilySetup(null);
         }
