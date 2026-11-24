@@ -181,7 +181,7 @@
         }
       }
       if(known.has(row.id)){
-        if(localEntry&&!localEntry.authorName&&row.created_by){localEntry.authorName=memberNames.get(row.created_by)||"Family member";localChanged=true;}
+        if(localEntry&&row.created_by){const currentName=memberNames.get(row.created_by)||"Family member";if(localEntry.authorName!==currentName){localEntry.authorName=currentName;localChanged=true;}}
         if(localEntry&&audio&&!localEntry.audio){
           localEntry.audio=await dataUrl(audio);
           localChanged=true;
@@ -321,7 +321,7 @@
       familyRole=membership.data&&membership.data.role;
       memberDisplayName=membership.data&&membership.data.display_name||"Family member";
       const settingsLink=$("[data-family-settings-link]");
-      if(settingsLink)settingsLink.hidden=familyRole!=="owner";
+      if(settingsLink)settingsLink.hidden=false;
       if(!familyId){
         showConnectButton(false);
         if(invitationToken||inviteSlug){familyPanel("join");}else{showFamilySetup(inviteToken||((location.hash.match(/^#\/join\/([^/]+)/)||[])[1]||null));}
@@ -353,6 +353,10 @@
     const {data,error}=await client.rpc("get_my_family_access_status");
     if(error)throw error;
     familyPanel("access");
+    const memberNameInput=$("#member-display-name");
+    if(memberNameInput)memberNameInput.value=memberDisplayName||"";
+    const memberNameSaved=$("[data-member-name-saved]");
+    if(memberNameSaved)memberNameSaved.hidden=true;
     const form=$("[data-family-access-form]");
     const readonly=$("[data-family-access-readonly]");
     const owner=data&&data.role==="owner";
@@ -374,7 +378,29 @@
     const title=$("[data-family-access] h2");
     if(title&&data&&data.family_name)title.textContent=data.family_name+" sharing settings";
     const link=$("[data-family-settings-link]");
-    if(link)link.hidden=!owner;
+    if(link)link.hidden=false;
+  }
+  async function saveMemberDisplayName(event){
+    if(event)event.preventDefault();
+    if(authBusy||!client||!user||!ready)return;
+    const form=$("[data-member-name-form]");
+    const name=(form.elements.displayName.value||"").trim();
+    if(!name||name.length>80){familyStatus("Please enter a name between 1 and 80 characters.",true);return;}
+    authBusy=true;
+    const button=form.querySelector("button[type='submit']");
+    if(button)button.disabled=true;
+    try{
+      const {data,error}=await client.rpc("set_my_family_display_name",{p_display_name:name});
+      if(error)throw error;
+      if(!data||!data.ok)throw Error(data&&data.error||"Your name could not be updated.");
+      memberDisplayName=name;
+      const saved=$("[data-member-name-saved]");
+      if(saved)saved.hidden=false;
+      familyStatus("Your name has been updated for this device.");
+      await syncStories();
+      emitUpdated();
+    }catch(error){familyStatus(error.message||"Your name could not be updated.",true);}
+    finally{authBusy=false;if(button)button.disabled=false;}
   }
   async function saveFamilyAccess(event){
     if(event)event.preventDefault();
@@ -494,6 +520,8 @@
     if(join)join.addEventListener("submit",joinFamily);
     const access=$("[data-family-access-form]");
     if(access)access.addEventListener("submit",saveFamilyAccess);
+    const memberName=$("[data-member-name-form]");
+    if(memberName)memberName.addEventListener("submit",saveMemberDisplayName);
     const question=$("#family-recovery-question"),custom=$("[data-custom-question]");
     if(question&&custom)question.addEventListener("change",()=>{custom.hidden=question.value!=="custom";});
     const accessQuestion=$("#access-recovery-question"),accessCustom=$("[data-access-custom-question]");
