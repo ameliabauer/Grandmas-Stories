@@ -353,6 +353,10 @@
     const {data,error}=await client.rpc("get_my_family_access_status");
     if(error)throw error;
     familyPanel("access");
+    const memberNameInput=$("#member-display-name");
+    if(memberNameInput)memberNameInput.value=memberDisplayName||"";
+    const memberNameSaved=$("[data-member-name-saved]");
+    if(memberNameSaved)memberNameSaved.hidden=true;
     const form=$("[data-family-access-form]");
     const readonly=$("[data-family-access-readonly]");
     const owner=data&&data.role==="owner";
@@ -374,7 +378,7 @@
     const title=$("[data-family-access] h2");
     if(title&&data&&data.family_name)title.textContent=data.family_name+" sharing settings";
     const link=$("[data-family-settings-link]");
-    if(link)link.hidden=!owner;
+    if(link)link.hidden=false;
   }
   async function saveMemberDisplayName(event){
     if(event)event.preventDefault();
