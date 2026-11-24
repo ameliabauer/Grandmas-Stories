@@ -46,7 +46,7 @@
         <h2>Create your family</h2>
         <p class="muted">Set up your shared family space. You won't need an email address or a personal password.</p>
         <label for="family-name">Family name</label>
-        <input id="family-name" name="familyName" type="text" maxlength="160" placeholder="The Betty Family" required>
+        <input id="family-name" name="familyName" type="text" maxlength="160" placeholder="The Bauer Family" required>
         <p class="family-help">Invite relatives with a private, one-time link after creating your archive. No shared password is needed.</p>
         <label for="family-recovery-question">Family recovery question</label>
         <select id="family-recovery-question" name="recoveryQuestion" required>
@@ -66,7 +66,7 @@
         </div>
         <label for="family-recovery-answer">Answer</label>
         <input id="family-recovery-answer" name="recoveryAnswer" type="text" maxlength="160" autocomplete="off" placeholder="Enter the answer" required>
-        <p class="family-help">Choose an answer trusted family members can remember. Answers are stored as secure hashes.</p>
+        
         <p class="field-error" data-family-error hidden></p>
         <button class="tx-btn tx-corduroy full" type="submit">Create family archive <span class="tx-arrow" aria-hidden="true">&#8594;</span></button>
         <button class="text-link family-back" type="button" data-family-back>Back</button>
@@ -104,6 +104,7 @@
         <p class="muted">Share this private invitation link with one relative. It can be used once and expires after 7 days.</p>
         <label for="family-invite-link">Family invitation link</label>
         <input id="family-invite-link" type="text" readonly>
+        <button class="tx-btn tx-corduroy full" type="button" data-family-action="share-invite">Share invitation link</button>
         <button class="tx-btn tx-leather tx-soft full" type="button" data-family-action="copy-invite">Copy invitation link</button>
         <button class="tx-btn tx-corduroy full" type="button" data-family-action="open-album">Open family album <span class="tx-arrow" aria-hidden="true">&#8594;</span></button>
       </div>
@@ -124,7 +125,7 @@
     <header class="album-head"><h2 id="album-title">Our family album</h2><p class="muted">Choose a photo and tell the story behind it.</p></header>
     <p class="manage-hint" data-manage-hint hidden>Tap the bin icon on any photo you'd like to delete. Tap Done when you're finished.</p>
     <ul class="prints" data-prints></ul>
-    <div class="empty-album" data-empty hidden><p>The album is empty.</p><button class="tx-btn tx-corduroy small" type="button" data-action="add-photo">Add the first photo</button></div>
+    <div class="empty-album" data-empty hidden><p>The album is empty.</p><button class="tx-btn tx-linen tx-soft small" type="button" data-action="add-photo">Add the first photo</button></div>
   </section>
 
   <section class="screen screen-story" data-screen="story" aria-labelledby="story-title" hidden>
@@ -184,7 +185,8 @@
                 <div class="family-share-heading"><span class="family-share-icon" aria-hidden="true">✉</span><div><h3 id="family-share-title">Invite your family</h3><p>Copy this ready-to-send invitation and share it with a relative. Each link works once and expires after 7 days.</p></div></div>
                 <label class="family-code-label" for="family-share-message">Invitation message</label>
                 <textarea id="family-share-message" data-family-share-message rows="5" readonly></textarea>
-                <button class="tx-btn tx-corduroy full" type="button" data-family-action="copy-family-share" data-copy-family-share hidden>Copy invitation message</button>
+                <button class="tx-btn tx-corduroy full" type="button" data-family-action="share-family-invite" data-share-family-invite hidden>Share invitation</button>
+                <button class="tx-btn tx-leather tx-soft full" type="button" data-family-action="copy-family-share" data-copy-family-share hidden>Copy invitation message</button>
                 <p class="family-share-note">Each invitation is private, single-use, and expires after 7 days. Create a new one for each relative.</p>
               </section>
               <h3 class="family-edit-heading">Family recovery</h3>
@@ -208,7 +210,7 @@
                 </div>
                 <label for="access-recovery-answer">Answer</label>
                 <input id="access-recovery-answer" name="recoveryAnswer" type="text" maxlength="160" autocomplete="off" placeholder="Enter the answer" required>
-                <p class="family-help">This replaces the existing recovery question and answer. Your answer is stored securely as a hash.</p>
+                
                 <p class="field-error" data-family-error hidden></p>
                 <button class="tx-btn tx-corduroy full" type="submit">Save family access settings</button>
               </form>

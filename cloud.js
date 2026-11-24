@@ -392,6 +392,7 @@
     if(saved)saved.hidden=true;
     const share=$("[data-family-share-message]");
     const copyShare=$("[data-family-action='copy-family-share']");
+    const shareInvite=$("[data-family-action='share-family-invite']");
     familySlug=null;
     if(owner){
       const family=await client.from("families").select("slug").eq("id",familyId).single();
@@ -400,7 +401,8 @@
       const url=await createFamilyInvitation();
       if(share)share.value="You’re invited to our family archive!\n\nOpen this personal invitation link to join: "+url+"\n\nThe link can be used once and expires in 7 days.";
       if(copyShare)copyShare.hidden=false;
-    }else{if(share)share.value="";if(copyShare)copyShare.hidden=true;}
+      if(shareInvite)shareInvite.hidden=false;
+    }else{if(share)share.value="";if(copyShare)copyShare.hidden=true;if(shareInvite)shareInvite.hidden=true;}
     const title=$("[data-family-access] h2");
     if(title&&data&&data.family_name)title.textContent=data.family_name+" sharing settings";
     const link=$("[data-family-settings-link]");
@@ -599,6 +601,19 @@
           if(token&&/^[a-f0-9]{64}$/i.test(token)){await loadFamilyInvitation(token);}
           else{familyStatus("That invitation link is missing its personal invite token. Ask the family owner to create a new invitation.",true);}
         }catch(error){familyStatus(error.message||"That invitation link could not be opened.",true);}
+      }
+      if(type==="share-invite" || type==="share-family-invite"){
+        const value=type==="share-invite"
+          ? "You’re invited to our family archive!\n\nOpen this personal invitation link to join: "+($("#family-invite-link")?.value||"")+"\n\nThe link can be used once and expires in 7 days."
+          : ($("[data-family-share-message]")?.value||"");
+        if(!value.trim())return;
+        if(navigator.share){
+          try{await navigator.share({title:"Join our family archive",text:value});familyStatus("Invitation ready to share.");}
+          catch(error){if(error&&error.name!=="AbortError")familyStatus("The share sheet could not be opened. You can copy the invitation instead.",true);}
+        }else{
+          try{await navigator.clipboard.writeText(value);familyStatus("Invitation copied. Paste it into Messages, WhatsApp, or Messenger.");}
+          catch(_){const field=type==="share-invite"?$("#family-invite-link"):$("[data-family-share-message]");if(field){field.focus();field.select();document.execCommand("copy");familyStatus("Invitation copied. Paste it into your messaging app.");}}
+        }
       }
       if(type==="copy-family-share"){
         const value=$("[data-family-share-message]")?.value||"";

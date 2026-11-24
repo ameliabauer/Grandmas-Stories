@@ -153,6 +153,9 @@
     manage.textContent = editing ? "Done" : "Manage photos";
     manage.setAttribute("aria-pressed", editing ? "true" : "false");
     manage.hidden = state.photos.length === 0;
+    $("[data-action='add-photo']").forEach(button => {
+      button.hidden = state.photos.length === 0 && !button.closest("[data-empty]");
+    });
     $("[data-empty]").hidden = state.photos.length > 0;
 
     state.photos.forEach((photo) => {
